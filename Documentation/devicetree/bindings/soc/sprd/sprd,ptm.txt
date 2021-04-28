@@ -1,0 +1,32 @@
+Spreadtrum Performance Trace Monitor
+
+Required properties:
+- compatible: "sprd,sharkle-ptm".
+	There will be different IP used in different Spreadtrum
+	SoC families. So we use SoC name to compatible different SoC.
+	e.g. sprd,sharkle-ptm(sharkle); sprd,sharkl3-ptm(sharkl3)
+- reg: Address range of ptm and coresight registers.
+- interrupts: Should contain the ptm interrupt number.
+- clock-names: Coresight clock select names PTM used.
+- clocks: Clock node ptm used.
+- sprd,funnel-port: Define funnel port ptm used.
+- sprd,ddr-chn: Number of channels supported by hardware.
+- sprd,chn-name: Define all the channels name.
+
+Example:
+	ptm_trace: ptm@30040000 {
+		compatible = "sprd,sharkle-ptm";
+		reg = <0 0x30040000 0 0x10000>,
+			<0 0x01001000 0 0x1000>,
+			<0 0x01003000 0 0x1000>,
+			<0 0x01004000 0 0x1000>;
+		interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
+		clock-names = "clk_cs", "cs_src";
+		clocks = <&clk_cssys>, <&clk_twpll_96m>;
+		sprd,funnel-port = <4>;
+		sprd,ddr-chn = <7>;
+		sprd,chn-name = "MM", "GPU", "DISP",
+			"A53", "AP/VSP/GSP", "WTLCP/PUBCP",
+			"WCN/AON";
+	};
+

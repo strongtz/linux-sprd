@@ -1,0 +1,75 @@
+menuconfig SND_SOC_SPRD
+	tristate "ASoC Audio for the SPREADTRUM"
+	depends on ARCH_SPRD
+	help
+	  Say Y if you want to build Spreadtrum ASOC card.
+
+if SND_SOC_SPRD
+
+config SND_SOC_SPRD_I2S
+	tristate #"ASoC Spreadtrum AP I2S sound card(bypass VBC) support"
+	help
+	  Say Y if you want to build in to kernel, Say M for ko module.
+	  this option will build Spreadtrum AP I2S driver for card bypasses
+	  VBC module, e.g. external codec or like BT/Digital FM etc.
+
+config SND_SOC_SPRD_VBC_V4_SC2730
+	tristate "ASoC Spreadtrum sound card with vbc v4 and codec sc2730"
+	select SPRD_AUDIO_AGDSP_ACCESS
+	select SPRD_AUDIO_MEMORY_MANAGER
+	select SPRD_AUDIO_SIPC
+	select SPRD_AUDIO_MCDT
+	select SND_SOC_SPRD_VBC_V4
+	select SND_SOC_SPRD_CODEC_SC2730
+	select SPRD_AUDIO_DSP_DUMP
+	select SND_SOC_COMPRESS
+	help
+	  Say Y or M here if you want to add support for ASoC audio on
+	  Spreadtrum boards using the VBC v4 and the sc2730 codec.
+	  ASOC machine with cpu dai vbc v4 and codec dai sc2730.
+	  This vbc is in audio cp, so we should select communication config
+	  and data transmit config.
+
+config SND_SOC_SPRD_I2S_DUMMY
+	tristate "ASoC Spreadtrum sound card with AP I2S and a dummy codec"
+	select SND_SOC_SPRD_I2S
+	help
+	  Say Y or M here if you want to add support for ASoC audio on Spreadtrum
+	  boards using the AP I2S and a dummy codec.
+
+config SND_SOC_SPRD_R1P0V3_SC2721
+	tristate "ASoC Spreadtrum sound card with vbc r1p0 v3 and codec sc2721"
+	select SND_SOC_SPRD_AUDIO_TWO_STAGE_DMAENGINE_SURPPORT
+	select SPRD_AUDIO_MEMORY_MANAGER
+	select SND_SOC_SPRD_VBC_R1P0V3
+	select SND_SOC_SPRD_CODEC_SC2721
+	select SND_SOC_SPRD_VAUDIO
+	help
+	  Sound card with vbc r1p0 v3 and codec sc2721.
+	  Say Y or M here if you want to add support for ASoC audio on Spreadtrum
+	  boards using the R1P0 V3 VBC and the sc2721 codec.
+
+config SND_SOC_SPRD_SHARKL3
+	tristate "ASoC Spreadtrum sound card for sharkl3 chip"
+	help
+	  Say Y or M here if you want to add support for ASoC audio on Spreadtrum
+	  boards using sharkl3 chip
+config SND_SOC_SPRD_SHARKLE
+	tristate "ASoC Spreadtrum sound card for sharklE chip"
+	help
+	  Say Y or M here if you want to add support for ASoC audio on Spreadtrum
+	  boards using sharklE chip
+
+config SND_SOC_SPRD_PIKE2
+	tristate "ASoC Spreadtrum sound card for pike2 chip"
+	help
+	  Say Y or M here if you want to add support for ASoC audio on Spreadtrum
+	  boards using pike2 chip
+
+source "sound/soc/sprd/dai/vbc/Kconfig"
+source "sound/soc/sprd/dai/i2s/Kconfig"
+source "sound/soc/sprd/dai/vaudio/Kconfig"
+source "sound/soc/sprd/platform/Kconfig"
+source "sound/soc/sprd/codec/sprd/Kconfig"
+
+endif #SND_SOC_SPRD

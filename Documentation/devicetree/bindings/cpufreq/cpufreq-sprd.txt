@@ -1,0 +1,289 @@
+DT binding for Spreadtrum cpufreq driver
+========================================
+
+It supports uniprocessor (UP), traditional symmetric multiprocessor (SMP) systems, and DSU
+multi-core systems.
+
+Required properties:
+- #address-cells: number of cells to encode an address.
+- #size-cells: number of cells representing the size of an address.
+- cpuX - node contain the particular cpu information.
+	- device_type: it must be set to "cpu".
+	- compatible: discribe ARM version in APSYS, it could be one of the following,
+			"arm,cortex-a7";
+			"arm,cortex-a53";
+			"arm,cortex-a55";
+			"arm,cortex-a75";
+	- reg: physical base address and length of the registers set for the device.
+	- operating-points: Table of frequencies and voltage CPU could be transitioned into,
+		in the decreasing order. Frequency should be in KHz units and voltage
+		should be in microvolts.
+	- cpu-supply: A phandle to the power supply regulator for this cpu.
+		This is mandatory for cpu0.
+	- cpufreq-data: A phandle to sprd-cpufreq driver related data. This contains information
+		about clocks, voltage tolerance etc.
+	- sprd,efuse-blk-binning: cpu binning block num and valuable bits
+		for example,<6 0x3c00> means cpu binning block num is 6 and 0x3c indicates
+		valuable bits are bit10 bit11 bit12 bit13.
+
+- cpufreq-clusX - node contain the properties for sprd cpufreq driver for X cluster.
+	- clocks: A phandle to the clock refered in clock-names for this cpu.
+	- clock-names: Names of the clocks as shown bellow -
+		- core_clk: mcu clock of this cpu.
+		- high_freq_clk_parent - high frequency clock parent that can be used by core_clk.
+
+Optional properties:
+- cpufreq-clusX node.
+	- clock-names: Names of the optional clock parents as shown bellow -
+		- low_freq_clk_parent - Lower frequency clock parent that can be used by core_clk.
+	- clock-latency: Specify the possible maximum transition latency for clock,
+		in unit of nanoseconds.
+	- voltage-tolerance: Specify the CPU voltage tolerance in percentage.
+	- dual-phase-supply - boolean flag used only if SOC have shared power supply for Big and
+		Little clusters, and we are not defining cpu-supply for this cpu.
+	-sprd,multi-version: A boolean property to illustrate whether there are multi-version of the same SOC.
+	-sprd,cpu-gpu-share-volt: A boolean property to illustrate whether cpu and gpu share the same vdd domain.
+
+- sprd_swdvfs node.
+	- compatible: Describe which soc will use swdvfs driver,for example:
+			"sprd,sharkl3-swdvfs";
+
+Example 1: Example for quad core, single cluster architecture.
+--------
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu0: cpu@f00 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			enable-method = "sprd,sc9830-smp";
+			reg = <0xf00>;
+			operating-points = <
+				/* kHz  uV */
+				1000000 950000
+				900000  950000
+				768000  950000>;
+			cpu-supply = <&vddarm>;
+			cpufreq-data = <&cpufreq_clus0>;
+			sprd,efuse-blk-binning= <6 0x3c00>;
+		};
+
+		cpu1: cpu@f01 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <0xf01>;
+		};
+
+		cpu2: cpu@f02 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <0xf02>;
+		};
+
+		cpu3: cpu@f03 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <0xf03>;
+		};
+	};
+
+	cpufreq_clus0: cpufreq-clus0 {
+		clocks = <&clk_mcu>,
+			<&clk_twpll_768m>,
+			<&clk_mpll>;
+		clock-names = "core_clk",
+			"low_freq_clk_parent",
+			"high_freq_clk_parent";
+		clock-latency = <50000>;
+		voltage-tolerance = <0>;
+	};
+
+Example 2: Example for Big-Little architecture having shared power supply for Big and Little clusters.
+---------
+    cpus {
+		#address-cells = <2>;
+		#size-cells = <0>;
+		..
+		..
+		CPU0: cpu@530000 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53", "arm,armv8";
+			reg = <0x0 0x530000>;
+			enable-method = "psci";
+			operating-points = <
+				/* kHz  uV */
+				1200000 850000
+				900000  820000
+				768000  800000>;
+			cpu-supply = <&vddarm0>;
+			cpufreq-data = <&cpufreq_clus0>;
+		};
+		CPU1: cpu@530001 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53", "arm,armv8";
+			reg = <0x0 0x530001>;
+			enable-method = "psci";
+			operating-points = <
+				/* kHz  uV */
+				1200000 850000
+				900000  820000
+				768000  800000>;
+			cpu-supply = <&vddarm0>;
+			cpufreq-data = <&cpufreq_clus0>;
+		};
+		..
+		..
+		CPU4: cpu@530100 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53", "arm,armv8";
+			reg = <0x0 0x530100>;
+			enable-method = "psci";
+			operating-points = <
+				/* kHz	uV */
+				2100000	900000
+				2000000	850000
+				1700000	800000
+				1536000	800000>;
+			cpu-supply = <&vddarm0>;
+			cpufreq-data = <&cpufreq_clus1>;
+		};
+		..
+		..
+	};
+
+	cpufreq_clus0: cpufreq-clus0 {
+		clocks = <&clk_lit_mcu>,
+			<&clk_twpll_768m>,
+			<&clk_mpll0>;
+		clock-names = "core_clk",
+			"low_freq_clk_parent",
+			"high_freq_clk_parent";
+		clock-latency = <50000>;
+		voltage-tolerance = <0>;
+		dual-phase-supply;
+	};
+
+	cpufreq_clus1: cpufreq-clus1 {
+		compatible = "arm,cortex-a53", "arm,armv8";
+		clocks = <&clk_big_mcu>,
+			<&clk_twpll_768m>,
+			<&clk_twpll>,
+			<&clk_mpll1>;
+		clock-names = "core_clk",
+			"low_freq_clk_parent",
+			"twpll_clk_parent",
+			"high_freq_clk_parent";
+		clock-latency = <50000>;
+		voltage-tolerance = <0>;
+		dual-phase-supply;
+	};
+
+Example 3: Example for Big-Little architecture having different power supply for Big and Little Clusters.
+---------
+    cpus {
+		#address-cells = <2>;
+		#size-cells = <0>;
+		..
+		..
+		CPU0: cpu@530000 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53", "arm,armv8";
+			reg = <0x0 0x530000>;
+			enable-method = "psci";
+			operating-points = <
+				/* kHz  uV */
+				1200000 850000
+				900000  820000
+				768000  800000>;
+			cpu-supply = <&vddarm0>;
+			cpufreq-data = <&cpufreq_clus0>;
+		};
+		CPU1: cpu@530001 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53", "arm,armv8";
+			reg = <0x0 0x530001>;
+			enable-method = "psci";
+			operating-points = <
+				/* kHz  uV */
+				1200000 850000
+				900000  820000
+				768000  800000>;
+			cpu-supply = <&vddarm0>;
+			cpufreq-data = <&cpufreq_clus0>;
+		};
+		..
+		..
+		CPU4: cpu@530100 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53", "arm,armv8";
+			reg = <0x0 0x530100>;
+			enable-method = "psci";
+			operating-points = <
+				/* kHz	uV */
+				2100000	900000
+				2000000	850000
+				1700000	800000
+				1536000	800000>;
+			cpu-supply = <&vddarm1>;
+			cpufreq-data = <&cpufreq_clus1>;
+		};
+		..
+		..
+	};
+
+	cpufreq_clus0: cpufreq-clus0 {
+		clocks = <&clk_lit_mcu>,
+			<&clk_twpll_768m>,
+			<&clk_mpll0>;
+		clock-names = "core_clk",
+			"low_freq_clk_parent",
+			"high_freq_clk_parent";
+		clock-latency = <50000>;
+		voltage-tolerance = <0>;
+	};
+
+	cpufreq_clus1: cpufreq-clus1 {
+		compatible = "arm,cortex-a53", "arm,armv8";
+		clocks = <&clk_big_mcu>,
+			<&clk_twpll_768m>,
+			<&clk_twpll>,
+			<&clk_mpll1>;
+		clock-names = "core_clk",
+			"low_freq_clk_parent",
+			"twpll_clk_parent",
+			"high_freq_clk_parent";
+		clock-latency = <50000>;
+		voltage-tolerance = <0>;
+	};
+
+Example 4: Example for A specific soc will use swdvfs driver.
+---------
+	sprd_swdvfs: sprd-swdvfs {
+		compatible = "sprd,sharkl3-swdvfs";
+	};
+
+Example 5: Example for A specific soc will be discerned of multi-version
+---------
+	cpufreq_clus0: cpufreq-clus0 {
+		clocks = <&clk_lit_mcu>,
+			<&clk_twpll_768m>,
+			<&clk_mpll0>;
+		clock-names = "core_clk",
+			"low_freq_clk_parent",
+			"high_freq_clk_parent";
+		clock-latency = <50000>;
+		voltage-tolerance = <0>;
+		sprd,multi-version;
+	};
+
+Example 6: Example for a specific soc's cpu and gpu share the same vdd domain
+	cpufreq_clus0: cpufreq-clus0 {
+		clocks = <&clk_lit_mcu>,
+			<&clk_twpll_768m>,
+			<&clk_mpll0>;
+		clock-names = "core_clk",
+			"low_freq_clk_parent",
+			"high_freq_clk_parent";
+		sprd,cpu-gpu-share-volt;
+	};

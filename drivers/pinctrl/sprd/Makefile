@@ -1,0 +1,9 @@
+obj-$(CONFIG_PINCTRL_SPRD)		+= pinctrl-sprd.o
+obj-$(CONFIG_PINCTRL_SPRD_SC9860)	+= pinctrl-sprd-sc9860.o
+obj-$(CONFIG_PINCTRL_SPRD_SHARKL5)      += pinctrl-sprd-sharkl5.o
+obj-$(CONFIG_PINCTRL_SPRD_ROC1)		+= pinctrl-sprd-roc1.o
+obj-$(CONFIG_PINCTRL_SPRD_SHARKL3)	+= pinctrl-sprd-sharkl3.o
+obj-$(CONFIG_PINCTRL_SPRD_ORCA)		+= pinctrl-sprd-orca.o
+obj-$(CONFIG_PINCTRL_SPRD_SHARKL5PRO)	+= pinctrl-sprd-sharkl5Pro.o
+obj-$(CONFIG_PINCTRL_SPRD_PIKE2)	+= pinctrl-sprd-pike2.o
+obj-$(CONFIG_PINCTRL_SPRD_SHARKLE)	+= pinctrl-sprd-sharkle.o

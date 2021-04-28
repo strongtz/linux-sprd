@@ -1,0 +1,57 @@
+PAM IPA for Spreadtrum platforms
+
+Required properties:
+- compatible: Should be "sprd,pam-ipa".
+- reg: Specify the physical base address of the controller and length
+  of memory mapped region.
+- power-domains: Should be <&pd_ipa_sys>.
+- vpower-supply: regulator for ipa_sys power
+- syscons: Should contain the base address, offset and bit for each entry in "syscon-names".
+- syscon-names: global register bits name, order and name should the same as code.
+- sprd,cp-ul-intr-to-ap: cp ul common fifo interrupt to AP. 0: no, 1: yes
+- sprd,cp-ul-threshold: cp ul common fifo threshold interrupt
+- sprd,cp-ul-timeout: cp ul common fifo timeout interrupt
+- sprd,cp-ul-flowctrl-mode: flow ctrl mode.
+				0: rx fifo empty
+				1: tx fifo full
+				2: rx fifo empty & tx fifp full
+- sprd,cp-ul-enter-flowctrl-watermark: enter flow ctrl watermark.
+- sprd,cp-ul-exit-flowctrl-watermark: exit flow ctrl watermark.
+- sprd,cp-dl-intr-to-ap: cp dl common fifo interrupt to AP. 0: no, 1: yes
+- sprd,cp-dl-threshold: cp dl common fifo threshold interrupt
+- sprd,cp-dl-timeout: cp dl common fifo timeout interrupt
+- sprd,cp-dl-flowctrl-mode: flow ctrl mode.
+				0: rx fifo empty
+				1: tx fifo full
+				2: rx fifo empty & tx fifp full
+- sprd,cp-dl-enter-flowctrl-watermark: enter flow ctrl watermark.
+- sprd,cp-dl-exit-flowctrl-watermark: exit flow ctrl watermark.
+
+Examples:
+	pam_ipa: pam-ipa@21140000 {
+		compatible = "sprd,pam-ipa";
+		reg = <0 0x21140000 0 0x100>;
+		reg-names = "pam-ipa-base";
+		power-domains = <&pd_ipa_sys>;
+		vpower-supply = <&vddipa>;
+		syscons = <&ipa_ahb_regs
+			  REG_IPA_AHB_IPA_EB
+			  MASK_IPA_AHB_PAM_IPA_EB>;
+		syscon-names = "enable";
+
+		sprd,cp-ul-intr-to-ap = <0>;
+		sprd,cp-ul-threshold = <1>;
+		sprd,cp-ul-timeout = <5>;
+		sprd,cp-ul-flowctrl-mode = <1>;
+		sprd,cp-ul-enter-flowctrl-watermark = <0x10>;
+		sprd,cp-ul-exit-flowctrl-watermark = <0x04>;
+		sprd,cp-dl-intr-to-ap = <0>;
+		sprd,cp-dl-threshold = <0x10>;
+		sprd,cp-dl-timeout = <0>;
+		sprd,cp-dl-flowctrl-mode = <0>;
+		sprd,cp-dl-enter-flowctrl-watermark = <0x24>;
+		sprd,cp-dl-exit-flowctrl-watermark = <0x04>;
+		sprd,pam-ipa-hw-ver = <1>;
+		sprd,pam-ipa-hw-mode = <0>;
+	};
+

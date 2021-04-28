@@ -1,0 +1,150 @@
+/*
+ * Spreadtrum orca modem board DTSI file
+ * These dt is used for external modem drivers
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+/ {
+	aliases {
+		lte-modem0 = &lte_pm;
+		nr-modem0 = &nr_dp;
+		nr-modem1 = &nr_pscp;
+	};
+
+	lte_pm: modem@0 {
+		compatible = "sprd,modem";
+		syscons = <&aon_apb_regs 0xff 0x0>,
+				<&pmu_apb_regs 0xff 0x100000>,
+				<&aon_apb_regs 0x8c 0x1>,
+				<&aon_apb_regs 0xff 0x0>,
+				<&aon_apb_regs 0xff 0x0>;
+		syscon-names = "shutdown", "deepsleep", "corereset",
+					"sysreset", "getstatus";
+	};
+
+	nr_dp: modem@1 {
+		compatible = "sprd,pcie-modem";
+		5g-modem-support;
+	};
+
+	nr_pscp: modem@2 {
+		compatible = "sprd,pcie-modem";
+		5g-modem-support;
+	};
+
+	sipc_pm: sipc@0 {
+		compatible = "sprd,sipc";
+		sprd,name = "sipc-pmsys";
+		sprd,type = "mbox";
+		sprd,dst = <6>;
+		sprd,core = <1>;
+		sprd,core_sensor = <6>;
+		/* <ap-addr dst-maped-addr size> */
+		sprd,smem-info = <0xdc00 0x2000bc00 0x2000>;
+	};
+
+	sipc_nr: sipc@1 {
+		compatible = "sprd,sipc";
+		sprd,name = "sipc-nr";
+		sprd,type = "pcie";
+		sprd,dst = <1>;
+		sprd,ep-dev = <0>;
+		sprd,smem-type = <0>;
+		sprd,smem-info = <0x89600000 0x89600000 0x3000000>;
+		sprd,high-offset = <0x00000000  0x00000000>;
+	};
+
+	spipe_pm: spipe@0 {
+		compatible = "sprd,spipe";
+		sprd,name = "spipe_pm";
+		sprd,dst = <6>;
+		sprd,channel = <4>;
+		sprd,ringnr = <2>;
+		sprd,size-rxbuf = <0xb00>;
+		sprd,size-txbuf = <0x180>;
+	};
+
+	spipe_nr: spipe@1 {
+		compatible = "sprd,spipe";
+		sprd,name = "spipe_nr";
+		sprd,dst = <1>;
+		sprd,channel = <4>;
+		sprd,ringnr = <15>;
+		sprd,size-rxbuf = <0x1000>; /* 4*1024 */
+		sprd,size-txbuf = <0x1000>; /* 4*1024 */
+	};
+
+	sdiag_nr: spipe@2 {
+		compatible = "sprd,spipe";
+		sprd,name = "sdiag_nr";
+		sprd,dst = <1>;
+		sprd,channel = <21>;
+		sprd,ringnr = <1>;
+		sprd,size-rxbuf = <0x40000>; /* 256*1024*/
+		sprd,size-txbuf = <0x8000>; /* 32*1024 */
+	};
+
+	stty_nr: spipe@3 {
+		compatible = "sprd,spipe";
+		sprd,name = "stty_nr";
+		sprd,dst = <1>;
+		sprd,channel = <6>;
+		sprd,ringnr = <32>;
+		sprd,size-rxbuf = <0x0800>; /* 2*1024*/
+		sprd,size-txbuf = <0x0800>; /* 2*1024 */
+	};
+
+	spipe@4 {
+		compatible = "sprd,spipe";
+		sprd,name = "slog_pm";
+		sprd,dst = <6>;
+		sprd,channel = <5>;
+		sprd,ringnr = <1>;
+		sprd,size-rxbuf = <0x5c0>;
+		sprd,size-txbuf = <0x20>;
+	};
+
+	spipe@5 {
+		compatible = "sprd,spipe";
+		sprd,name = "sctl_pm";
+		sprd,dst = <6>;
+		sprd,channel = <6>;
+		sprd,ringnr = <1>;
+		sprd,size-rxbuf = <0x40>;
+		sprd,size-txbuf = <0x20>;
+	};
+
+	snv_nr: spipe@6 {
+		compatible = "sprd,spipe";
+		sprd,name = "snv_nr";
+		sprd,dst = <1>;
+		sprd,channel = <40>;
+		sprd,ringnr = <1>;
+		sprd,size-rxbuf = <0x40400>; /* 257*1024*/
+		sprd,size-txbuf = <0x1000>; /* 4*1024 */
+	};
+
+	slog_nr: spool@0{
+		compatible = "sprd,spool";
+		sprd,name = "slog_nr";
+		sprd,dst = <1>;
+		sprd,channel = <5>;
+		sprd,tx-blksize = <0>;
+		sprd,tx-blknum = <0>;
+		sprd,rx-blksize = <0x10000>; /* 64k*/
+		sprd,rx-blknum = <128>;
+	};
+
+	sprd-mcd {
+		compatible = "sprd,roc1-modem-ctrl";
+		poweron-gpio = <&ap_gpio 15 GPIO_ACTIVE_HIGH>;
+		reset-gpio = <&ap_gpio 16 GPIO_ACTIVE_HIGH>;
+		cpwatchdog-gpio = <&ap_gpio 30 GPIO_ACTIVE_HIGH>;
+		cpassert-gpio = <&ap_gpio 36 GPIO_ACTIVE_HIGH>;
+		cppanic-gpio = <&ap_gpio 37 GPIO_ACTIVE_HIGH>;
+		cppoweroff-gpio = <&ap_gpio 33 GPIO_ACTIVE_HIGH>;
+	};
+};

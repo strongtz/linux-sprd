@@ -1,0 +1,35 @@
+
+menu "SIPA modules"
+
+config SPRD_SIPA
+	bool "Sprd IPA"
+	default n
+	help
+	  SIPA is a module for spreadtrum ip packet accelator driver.
+
+config SPRD_SIPA_WCN
+	bool "Enable sipa for WCN"
+	default n
+	depends on SPRD_SIPA
+	help
+	  This option enables sipa interface for WCN.
+
+config SIPA_TEST
+	bool "Enable sipa test module"
+	default n
+	depends on SPRD_SIPA
+	help
+	  This option enables sipa test module.
+
+config SPRD_IPA_PCIE_WORKROUND
+	bool "Enable ipa pcie workround"
+	default n
+	depends on SPRD_SIPA
+	help
+	  This option enables sipa pcie workround.
+          Orca ipa hardware limitations:
+	  the sipc share memory must map from
+	  0x280000000(orca side) to 0x80000000(roc1 side),
+	  and the size must be 256M
+
+endmenu

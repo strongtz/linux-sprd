@@ -1,0 +1,131 @@
+SIPA for Spreadtrum platforms
+
+Required properties:
+- compatible: should be one of following:
+	"sprd,roc1-sipa",
+	"sprd,orca-sipa".
+- reg: Specify the physical base address of the controller and length
+  of memory mapped region.
+- interrupts: Should contain ipa interrupt.
+- power-domains: A phandle pointed to the corresponding power domain.
+- vpower-supply: regulator for ipa_sys power
+- sprd,sipa-bypass-mode: IPA work mode select. 0: bypass mode 1: normal_mode
+- sprd,usb-dl-tx:
+	First parameter indicates usb dl tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates usb dl tx common fifo total depth.
+- sprd,usb-dl-rx:
+	First parameter indicates usb dl rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates usb dl rx common fifo total depth.
+- sprd,usb-ul-tx:
+	First parameter indicates usb ul tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates usb ul tx common fifo total depth.
+- sprd,usb-ul-rx:
+	First parameter indicates usb ul rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates usb ul rx common fifo total depth.
+- sprd,cp-dl-tx:
+	First parameter indicates cp dl tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates cp dl tx common fifo total depth.
+- sprd,cp-dl-rx:
+	First parameter indicates cp dl rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates cp dl rx common fifo total depth.
+- sprd,cp-ul-tx:
+	First parameter indicates cp ul tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates cp ul tx common fifo total depth.
+- sprd,cp-ul-rx:
+	First parameter indicates cp ul rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates cp ul rx common fifo total depth.
+- sprd,wifi-dl-tx:
+	First parameter indicates wifi dl tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates wifi dl tx common fifo total depth.
+- sprd,wifi-dl-rx:
+	First parameter indicates wifi dl rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates wifi dl rx common fifo total depth.
+- sprd,wifi-ul-tx:
+	First parameter indicates wifi ul tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates wifi ul tx common fifo total depth.
+- sprd,wifi-ul-rx:
+	First parameter indicates wifi ul rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates wifi ul rx common fifo total depth.
+- sprd,ap-eth-dl-tx:
+	First parameter indicates ap eth dl tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap eth dl tx common fifo total depth.
+- sprd,ap-eth-dl-rx:
+	First parameter indicates ap eth dl rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap eth dl rx common fifo total depth.
+- sprd,ap-eth-ul-tx:
+	First parameter indicates ap eth ul tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap eth ul tx common fifo total depth.
+- sprd,ap-eth-ul-rx:
+	First parameter indicates ap eth ul rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap eth ul rx common fifo total depth.
+- sprd,ap-ip-dl-tx:
+	First parameter indicates ap ip dl tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap ip dl tx common fifo total depth.
+- sprd,ap-ip-dl-rx:
+	First parameter indicates ap ip dl rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap ip dl rx common fifo total depth.
+- sprd,ap-ip-ul-tx:
+	First parameter indicates ap ip ul tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap ip ul tx common fifo total depth.
+- sprd,ap-ip-ul-rx:
+	First parameter indicates ap ip ul rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap ip ul rx common fifo total depth.
+- sprd,ap-pcie-dl-tx:
+	First parameter indicates ap pcie dl tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap pcie dl tx common fifo total depth.
+- sprd,ap-pcie-dl-rx:
+	First parameter indicates ap pcie dl rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap pcie dl rx common fifo total depth.
+- sprd,ap-pcie-ul-tx:
+	First parameter indicates ap pcie ul tx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap pcie ul tx common fifo total depth.
+- sprd,ap-pcie-ul-rx:
+	First parameter indicates ap pcie ul rx common fifo is it in iram. 0: DDR 1: iram.
+	Second parameter indicates ap pcie ul rx common fifo total depth.
+
+Optional properties:
+- sprd,need-through-pcie: boolean, set this for IPA need send data to cp behind.
+- sprd,wiap-ul-dma: boolean, set this for enable wiap ul common fifo dma function.
+- sprd,tft-mode: boolean, set this for enable ipa tft(Traffic Flow Template) feature,
+	implement packet filtering and forwarding; not set this will disable ipa tft feature.
+
+Examples:
+	pa_local: sprd,sipa@21180000 {
+		compatible = "sprd,roc1-sipa";
+		reg = <0 0x21180000 0 0x00001000>,
+			<0 0x21040000 0 0x00000140>,
+			<0 0x20b10000 0 0x00040000>;
+		reg-names = "glb-base", "ipa-sys", "iram-base";
+		interrupts = <GIC_SPI 138 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "local_ipa_irq";
+		power-domains = <&pd_ipa_sys>;
+		vpower-supply = <&vddipa>;
+
+		sprd,sipa-bypass-mode = <0>;
+		sprd,need-through-pcie;
+		sprd,wiap-ul-dma;
+		sprd,tft-mode;
+
+		sprd,usb-dl-tx = <1 1024>;
+		sprd,usb-dl-rx = <1 1024>;
+		sprd,usb-ul-tx = <1 1024>;
+		sprd,usb-ul-rx = <1 1024>;
+		sprd,cp-dl-tx = <1 1024>;
+		sprd,cp-dl-rx = <1 1024>;
+		sprd,cp-ul-tx = <1 1024>;
+		sprd,cp-ul-rx = <1 1024>;
+		sprd,wifi-dl-tx = <1 1024>;
+		sprd,wifi-dl-rx = <1 1024>;
+		sprd,wifi-ul-tx = <1 1024>;
+		sprd,wifi-ul-rx = <1 1024>;
+		sprd,ap-eth-dl-tx = <0 1024>;
+		sprd,ap-eth-dl-rx = <0 1024>;
+		sprd,ap-eth-ul-tx = <0 1024>;
+		sprd,ap-eth-ul-rx = <0 1024>;
+		sprd,ap-ip-dl-tx = <0 1024>;
+		sprd,ap-ip-dl-rx = <0 1024>;
+		sprd,ap-ip-ul-tx = <0 1024>;
+		sprd,ap-ip-ul-rx = <0 1024>;
+
+	};
+

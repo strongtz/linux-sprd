@@ -1,0 +1,46 @@
+*Spreadtrum SoCs keypad controller device tree bindings
+=============================================================
+
+Keypad controller is used to interface a SoC with a matrix-keypad device.
+The keypad controller supports multiple row and column lines.
+A key can be placed at each intersection of a unique row and a unique column.
+The keypad controller can sense a key-press and key-release and report the
+event using a interrupt to the cpu.
+
+Required SoC Specific Properties:
+- compatible: Should be "sprd,s9820e-keypad".
+- reg: Physical base address of the controller and length of memory mapped
+  region.
+- interrupts: The interrupt number to the cpu.
+- debounce-interval: Debouncing interval time in milliseconds.
+  If not specified defaults to 5.
+
+Required Properties:
+- linux,keymap: An array of packed 1-cell entries containing the equivalent
+  of row, column and linux key-code. The 32-bit big endian cell is packed
+  as:
+	row << 24 | column << 16 | key-code
+- keypad,num-rows: Number of row lines connected to the keypad controller.
+- keypad,num-columns: Number of column lines connected to the keypad
+  controller.
+
+Optional Properties specific to linux:
+- wakeup-source: Use any event on keypad as wakeup event.
+- linux,repeat: Enable autorepeat feature.
+
+Example:
+	keypad@40250000 {
+		compatible = "sprd,s9820e-keypad";
+		reg = 	<0x40250000 0x1000>;
+		interrupts = <GIC_SPI 36 IRQ_TYPE_NONE>;
+		clocks = <&aonapb_gate CLK_KPD_EB>,
+			<&aonapb_gate CLK_KPD_RTC_EB>;
+		clock-names = "enable", "rtc";
+		keypad,num-rows= <3>;
+		keypad,num-columns = <3>;
+		debounce-inteval = <5>;
+		linux,keymap = < 0x00000001
+				 0x01000002
+				 0x00020003>;
+		status = "okay";
+	};

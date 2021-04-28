@@ -1,0 +1,21 @@
+Spreadtrum SC2730 fast charger binding
+
+Required properties:
+ - compatible: Should be "sprd,sc2730-fast-chg".
+ - reg: Address offset of charger register.
+ - phys: Contains a phandle to the USB phy.
+ - interrupt-parent: Specifies the phandle of the interrupt controller to which
+ the IRQs from PMIC 2730 are delivered to.
+ - interrupts: IRQ line info for sc2730.
+ - sprd,input-voltage-microvolt: Specifies the input voltage for fast charging.
+
+Example:
+
+	sc2730-fchg@400 {
+		compatible = "sprd,sc2730-fast-chg";
+		reg = <0x400>;
+		phys = <&ssphy>;
+		interrupt-parent = <&sc2730_pmic>;
+		interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
+		sprd,input-voltage-microvolt = <9000000>;
+	};

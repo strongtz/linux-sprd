@@ -1,0 +1,40 @@
+schedutil governor's DT glue
+-----------------------------------------------
+
+This is DT specific glue layer for schedutil governor for sprd systems.
+
+For some SOCs, such as sharkL3, there is no hardware auto scaling for
+DVFS under WFI, so, a software slack timer was added in schedutil to
+check whether the OPP is the lowest one and scaling to the lowest one
+if not.
+
+For some other SOCs with hardware auto scaling for DVFS under WFI, there
+is no need to add software slack timer in schedutil.
+
+This property is added to indicate that this SOC need software slack timer
+support in schedutil, which help to check the OPP after cpu entered WFI.
+
+Required properties
+- sugov_slack_timer
+	value type: boolean
+	Description: config this property, indicate this SOC need software
+	support; else, indicate this SOC no need software support.
+	There is no need to add this property into every cpu node, once this
+	property is searched in one cpu node, the parsed logic will stop and
+	considered this SOC need software support.
+
+Examples:
+
+CPU0: cpu@0 {
+	      device_type = "cpu";
+	      compatible = "arm,cortex-a55","arm,armv8";
+	      reg = <0x0 0x0>;
+	      enable-method = "psci";
+	      cpu-supply = <&fan53555_dcdc>;
+	      cpufreq-data-v1 = <&cpufreq_clus0>;
+	      cpu-idle-states = <&CORE_PD>;
+	      sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
+	      capacity-dmips-mhz = <1024>;
+	      sugov_slack_timer;
+      };
+

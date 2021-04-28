@@ -1,0 +1,8 @@
+source "drivers/soc/sprd/modem/sipc/Kconfig"
+source "drivers/soc/sprd/modem/cproc/Kconfig"
+source "drivers/soc/sprd/modem/iq/Kconfig"
+source "drivers/soc/sprd/modem/dvfs/Kconfig"
+source "drivers/soc/sprd/modem/mcd/Kconfig"
+source "drivers/soc/sprd/modem/pcie/Kconfig"
+source "drivers/soc/sprd/modem/modem_loader/Kconfig"
+source "drivers/soc/sprd/modem/crypto/Kconfig"

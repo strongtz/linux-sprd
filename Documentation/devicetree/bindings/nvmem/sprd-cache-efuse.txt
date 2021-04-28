@@ -1,0 +1,33 @@
+= Spreadtrum normal eFuse device tree bindings =
+
+Required properties:
+- compatible: Should be one of the following.
+	"sprd,sharkl5-cache-efuse"
+- reg: Base address of efuse storage in efuse cache scheme
+
+= Data cells =
+Are child nodes of eFuse, bindings of which as described in
+bindings/nvmem/nvmem.txt
+
+Example:
+
+	cache_efuse: efuse@15c00 {
+		compatible = "sprd,sharkl5-cache-efuse";
+		reg = <0 0x15c00 0 0x3ff>;
+
+		/* Data cells */
+		thermal_calib: calib@10 {
+			reg = <0x10 0x2>;
+		};
+	};
+
+= Data consumers =
+Are device nodes which consume nvmem data cells.
+
+Example:
+
+	thermal {
+		...
+		nvmem-cells = <&thermal_calib>;
+		nvmem-cell-names = "calibration";
+	};

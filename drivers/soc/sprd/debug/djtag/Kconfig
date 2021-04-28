@@ -1,0 +1,11 @@
+config SPRD_DJTAG_CORE
+	bool
+	help
+	  Say Y here to support the dmc mpu core.
+
+config SPRD_DJTAG
+	tristate "Spreadtrum DJTAG Support"
+	depends on SPRD_DEBUG
+	select SPRD_DJTAG_CORE
+	help
+	  Say Y here to support djtag For sharkle, sharkl3

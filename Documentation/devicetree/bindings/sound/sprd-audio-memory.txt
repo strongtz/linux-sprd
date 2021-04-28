@@ -1,0 +1,64 @@
+* Spreadtrum sound audio memory manager driver
+
+This node models spreadtrum sound audio memory manager driver
+
+Required properties:
+
+- compatible : "sprd,audio-mem-sharkl5", "sprd,audio-mem-sharkl2", "sprd,audio-mem-whale2", "sprd,audio-mem-roc1",
+	"sprd,audio-mem-sharkl5pro", "sprd,sharkl3-audio-mem","sprd,pike2-audio-mem", "sprd,sharkle-audio-mem"
+- ddr32-ap-dsp-map-offset : ddr address mapping offset between ap and audio co-processor
+- sprd,ddr32-dma : ddr used by dma
+- sprd,ddr32-dspmemdump : ddr used by audio co-processor dump
+- sprd,cmdaddr : memory for audio communicate command
+- sprd,smsg-addr : memory for audio communicate parameters
+- sprd,shmaddr-aud-str : memory for audio co-processor audio structure parameters.
+- sprd,shmaddr-dsp-vbc : memory for audio co-processor vbc parameters
+- sprd,shmaddr-nxp : memory for audio co-processor nxp parameters
+- sprd,shmaddr-reg-dump : memory for vbc register
+- sprd,iram-ap-base : iram base for ap
+- sprd,iram-dsp-base : iram base for audio co-processor.
+- sprd,offload-addr ; compress offload iram offset,
+	this offset is used to transform agcp address to ap address of iram.
+- sprd,audcp-aon-iram : The iram used as private data for audio cp in aon area.
+
+Example:
+audio-mem-mgr {
+	compatible = "sprd,audio-mem-sharkl5", "sprd,sharkl3-audio-mem, sprd,audio-mem-orca",
+		     "sprd,audio-mem-sharkl5pro";
+	/*
+	 * base is 0x87400000 for sharkl5
+	 * 1. reserved ddr layout total 4M:
+	 * 3M (ap used. include dma data,dma node(dynamic),
+	 * dsp log(65K), dsp pcm(65K)) + 1k(cmd param) 2K + 16b(cmd) +
+	 * 1K AUDIO_STRUCT_PARA + 1K(nxp/cvs) + dsp used(4k)) +
+	 * 0.5M dsp memdump
+	*/
+	ddr32-ap-dsp-map-offset = <0x0>;
+	/* 3M for dynamic alloc, 0x87400000 - 0x87700000 ddr32-dma, 1M for other */
+	/* (or 14M temp for haps 0x86900000 - 0x87700000 ddr32-dma, haps only) */
+	sprd,ddr32-dma = <0x86900000 0xE00000>;
+	/* 512K,  0x87700000 - 0x87780000*/
+	sprd,ddr32-dspmemdump = <0x87700000 0x80000>;
+	/* 1K cmd para, 0x87780000 - 0x87780400 */
+	sprd,cmdaddr = <0x87780000 0x400>;
+	/* 2K + 16byte,0x87780400 - 0x87780e10 */
+	sprd,smsg-addr = <0x87780400 0xa10>;
+	/* 1K AUDIO_STRUCT_PARA 0x87780e10 - 0x87781210*/
+	sprd,shmaddr-aud-str = <0x87780e10 0x400>;
+	/* 5K DSP_VBC_PARA, 0x87781210 - 0x87782610 */
+	sprd,shmaddr-dsp-vbc = <0x87781210 0x1400>;
+	/* 1K nxp/cvs para, 0x87782610 - 0x87782a10 */
+	sprd,shmaddr-nxp = <0x87782610 0x400>;
+	/* 2K ivsence smartpa param, 0x87782a10 - 0x87783210 */
+	sprd,shmaddr-dsp-smartpa = <0x87782a10 0x1000>;
+	/* 1K REG DUMP, 0x87783a10 - 0x87783a50 */
+	sprd,shmaddr-reg-dump = <0x87783a10 0x400>;
+
+	/* 2. iram layout total 32K */
+	sprd,iram-ap-base =  <0x33800000>;
+	sprd,iram-dsp-base = <0x01800000>;
+	/* mp3 23K */
+	sprd,offload-addr = <0x33800000 0x5c00>;
+	/* iram for audio cp aon */
+	sprd,audcp-aon-iram = <0xa400 0x1000>;
+};

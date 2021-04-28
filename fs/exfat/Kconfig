@@ -1,0 +1,23 @@
+config EXFAT_FS
+	tristate "EXFAT fs support"
+	select NLS
+	select NLS_UTF8
+	help
+	  If you want to use exfat file system, then you must say Y or M here
+	  to include exFAT support. You will then be able to mount partitions or
+	  diskettes with exFAT file systems and transparently access the
+	  files on them.
+
+config EXFAT_VIRTUAL_XATTR
+	bool "Virtual xattr support for exFAT filesystem"
+	default n
+	depends on EXFAT_FS
+	help
+	  Modification of exFAT filesystem for virtual xattr
+
+config EXFAT_VIRTUAL_XATTR_SELINUX_LABEL
+	string "Default string for SELinux label"
+	depends on EXFAT_FS && EXFAT_VIRTUAL_XATTR
+	default "u:object_r:sdcard_external:s0"
+	help
+	  Set this to the default string for SELinux label.

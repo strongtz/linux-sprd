@@ -1,0 +1,58 @@
+Spreadtrum DJTAG
+
+== Introduction ==
+The main functions of djtag are to configure the busmonitor, configure
+the system performance related registers, and view the debug registers
+of bus status. As the above hardware design, the software design a model,
+according to the function of the division. Each function is viewed as
+a slave device with an independent drive, and DJTAG is regarded as the
+master bus, and all the devices connect to it.the slave device config
+parameters by DJTAG bus. The slave devices and the master djtag dts how
+to config as below.
+
+For example:
+djtag: djtag@40340000 {
+	compatible  = "sprd,djtag";
+	...
+	aon@0{
+		...
+	}
+
+	ap@1{
+		...
+	}
+
+	mm@2{
+		...
+	}
+};
+
+Required properties:
+- compatible: Must be "sprd,djtag".
+- reg: Address range of djtag registers.
+- reg-names: Must be "glb" and "djtag". reg-names is fixed in DJTAG driver,
+	it will determine the order of reg address. The DJTAG driver will
+	find the corresponding address in the order of the fixed string.
+- clock-names: Must be "enable", It is a name that the correspond clocks property.
+- clocks: Should contain djtag enable bits.
+- hwlocks: Should contain all HWspinlock of the DJTAG module using.
+- hwlock-names: Should contain all HWspinlock names of the DJTAG module using.
+- #address-cells: number of cells required to define a sys module address
+	on the DJTAG bus. Should be set to 1.
+- #size-cells: size of cells required to define a sys module address size on
+	the DJTAG bus, should be set to 0.
+
+Example:
+
+djtag: djtag@40340000 {
+	compatible  = "sprd,djtag";
+	reg = <0x40340000 0x1000>,
+		<0x402e0000 0x10000>;
+	reg-names = "djtag", "glb";
+	clock-names = "enable";
+	clocks = <&clk_aon_apb_gates1 20>;
+	hwlocks = <&hwslock1 10>;
+	hwlock-names = "djtag";
+	#address-cells = <1>;
+	#size-cells = <0>;
+};

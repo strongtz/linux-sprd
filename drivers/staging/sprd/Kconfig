@@ -1,0 +1,20 @@
+source "drivers/staging/sprd/mailbox/Kconfig"
+
+source "drivers/staging/sprd/sipa/Kconfig"
+
+source "drivers/staging/sprd/pam_ipa/Kconfig"
+
+source "drivers/staging/sprd/sipa_sys/Kconfig"
+
+source "drivers/staging/sprd/sipa_delegate/Kconfig"
+
+config SPRD_DATA_TRANSPORTER
+	tristate "SPRD Data Transporter"
+	default n
+	depends on SPRD_SIPC
+	help
+	  The data transporter for SC9650 miniAP.
+
+source "drivers/staging/sprd/sfp/Kconfig"
+source "drivers/staging/sprd/debug_log/Kconfig"
+

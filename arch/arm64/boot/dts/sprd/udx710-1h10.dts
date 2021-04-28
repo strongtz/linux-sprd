@@ -1,0 +1,130 @@
+/*
+ * Spreadtrum orca udx710 board DTS file
+ *
+ * Copyright (C) 2017,2018 Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+/dts-v1/;
+
+#include <dt-bindings/gpio/gpio.h>
+
+#include "udx710.dtsi"
+#include "sc2730.dtsi"
+#include "udx710-mach.dtsi"
+
+/ {
+	model = "Spreadtrum UDX710 Board";
+
+	compatible = "sprd,udx710_1h10", "sprd,udx710";
+
+	sprd,sc-id = <710 1 0x20000>;
+
+	aliases {
+		serial0 = &uart0;
+	};
+
+	memory: memory@80000000 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x20000000>;
+	};
+
+	chosen {
+		stdout-path = &uart0;
+		bootargs = "earlycon console=ttyS0,115200n8 loglevel=8 init=/init root=/dev/ram0 ro androidboot.hardware=udx710_1h10 androidboot.selinux=permissive swiotlb=64k androidboot.dtbo_idx=0 printk.devkmsg=on";
+	};
+
+	ion {
+		compatible = "sprd,ion";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		heap@0 {
+			reg = <0>;
+			label = "system";
+			type = <0>;
+		};
+	};
+
+	audio-mem-mgr {
+		memory-region = <&audio_reserved &audiodsp_reserved>;
+	};
+	sprd-mcd {
+		compatible = "sprd,orca-modem-ctrl";
+		cpwatchdog-gpio = <&ap_gpio 26 GPIO_ACTIVE_HIGH>;
+		cpassert-gpio = <&ap_gpio 27 GPIO_ACTIVE_HIGH>;
+		cppanic-gpio = <&ap_gpio 28 GPIO_ACTIVE_HIGH>;
+		cppoweroff-gpio = <&ap_gpio 29 GPIO_ACTIVE_HIGH>;
+	};
+
+	extcon_usb0: extcon_usb0 {
+		compatible = "linux,extcon-usb-gpio";
+
+		vbus-gpios = <&ap_gpio 11 GPIO_ACTIVE_HIGH>;
+	};
+
+	dvfs_dcdc_cpu0_supply: dvfs-dcdc-cpu0-supply {
+		supply-type-sel = <0x29c 0 0>;
+		top-dvfs-adi-state = <0x88 0 0xf>;
+		voltage-grade-num = <7>;
+		voltage-grade = <0 0x100 0x240 0 0x1fff>,
+			<1 0x100 0x240 9 0x1fff>,
+			<2 0x100 0x240 18 0x1fff>,
+			<3 0x100 0x244 0 0x1fff>,
+			<4 0x100 0x244 9 0x1fff>,
+			<5 0x100 0x244 18 0x1fff>,
+			<6 0x100 0x248 0 0x1fff>;
+		tuning-latency-us = <200>;
+		chnl-in-i2c = <0>;
+	};
+};
+
+&uart0 {
+	status = "ok";
+};
+
+&dmc_mpu {
+	status = "okay";
+};
+
+&ssphy0 {
+	vdd-supply = <&vddusb33>;
+	status = "okay";
+};
+
+&usb3_0 {
+	extcon = <&extcon_usb0>;
+	status = "okay";
+};
+
+&ssphy1 {
+	vdd-supply = <&vddusb33>;
+	extcon = <&pmic_typec>;
+	status = "okay";
+};
+
+&usb3_1 {
+	extcon = <&pmic_typec>;
+	status = "okay";
+};
+
+&vddcamd0 {
+	regulator-always-on;
+};
+
+&vddwcn {
+	regulator-always-on;
+};
+
+&vddldo0 {
+	regulator-always-on;
+};
+
+&pcie1 {
+	sprd,pcie-startup-syscons =
+		<&aon_apb_regs 0 0
+			REG_AON_APB_RF_PCIE_SLV_ADDR_OFFSET
+			MASK_AON_APB_RF_PCIE_SLV_ADDR_OFFSET
+			0x1>;
+	status = "okay";
+};

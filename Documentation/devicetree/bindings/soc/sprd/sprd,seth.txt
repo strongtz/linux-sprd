@@ -1,0 +1,12 @@
+Spreadtrum seth bindings
+
+This is only for virtual network interface controller that dealing with tcpip data transferring.
+
+Required properties:
+- compatible:
+    - "sprd,seth": for network interface controller
+    - "sprd,name": for name of nic
+    - "sprd,dst": for id of destination
+    - "sprd,channel": for id of channel
+    - "sprd,blknum": for number of blocks
+    - "sprd,poolsize": for the pool size of sipc

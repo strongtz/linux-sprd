@@ -1,0 +1,5 @@
+config SND_SOC_SPRD_PA_UCP1301
+	tristate "Sprd Smart PA UCP1301"
+	depends on I2C
+	help
+	  If ucp1301 smart pa is needed, set this to Y or M, else N.

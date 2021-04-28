@@ -1,0 +1,10 @@
+kunit example: initializing
+kunit example: example_simple_test passed
+kunit example: exiting
+kunit example: initializing
+kunit example: example_mock_test passed
+kunit example: exiting
+kunit example: all tests passed
+dummy 0-0053: hwmon0: sensor 'lm75'
+kunit lm75: lm75_test_read passed
+kunit lm75: all tests passed

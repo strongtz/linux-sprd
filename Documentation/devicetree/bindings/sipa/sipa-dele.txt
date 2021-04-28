@@ -1,0 +1,23 @@
+SIPA delegator for Spreadtrum platforms
+
+Required properties:
+- compatible: should be one of following:
+	"sprd,roc1-sipa-delegate",
+	"sprd,orca-sipa-delegate".
+- reg: Specify the physical base address of the controller and length
+  of memory mapped region.
+- sprd,ul-fifo-depth:
+	Specify uplink transfer fifo total depth.
+- sprd,dl-fifo-depth:
+	Specify downlink transfer fifo total depth.
+
+Examples:
+	ipa_delegate: sipa-dele@2e000000 {
+		compatible = "sprd,roc1-sipa-delegate";
+		reg = <0x0 0x2e000000 0 0x00001000>,
+		      <0x3 0x8e000000 0 0x00001000>;
+		reg-names = "remote-base", "mapped-base";
+
+		sprd,ul-fifo-depth = <1024>;
+		sprd,dl-fifo-depth = <1024>;
+	};

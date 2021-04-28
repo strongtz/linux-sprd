@@ -1,0 +1,29 @@
+Spreadtrum Generic USB PHY
+===========================================================
+
+Required properties:
+  - compatible: should be one of following:
+    "sprd,roc1-ssphy", "sprd,orca1-ssphy0", "sprd,orca1-ssphy1"
+  - reg: must be the PHY controller base address
+  - reg-names: "phy_glb_regs" for the usb phy global register
+  - sprd,syscon-enables: specify the handle for aon apb syscon
+  - sprd,syscon-ipa-ahb: specify the handle for ap ahb syscon
+  - sprd,syscon-anag3: specify the handle for anlg_phy_g4 syscon
+  - sprd,syscon-pmu-apb: specify the handle for pmu-apb syscon
+  - sprd,vdd-voltage: the voltage should be set 3.3V
+
+Example
+-------
+
+Board specific DT entry:
+
+	hsphy: hsphy@e00000 {
+		compatible = "sprd,roc1-ssphy";
+		reg = <0xe00000 0x3030>;
+		reg-names = "phy_glb_regs";
+		sprd,syscon-enable = <&aon_apb_regs>;
+		sprd,syscon-ipa-ahb = <&ap_ahb_regs>;
+		sprd,syscon-anag3 = <&anlg_phy_g4_regs>;
+		sprd,syscon-pmu-apb = <&pmu_apb_regs>;
+		sprd,vdd-voltage = <3300000>;
+	};

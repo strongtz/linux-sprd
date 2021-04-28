@@ -1,0 +1,36 @@
+KTD3137-backlight bindings
+
+Required properties:
+- compatible			: Must be "sprd,ktd3137"
+
+Optional properties:
+- hwen-gpio			: hwen gpio
+- ktd,using-lsb			: switch max brightness
+- ktd,using-linear		: switch update value
+- ktd,bl-fscal-led		: default 20.2mA
+- ktd,turn-on-ramp		: please check datasheet
+- ktd,turn-off-ramp		: please check datasheet
+- ktd,i2c-trans-dim		: please check datasheet
+- ktd,bl-channel		: switch blacklight channel
+- ktd,ovp-level			: default 32v
+- ktd,inductor-current		: dfault 2600mA
+- ktd,switching-frequency	: dfault 1000KHz
+
+Example:
+
+	ktd3137_backlight: sprd_backlight {
+		status = "okay";
+		compatible = "sprd,ktd3137";
+		reg = <0x36>;
+		hwen-gpio = <&ap_gpio 133 GPIO_ACTIVE_HIGH>;
+		ktd,using-lsb;
+		ktd,using-linear;
+		ktd,bl-fscal-led = <0x99>;
+		ktd,turn-on-ramp = <0>;
+		ktd,turn-off-ramp = <0>;
+		ktd,i2c-trans-dim = <0>;
+		ktd,bl-channel = <2>;
+		ktd,ovp-level = <32>;
+		ktd,inductor-current = <1800>;
+		ktd,switching-frequency = <1000>;
+	};

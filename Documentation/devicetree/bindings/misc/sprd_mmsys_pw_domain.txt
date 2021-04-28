@@ -1,0 +1,41 @@
+syscon-names: global register bits name, order and name should the same as code,
+             code file drivers/soc/sprd/domain/mmsys_pw_domain_r6p0.c
+syscons: global register bits, <regmap,register address, mask>
+
+clock-names: clock name for mmsys ahb enable.
+clocks: clock for mmsys ahb enable.
+
+example(Maybe some change later):
+mm_domain: mm_domain {
+	compatible = "sprd,mm-domain";
+	syscon-names = "chip_id0",
+		"chip_id1",
+		"force_shutdown",
+		"shutdown_en",
+		"power_state",
+		"mm_qos_ar",
+		"mm_qos_aw";
+	syscons = <&aon_apb_regs REG_AON_APB_AON_CHIP_ID0 MASK_AON_APB_AON_CHIP_ID0>,
+		<&aon_apb_regs REG_AON_APB_AON_CHIP_ID1 MASK_AON_APB_AON_CHIP_ID1>,
+		<&pmu_apb_regs REG_PMU_APB_PD_MM_TOP_CFG MASK_PMU_APB_PD_MM_TOP_FORCE_SHUTDOWN>,
+		<&pmu_apb_regs REG_PMU_APB_PD_MM_TOP_CFG MASK_PMU_APB_PD_MM_TOP_AUTO_SHUTDOWN_EN>,
+		<&pmu_apb_regs REG_PMU_APB_PWR_STATUS3_DBG MASK_PMU_APB_PD_MM_TOP_STATE>,
+		<&mm_ahb_regs REG_MM_AHB_MM_QOS MASK_MM_AHB_AR_QOS_THRESHOLD_MM>,
+		<&mm_ahb_regs REG_MM_AHB_MM_QOS MASK_MM_AHB_AW_QOS_THRESHOLD_MM>;
+
+	clock-names = "mm_eb",
+		"mm_ahb_eb",
+		"clk_mm_ahb"
+		"clk_mm_ahb_parent",
+		"mm_mtx_eb",
+		"clk_mm_mtx"
+		"clk_mm_mtx_parent";
+	clocks = <&aonapb_gate CLK_MM_EB>,
+		<&mm_gate CLK_MM_CKG_EB>,
+		<&mm_clk CLK_MM_AHB>,
+		<&mm_clk CLK_TWPLL_153M6>
+		<&mm_gate CLK_ISP_AHB_EB>, /* TBC */
+		<&mm_clk CLK_MM_MTX>,
+		<&mm_clk CLK_ISPPLL_468M>;
+	mm_qos = <0x0D 0x0D>; /* AR, AW */
+};

@@ -1,0 +1,19 @@
+Spreadtrum DRM master device
+================================
+
+The SPRD DRM master device is a virtual device needed to list all
+DPU devices or other display interface nodes that comprise the
+graphics subsystem.
+
+Required properties:
+- compatible: Should be "sprd,display-subsystem"
+- ports: Should contain a list of phandles pointing to display interface port
+  of DPU devices. DPU definitions as defined in
+  Documentation/devicetree/bindings/display/sprd/dpu.txt
+
+example:
+
+display-subsystem {
+	compatible = "sprd,display-subsystem";
+	ports = <&dpu_out>;
+};

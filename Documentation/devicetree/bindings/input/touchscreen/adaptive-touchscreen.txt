@@ -1,0 +1,46 @@
+Device-Tree bindings for adaptive touchscreen framework
+
+Required properties:
+ - compatible: must be "adaptive-touchscreen"
+ - gpios: the reset and interrupt GPIO number
+
+Optional properties:
+ - reg                   : I2C address of some designated touchscreen
+                           controller, this value will be a reference for
+                           adaptive touchscreen driver.
+ - virtualkeys           : virtual key settings in u32 array form, a valid
+                           virtual key setting must have keycode, x, y, width,
+                           height in order.
+ - touchscreen-size-x    : the reporting area width
+ - touchscreen-size-y    : the reporting area height
+ - surface-width         : width of displayed surface
+                           If not set, we don't resize virtual key hit box.
+ - surface-height        : height of displayed surface
+                           If not set, we don't resize virtual key hit box.
+ - virtualkey-report-abs : indicated whether we should report virtual key as
+                           ABS or KEY event.
+ - firmware-auto-upgrade : indicated whether we do firmware upgrading in
+                           booting.
+ - controller            : the designated controller name.
+                           If not specified, driver will select property
+                           controller automatically.
+ - avdd-supply           : the name of regulator supply.
+                           If set, driver will do power control in suspend
+                           and resume time.
+
+Example nodes:
+&i2c0 {
+	/* ... */
+	touchscreen {
+		compatible = "adaptive-touchscreen";
+		reg = <0x26>;
+		gpios = <&ap_gpio 145 0
+			&ap_gpio 144 0>;
+		controller = "mstar,MSG21XXA";
+		firmware-auto-upgrade;
+		virtualkeys = <580 120 1350 60 45
+			172 360 1350 60 45
+			158 600 1350 60 45>;
+	};
+	/* ... */
+};

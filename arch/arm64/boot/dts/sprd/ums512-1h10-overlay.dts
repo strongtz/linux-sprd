@@ -1,0 +1,116 @@
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	fragment {
+		target-path = "/";
+		__overlay__ {
+			sprd-wlan {
+				compatible = "sprd,sc2355-wifi";
+			};
+
+			fingerprint@0 {
+				compatible = "microarray,afs121";
+				fpint-gpios = <&eic_async 13 0>;
+			};
+
+			gpio-keys {
+				compatible = "gpio-keys";
+
+				key-volumedown {
+					label = "Volume Down Key";
+					linux,code = <KEY_VOLUMEDOWN>;
+					gpios = <&ap_gpio 124 GPIO_ACTIVE_LOW>;
+					debounce-interval = <2>;
+					wakeup-source;
+				};
+
+				key-volumeup {
+					label = "Volume Up Key";
+					linux,code = <KEY_VOLUMEUP>;
+					gpios = <&pmic_eic 4 GPIO_ACTIVE_HIGH>;
+					debounce-interval = <2>;
+					wakeup-source;
+				};
+
+				key-power {
+					label = "Power Key";
+					linux,code = <KEY_POWER>;
+					gpios = <&pmic_eic 1 GPIO_ACTIVE_LOW>;
+					debounce-interval = <2>;
+					wakeup-source;
+				};
+			};
+
+			pwm_backlight: backlight {
+				compatible = "sprd,sharkl5pro-backlight";
+				pwms = <&pwms 2 40000>;
+				pwm-names = "backlight";
+				sprd,max-brightness-level = <880>;
+				default-brightness-level = <115>;
+				sprd,brightness-scale = <1023>;
+			};
+		};
+	};
+
+};
+
+&reserved_memory {
+
+	fd_reserved: faceid-mem@efaae000 {
+		reg = <0x0 0xefaae000 0x0 0x00f00000>;
+	};
+
+	vdsp_reserved: vdsp-mem@f09ae000 {
+		reg = <0x0 0xf09ae000 0x0 0x03700000>;
+	};
+/*
+	gpu_reserved: gpu-mem@fb8ae000 {
+		reg = <0x0 0xfb8ae000 0x0 0x01e5a000>;
+	};
+*/
+};
+
+&ion {
+	heap@4 {
+		reg = <4>;
+		label = "carveout_fd";
+		type = <2>;
+		memory-region = <&fd_reserved>;
+	};
+
+	heap@5 {
+		reg = <5>;
+		label = "carveout_vdsp";
+		type = <2>;
+		memory-region = <&vdsp_reserved>;
+	};
+};
+
+&i2c3 {
+	status = "okay";
+
+	touchscreen@20 {
+		compatible = "synaptics,dsx";
+		reg = <0x20>;
+		gpios = <&ap_gpio 145 GPIO_ACTIVE_HIGH
+			&ap_gpio 144 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&panel {
+	sprd,backlight = <&pwm_backlight>;
+};
+
+&dpu {
+	sprd,backlight = <&pwm_backlight>;
+};
+
+&ddr_dfs {
+	sprd-scene = "boost", "lcdon", "lcdoff", "camlow",
+		"camhigh", "camveryhigh", "faceid";
+	sprd-freq = <1333 768 256 384 512 1333 1333>;
+};

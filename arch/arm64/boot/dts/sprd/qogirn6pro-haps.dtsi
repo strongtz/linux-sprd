@@ -1,0 +1,65 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Spreadtrum Qogirn6pro platform DTS file
+ *
+ * Copyright (C) 2019, Spreadtrum Communications Inc.
+ */
+
+#include <dt-bindings/soc/sprd,sharkl5-regs.h>
+#include <dt-bindings/soc/sprd,sharkl5-mask.h>
+#include <dt-bindings/clock/sprd,sharkl5-clk.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+/ {
+	interrupt-parent = <&gic>;
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	soc: soc {
+		compatible = "simple-bus";
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		ap-apb {
+			compatible = "simple-bus";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			ranges;
+
+			uart0: serial@70000000 {
+				compatible = "sprd,ums7520-uart",
+					     "sprd,sc9836-uart";
+				reg = <0x70000000 0x100>;
+				interrupts = <GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH>;
+				clock-names = "enable", "uart", "source";
+				clocks = <&ext_26m CLK_UART0_EB>;
+				status = "disabled";
+			};
+
+			uart1: serial@70100000 {
+				compatible = "sprd,ums7520-uart",
+					     "sprd,sc9836-uart";
+				reg = <0x70100000 0x100>;
+				interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>;
+				clock-names = "enable", "uart", "source";
+				clocks = <&ext_26m CLK_UART1_EB>;
+				status = "disabled";
+			};
+		};
+	};
+
+	ext_26m: ext-26m {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <26000000>;
+		clock-output-names = "ext-26m";
+	};
+
+	ext_32k: ext_32k {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <32768>;
+		clock-output-names = "ext-32k";
+	};
+};

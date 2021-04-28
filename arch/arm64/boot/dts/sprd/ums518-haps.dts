@@ -1,0 +1,261 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Unisoc Sharkl5Pro platform DTS file
+ *
+ * Copyright (C) 2018, Unisoc Communications Inc.
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/gpio/gpio.h>
+
+#include "ums518-haps.dtsi"
+#include "ums518-haps-mach.dtsi"
+#include "ums518-haps-modem.dtsi"
+#include "lcd/lcd_nt35596_boe_mipi_fhd.dtsi"
+#include "lcd/lcd_nt35695_truly_mipi_fhd.dtsi"
+
+/ {
+	model = "Unisoc UMS518 Haps board";
+
+	compatible = "sprd,ums518";
+
+	sprd,sc-id = <518 1 0x20000>;
+
+	aliases {
+		serial0 = &uart0;
+		serial1 = &uart1;
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x1 0x00000000>;
+	};
+
+	chosen {
+		stdout-path = &uart1;
+		bootargs = "earlycon=sprd_serial,0x70100000,115200n8 console=ttyS1,115200n8 loglevel=11 maxcpus=1 init=/init root=/dev/mmcblk0p30 rootfstype=ext4 rw rootwait androidboot.hardware=ums518_haps androidboot.selinux=permissive printk.devkmsg=on";
+	};
+
+	ipi: interrupt-controller {
+		compatible = "android,CustomIPI";
+		#interrupt-cells = <1>;
+		interrupt-controller;
+	};
+
+	trusty {
+		compatible = "android,trusty-smc-v1";
+		irq {
+			compatible = "android,trusty-irq-v1";
+			interrupt-templates = <&ipi 0>,
+				<&gic 1 GIC_PPI 0>,
+				<&gic 1 GIC_SPI 0>;
+			interrupt-ranges = < 0  15 0>,
+					<16  31 1>,
+					<32 223 2>;
+		};
+
+		virtio {
+			compatible = "android,trusty-virtio-v1";
+		};
+
+		log {
+			compatible = "android,trusty-log-v1";
+		};
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		sml_reserved: sml-mem@94000000{
+			reg = <0x0 0x94000000 0x0 0x00020000>;
+		};
+
+		tos_reserved: tos-mem@94020000{
+			reg = <0x0 0x94020000 0x0 0x01fe0000>;
+		};
+
+		fb_reserved: framebuffer-mem@bc000000{
+			reg = <0x0 0xbc000000 0x0 0x02000000>;
+		};
+	};
+
+	sprd-iq {
+		compatible = "sprd,iq";
+		sprd,region = <&iq_reserved>;
+		sprd,mapping-offs = <0x0>;
+	};
+
+	ion {
+		compatible = "sprd,ion";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		heap@1 {
+			reg = <1>;
+			label = "carveout_mm";
+			type = <2>;
+		};
+
+		heap@2 {
+			reg = <2>;
+			label = "carveout_overlay";
+			type = <2>;
+			/* memory-region = <&overlay_reserved>;*/
+		};
+
+		heap@3 {
+			reg = <3>;
+			label = "carveout_fb";
+			type = <2>;
+			memory-region = <&fb_reserved>;
+		};
+	};
+
+	dvfs_dcdc_cpu0_supply: dvfs-dcdc-cpu0-supply {
+		top-dvfs-adi-state = <0x70 0 0xf>;
+		voltage-grade-num = <7>;
+		voltage-grade = <0 0xe0 0xf4 0 0x1ff>,
+			<1 0xf0 0xf4 9 0x1ff>,
+			<2 0x100 0xf4 18 0x1ff>,
+			<3 0x110 0xf8 0 0x1ff>,
+			<4 0x120 0xf8 9 0x1ff>,
+			<5 0x130 0xf8 18 0x1ff>,
+			<6 0x140 0xfc 0 0x1ff>;
+		voltage-up-delay = <50 0x58 0 0xffff 0x600>,
+			<100 0x58 16 0xffff 0xa00>,
+			<150 0x54 0 0xffff 0xf00>,
+			<200 0x54 16 0xffff 0x1400>,
+			<250 0x50 0 0xffff 0x1900>,
+			<300 0x50 16 0xffff 0x1e00>,
+			<350 0x110 0 0xffff 0x2300>;
+		voltage-down-delay = <50 0x64 0 0xffff 0x600>,
+			<100 0x64 16 0xffff 0xa00>,
+			<150 0x60 0 0xffff 0xf00>,
+			<200 0x60 16 0xffff 0x1400>,
+			<250 0x5c 0 0xffff 0x1900>,
+			<300 0x5c 16 0xffff 0x1e00>,
+			<350 0x114 0 0xffff 0x2300>;
+		tuning-latency-us = <200>;
+		chnl-in-i2c = <0>;
+	};
+	dvfs_dcdc_cpu1_supply: dvfs-dcdc-cpu1-supply {
+		supply-type-sel = <0x120 0 1>;
+		top-dvfs-i2c-state = <0x9c 4 0xf>;
+		voltage-grade-num = <6>;
+		voltage-grade = <0 0x2d 0x12c 0 0x7f>,
+			<1 0x32 0x12c 7 0x7f>,
+			<2 0x37 0x12c 14 0x7f>,
+			<3 0x3c 0x12c 21 0x7f>,
+			<4 0x41 0x130 0 0x7f>,
+			<5 0x46 0x130 7 0x7f>;
+		voltage-up-delay = <50 0x84 0 0xffff 0x1600>,
+			<100 0x84 16 0xffff 0x1a00>,
+			<150 0x80 0 0xffff 0x1f00>,
+			<200 0x80 16 0xffff 0x2400>,
+			<250 0x7c 0 0xffff 0x2900>,
+			<300 0x7c 16 0xffff 0x2e00>,
+			<350 0x118 0 0xffff 0x3300>;
+		voltage-down-delay = <50 0x90 0 0xffff 0x600>,
+			<100 0x90 16 0xffff 0xa00>,
+			<150 0x8c 0 0xffff 0xf00>,
+			<200 0x8c 16 0xffff 0x1400>,
+			<250 0x88 0 0xffff 0x1900>,
+			<300 0x88 16 0xffff 0x1e00>,
+			<350 0x11c 0 0xffff 0x2300>;
+		tuning-latency-us = <300>;
+		chnl-in-i2c = <1>;
+	};
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&dpu {
+	status = "okay";
+};
+
+&dsi {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	panel {
+		compatible = "sprd,generic-mipi-panel";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0>;
+
+		reset-gpio = <&ap_gpio 50 GPIO_ACTIVE_HIGH>;
+		port {
+			reg = <1>;
+			panel_in: endpoint {
+				remote-endpoint = <&dphy_out>;
+			};
+		};
+	};
+};
+
+&lcd_nt35596_boe_mipi_fhd {
+	sprd,phy-bit-clock = <300000>; /* kbps */
+};
+
+&lcd_nt35596_fhd_timing0 {
+	clock-frequency = <6500000>;
+};
+
+&lcd_nt35695_truly_mipi_fhd {
+	sprd,phy-bit-clock = <300000>; /* kbps */
+};
+
+&lcd_nt35695_fhd_timing0 {
+	clock-frequency = <6500000>;
+};
+
+&dphy {
+	status = "okay";
+};
+
+&sdio0 {
+	bus-width = <4>;
+	sprd,name = "sdio_sd";
+	sprd,sdio-adma;
+	no-sdio;
+	no-mmc;
+	status = "disabled";
+};
+
+&sdio1 {
+	bus-width = <4>;
+	sprd,name = "sdio_wifi";
+	sprd,sdio-adma;
+	no-sd;
+	no-mmc;
+	status = "disabled";
+};
+
+&sdio2 {
+	bus-width = <4>;
+	sprd,name = "sdio_wifi";
+	sprd,sdio-adma;
+	no-sd;
+	no-mmc;
+	status = "disabled";
+};
+
+&sdio3 {
+	bus-width = <8>;
+	non-removable;
+	cap-mmc-hw-reset;
+	sprd,name = "sdio_emmc";
+	no-sdio;
+	no-sd;
+	status = "okay";
+};

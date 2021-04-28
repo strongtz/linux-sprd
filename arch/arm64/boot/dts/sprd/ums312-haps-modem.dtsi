@@ -1,0 +1,224 @@
+/*
+ * Spreadtrum Sharkl5 modem board DTSI file
+ * These dt is used for modem drivers
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+/ {
+	scproc-pubcp {
+		compatible = "sprd,scproc_pubcp";
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+		scproc_pubpm: scproc@800000 {
+			sprd,name = "pmic";
+			/* 0xff is invaild register offset */
+			syscons = <&aon_apb_regs 0xff 0x0>,
+					<&pmu_apb_regs 0xff 0x100000>,
+					<&aon_apb_regs 0x8c 0x1>,
+					<&aon_apb_regs 0xff 0x0>,
+					<&aon_apb_regs 0xff 0x0>;
+			syscon-names = "shutdown", "deepsleep", "corereset",
+						"sysreset", "getstatus";
+			reg = <0x0 0x800000 0x0 0x3b000>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+			/* segnr=1 */
+			/*TODO: ranges use to limit pm-sys & cali_lib memory region. it's not
+				standard use, need modify if possible*/
+			ranges = <0x0 0x0 0x800000 0x3b000>,
+					<0x3b000 0x0 0x83b000 0x5000>;
+			pm-sys@0 {
+				cproc,name = "pm_sys";
+				reg = <0x0 0x3b000>;
+			};
+
+			cali_lib@3b000 {
+				cproc,name = "cali_lib";
+				reg = <0x3b000 0x5000>; /* <cali_lib_addr size> */
+			};
+		};
+
+		scproc_pubcp: scproc@4400 {
+			sprd,decoup = "cproc-use-decoup";
+			sprd,name = "cptl";
+			/* 0xff is invaild register offset */
+			syscons = <&pmu_apb_regs 0x58 0x2000000>,
+					<&pmu_apb_regs 0xcc 0x40000>,
+					<&aon_apb_regs 0x174 0x400>,
+					<&pmu_apb_regs 0xb0 0x2>,
+					<&aon_apb_regs 0xff 0x0>;
+			syscon-names = "shutdown", "deepsleep", "corereset",
+						"sysreset", "getstatus";
+			reg = <0x0 0x4400 0x0 0x1000>;
+		};
+	};
+
+	sprd-sipc {
+		compatible = "sprd,sipc";
+		sipc0: sipc@87800000 {
+			sprd,name = "sipc-lte";
+			sprd,dst = <5 2>; /* <dst core-id> */
+			/* <ap-addr dst-maped-addr size> */
+			sprd,smem-info = <0x87800000 0x87800000 0x800000>;
+		};
+
+		sipc1: sipc@d000 {
+			sprd,name = "sipc-pmsys";
+			sprd,dst = <6 1 7>; /* <dst core-id> */
+			/* <ap-addr dst-maped-addr size> */
+			sprd,smem-info = <0xdc00 0x2000bc00 0x2000>;
+		};
+	};
+
+	sprd-spipe {
+		compatible = "sprd,spipe";
+		spipe@0 {
+			sprd,name = "spipe_pm";
+			sprd,dst = <6>;
+			sprd,channel = <4>;
+			sprd,ringnr = <2>;
+			sprd,size-rxbuf = <0xb00>;
+			sprd,size-txbuf = <0x180>;
+		};
+
+		spipe@1 {
+			sprd,name = "slog_pm";
+			sprd,dst = <6>;
+			sprd,channel = <5>;
+			sprd,ringnr = <1>;
+			sprd,size-rxbuf = <0x5c0>;
+			sprd,size-txbuf = <0x20>;
+		};
+
+		spipe@2 {
+			sprd,name = "sctl_pm";
+			sprd,dst = <6>;
+			sprd,channel = <6>;
+			sprd,ringnr = <1>;
+			sprd,size-rxbuf = <0x40>;
+			sprd,size-txbuf = <0x20>;
+		};
+
+		spipe@3 {
+			sprd,name = "spipe_lte";
+			sprd,dst = <5>;
+			sprd,channel = <4>;
+			sprd,ringnr = <15>;
+			sprd,size-rxbuf = <0x1000>; /* 4*1024 */
+			sprd,size-txbuf = <0x1000>; /* 4*1024 */
+		};
+
+		spipe@4 {
+			sprd,name = "sdiag_lte";
+			sprd,dst = <5>;
+			sprd,channel = <21>;
+			sprd,ringnr = <1>;
+			sprd,size-rxbuf = <0x40000>; /* 256*1024*/
+			sprd,size-txbuf = <0x8000>; /* 32*1024 */
+		};
+
+		spipe@5 {
+			sprd,name = "stty_lte";
+			sprd,dst = <5>;
+			sprd,channel = <6>;
+			sprd,ringnr = <32>;
+			sprd,size-rxbuf = <0x0800>; /* 2*1024*/
+			sprd,size-txbuf = <0x0800>; /* 2*1024 */
+		};
+	};
+
+	sprd-spool {
+		compatible = "sprd,spool";
+		sprd,name = "slog_lte";
+		sprd,dst = <5>;
+		sprd,channel = <5>;
+		sprd,tx-blksize = <0>;
+		sprd,tx-blknum = <0>;
+		sprd,rx-blksize = <0x10000>; /* 64k*/
+		sprd,rx-blknum = <4>;
+	};
+
+	sprd-sipx {
+		compatible = "sprd,sipx";
+		sprd,name = "sipx_lte";
+		sprd,dst = <5>;
+		sprd,dl-pool = <2048>;
+		sprd,dl-ack-pool = <64>;
+		sprd,ul-pool = <2048>;
+		sprd,ul-ack-pool = <1024>;
+	};
+
+	sprd-seth {
+		compatible = "sprd,seth";
+
+		seth@0 {
+			sprd,name = "seth_lte0";
+			sprd,dst = <5>;
+			sprd,channel = <7>;
+			sprd,blknum = <256>;
+			sprd,poolsize = <16>;
+		};
+
+		seth@1 {
+			sprd,name = "seth_lte1";
+			sprd,dst = <5>;
+			sprd,channel = <8>;
+			sprd,blknum = <256>;
+			sprd,poolsize = <16>;
+		};
+
+		seth@2 {
+			sprd,name = "seth_lte2";
+			sprd,dst = <5>;
+			sprd,channel = <9>;
+			sprd,blknum = <256>;
+			sprd,poolsize = <16>;
+		};
+
+		seth@3 {
+			sprd,name = "seth_lte3";
+			sprd,dst = <5>;
+			sprd,channel = <18>;
+			sprd,blknum = <256>;
+			sprd,poolsize = <16>;
+		};
+
+		seth@4 {
+			sprd,name = "seth_lte4";
+			sprd,dst = <5>;
+			sprd,channel = <19>;
+			sprd,blknum = <256>;
+			sprd,poolsize = <16>;
+		};
+
+		seth@5 {
+			sprd,name = "seth_lte5";
+			sprd,dst = <5>;
+			sprd,channel = <20>;
+			sprd,blknum = <256>;
+			sprd,poolsize = <16>;
+		};
+
+		seth@6 {
+			sprd,name = "seth_lte6";
+			sprd,dst = <5>;
+			sprd,channel = <24>;
+			sprd,blknum = <256>;
+			sprd,poolsize = <16>;
+		};
+
+		seth@7 {
+			sprd,name = "seth_lte7";
+			sprd,dst = <5>;
+			sprd,channel = <25>;
+			sprd,blknum = <256>;
+			sprd,poolsize = <16>;
+		};
+	};
+};
+
+

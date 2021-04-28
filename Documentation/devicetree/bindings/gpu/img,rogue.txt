@@ -1,0 +1,60 @@
+IMG Rogue GPU
+====================
+
+Required properties:
+
+- compatible :
+  * Must contain one of the following:
+    + "sprd,rogue"
+  * which must be preceded by one of the following vendor specifics:
+    + "sp9863a chip,rogue"
+
+- reg : Physical base address of the device and length of the register area.
+
+- interrupts : Contains the three IRQ lines required by IMG Rogue devices.
+
+- interrupt-names : Contains the names of IRQ resources in the order they were
+  provided in the interrupts property. Must contain: "job", "mmu", "gpu".
+
+
+Optional properties:
+
+- clocks : Phandle to clock for the Mali Midgard device.
+
+- mali-supply : Phandle to regulator for the Mali device. Refer to
+  Documentation/devicetree/bindings/regulator/regulator.txt for details.
+
+- operating-points-v2 : Refer to Documentation/devicetree/bindings/power/opp.txt
+  for details.
+
+
+Example for a IMG Rogue:
+
+gpu: gpu@60000000 {
+	compatible = "sprd,rogue";
+	reg = <0x60000000 0x100000>;
+	syscons = <&pmu_regs REG_PMU_APB_PD_GPU_TOP_CFG
+		MASK_PMU_APB_PD_GPU_TOP_FORCE_SHUTDOWN>,
+		<&pmu_regs REG_PMU_APB_PD_GPU_CORE_CFG
+			MASK_PMU_APB_PD_GPU_CORE_FORCE_SHUTDOWN>,
+		<&pmu_regs REG_PMU_APB_PD_GPU_CORE_CFG
+			MASK_PMU_APB_PD_GPU_CORE_AUTO_SHUTDOWN_EN>;
+	syscon-names = "top_force_shutdown",
+		"core_force_shutdown",
+		"core_auto_shutdown";
+	interrupts = <GIC_SPI 39 IRQ_TYPE_LEVEL_HIGH>;
+
+	operating-points = <
+		/* kHz    uV */
+		256000    0
+		384000    0
+		550000    0
+		>;
+
+	sprd,dvfs-lists = <
+		/* kHz  uV  idx div */
+		256000  0    5   1
+		384000  0    7   1
+		550000  0    9   1
+		>;
+};

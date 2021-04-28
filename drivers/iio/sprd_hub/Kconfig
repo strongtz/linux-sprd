@@ -1,0 +1,19 @@
+#
+# SPRD Sensor Hub drivers configuration
+#
+
+menu "Spreadtrum Sensor Hub"
+
+config SPRD_SENSOR_HUB
+	tristate "Spreadtrum Sensor Hub"
+	select IIO_BUFFER
+	select IIO_KFIFO_BUF
+	select IIO_TRIGGER
+	depends on SPRD_SIPC
+	help
+	  Support Sensor hub Feature
+
+	  Say Y here to build support for sensor hub.
+	  To compile this driver as a module, choose M here
+
+endmenu

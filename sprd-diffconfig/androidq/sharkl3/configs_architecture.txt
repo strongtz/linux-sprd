@@ -1,0 +1,22 @@
+sharkl3 configs file architecture
+
+||basefile:
+||{
+||        kernel/arch/arm64/config/sprd_sharkl3_defconfig
+||}
+=======>||if (TARGET_BUILD_VARIANT == user)
+        ||{
+        ||        kernel/sprd-diffconfig/sharkl3/arm64/user_diff_config
+        ||}
+        =======>||if (BOARD_TEE_CONFIG == trusty)
+                ||{
+                ||        kernel/sprd-diffconfig/sharkl3/arm64/trusty_diff_config
+                ||}
+                =======>||if (BOARD_WCN_CONFIG == ext)
+                        ||{
+                        ||        kernel/sprd-diffconfig/sharkl3/arm64/wcn_built_in_diff_config
+                        ||}
+                        ||else if (BOARD_WCN_CONFIG == built-in)
+                        ||{
+                        ||        kernel/sprd-diffconfig/sharkl3/arm64/wcn_ext_diff_config
+                        ||}

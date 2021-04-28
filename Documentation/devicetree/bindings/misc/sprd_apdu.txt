@@ -1,0 +1,19 @@
+Spreadtrum APDU driver
+================================================================
+
+Required properties:
+ - compatible: should be one of the following:
+   "sprd,roc1-apdu"
+ - reg: physical base address of the musb and length of memory mapped region
+ - interrupts: interrupt number for the musb controller
+
+Example:
+-------
+
+Board specific DT entry:
+
+	apdu_if: apdu@32380000 {
+		compatible = "sprd,roc1-apdu";
+		reg = <0 0x32380000 0 0x10000>;
+		interrupts = <GIC_SPI 187 IRQ_TYPE_LEVEL_HIGH>;
+	};

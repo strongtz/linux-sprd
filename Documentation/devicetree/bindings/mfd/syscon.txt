@@ -1,0 +1,73 @@
+* System Controller Registers R/W driver
+
+System controller node represents a register region containing a set
+of miscellaneous registers. The registers are not cohesive enough to
+represent as any specific type of device. The typical use-case is for
+some other node's driver, or platform-specific code, to acquire a
+reference to the syscon node (e.g. by phandle, node path, or search
+using a specific compatible value), interrogate the node (or associated
+OS driver) to determine the location of the registers, and access the
+registers directly.
+
+Required properties:
+- compatible: Should contain "syscon".
+- reg: the register region can be accessed from syscon
+
+Optional property:
+- reg-io-width: the size (in bytes) of the IO accesses that should be
+  performed on the device.
+- hwlocks: reference to a phandle of a hardware spinlock provider node.
+- #syscon-cells:   Represents the number of args. Used when syscon-names
+  is going to be used. The value is vendor specific.
+
+Examples:
+gpr: iomuxc-gpr@020e0000 {
+	compatible = "fsl,imx6q-iomuxc-gpr", "syscon";
+	reg = <0x020e0000 0x38>;
+	hwlocks = <&hwlock1 1>;
+};
+
+hwlock1: hwspinlock@40500000 {
+	...
+	reg = <0x40500000 0x1000>;
+	#hwlock-cells = <1>;
+};
+
+
+==Syscon names==
+
+Refer to syscon node by names with phandle args in syscon consumer node.
+
+Required properties:
+- syscons:	List of phandle and any number of args. Args is specific to
+		differnet vendor. For example: In Spreatrum SoCs, the 1st arg
+		will be treated as register address offset and the 2nd is bit
+		mask as default.
+
+- syscon-names:	List of syscon node name strings sorted in the same
+		order as the syscons property.
+
+Optional properties:
+
+- syscon-ranges:	/*TODO*/
+
+
+For example:
+
+apb_regs: syscon@20008000 {
+	compatible = "sprd,apb-glb", "syscon";
+	#syscon-cells = <2>;
+	reg = <0x20008000 0x100>;
+};
+
+aon_regs: syscon@40008000 {
+	compatible = "sprd,aon-glb", "syscon";
+	#syscon-cells = <1>;
+	reg = <0x40008000 0x100>;
+};
+
+display@40500000 {
+	...
+	syscons = <&ap_apb_regs 0x4 0xf00>, <&aon_regs 0x8>;
+	syscon-names = "enable", "power";
+};

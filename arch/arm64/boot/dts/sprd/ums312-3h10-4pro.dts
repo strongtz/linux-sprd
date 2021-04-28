@@ -1,0 +1,802 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Unisoc Sharkl5 platform DTS file
+ *
+ * Copyright (C) 2018, Unisoc Communications Inc.
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/gpio/gpio.h>
+
+#include "ums312.dtsi"
+#include "sc2730.dtsi"
+#include "ums312-mach.dtsi"
+#include "sprd-sound-fe-be.dtsi"
+#include "lcd/lcd_td4310_truly_mipi_fhd.dtsi"
+
+/ {
+	model = "Unisoc UMS312 3H10 4PRO board";
+
+	compatible = "sprd,ums312";
+
+	sprd,sc-id = <312 1 0x20000>;
+
+	aliases {
+		serial0 = &uart0;
+		serial1 = &uart1;
+		serial2 = &uart2;
+	};
+
+	memory: memory {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x80000000>;
+	};
+
+	chosen {
+		stdout-path = &uart1;
+		bootargs = "earlycon=sprd_serial,0x70100000,115200n8 console=ttyS1,115200n8 loglevel=1 maxcpus=3 init=/init root=/dev/mmcblk0p30 rootfstype=ext4 ro rootwait androidboot.hardware=ums312_3h10_4pro androidboot.dtbo_idx=0 swiotlb=1 printk.devkmsg=on";
+	};
+
+	ipi: interrupt-controller {
+		compatible = "android,CustomIPI";
+		#interrupt-cells = <1>;
+		interrupt-controller;
+	};
+
+	trusty {
+		compatible = "android,trusty-smc-v1";
+		irq {
+			compatible = "android,trusty-irq-v1";
+			interrupt-templates = <&ipi 0>,
+				<&gic 1 GIC_PPI 0>,
+				<&gic 1 GIC_SPI 0>;
+			interrupt-ranges = < 0  15 0>,
+					<16  31 1>,
+					<32 223 2>;
+		};
+
+		virtio {
+			compatible = "android,trusty-virtio-v1";
+		};
+
+		log {
+			compatible = "android,trusty-log-v1";
+		};
+	};
+
+	sprd-sysdump {
+		memory-region = <&memory>;
+		memory-region-re = <&ddrbist_reserved>, <&cp_reserved>, <&smem_reserved>, <&scproc_pubpm>, <&audio_reserved>, <&audiodsp_reserved>;
+		memory-region-se = <&tos_reserved>, <&sml_reserved>;
+	};
+
+	sprd-iq {
+		compatible = "sprd,iq";
+		sprd,region = <&iq_reserved>;
+		sprd,mapping-offs = <0x0>;
+	};
+
+	ion: ion {
+		compatible = "sprd,ion";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		heap@1 {
+			reg = <1>;
+			label = "carveout_mm";
+			type = <2>;
+		};
+
+		heap@2 {
+			reg = <2>;
+			label = "carveout_overlay";
+			type = <2>;
+		};
+
+		heap@3 {
+			reg = <3>;
+			label = "carveout_fb";
+			type = <2>;
+			memory-region = <&fb_reserved>;
+		};
+	};
+
+	sprd_marlin3: sprd-marlin3 {
+		compatible = "sprd,marlin3";
+		m2-to-ap-coexist-gpios = <&ap_gpio 119 GPIO_ACTIVE_LOW>;
+		m2-wakeup-ap-gpios = <&ap_gpio 32 GPIO_ACTIVE_LOW>;
+		permit-ap-send-gpios = <&ap_gpio 121 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&ap_gpio 97 GPIO_ACTIVE_LOW>;
+		enable-gpios = <&ap_gpio 143 GPIO_ACTIVE_LOW>;
+		m2-to-ap-irq-gpios = <&ap_gpio 96 GPIO_ACTIVE_LOW>;
+		avdd12-supply = <&vddwcn>;
+		avdd33-supply = <&vddwifipa>;
+		dcxo18-supply = <&vddsim2>;
+
+		clock-names = "clk_32k","source","enable";
+		clocks = <&aon_clk CLK_AUX0>,
+			 <&ext_32k>,
+			 <&aonapb_gate CLK_AUX0_EB>;
+
+		sdhci-name = <&sdio1>;
+		sprd,btwf-file-name = "/dev/block/platform/soc/soc:ap-apb/71400000.sdio/by-name/wcnmodem";
+		sprd,gnss-file-name = "/dev/block/platform/soc/soc:ap-apb/71400000.sdio/by-name/gnssmodem";
+		adma-tx;
+		adma-rx;
+		/*
+		 * bound parameter:
+		 * [0]:addr offset, [1]:mask, [2]:unboundval, [3]:boundval
+		 */
+		avdd12-parent-bound-chip = <0x1a4c 0x1 0x0 0x1>;
+		avdd12-bound-wbreq = <0x1ac8 0x1000 0x0 0x1000>;
+		avdd33-bound-wbreq = <0x1acc 0x4 0x0 0x4>;
+		post-power-on-delay-ms = <20>;
+	};
+
+	sprd-mtty {
+		compatible = "sprd,mtty";
+		sprd,name = "ttyBT";
+	};
+
+	sprd-fm {
+		compatible = "sprd,marlin3-fm";
+		sprd,name = "sprd-fm";
+	};
+
+	sprd-wlan {
+		compatible = "sprd,sc2355-wifi";
+	};
+
+	bat: battery {
+		compatible = "simple-battery";
+		charge-full-design-microamp-hours = <2780000>;
+		charge-term-current-microamp = <120000>;
+		constant_charge_voltage_max_microvolt = <4350000>;
+		factory-internal-resistance-micro-ohms = <320000>;
+		voltage-min-design-microvolt = <3450000>;
+		ocv-capacity-celsius = <20>;
+		ocv-capacity-table-0 = <4330000 100>, <4249000 95>, <4189000 90>,
+					<4133000 85>, <4081000 80>, <4034000 75>,
+					<3991000 70>, <3953000 65>, <3910000 60>,
+					<3866000 55>, <3836000 50>, <3813000 45>,
+					<3795000 40>, <3782000 35>, <3774000 30>,
+					<3765000 25>, <3750000 20>, <3726000 15>,
+					<3687000 10>, <3658000 5>, <3400000 0>;
+		charge-sdp-current-microamp = <500000 500000>;
+		charge-dcp-current-microamp = <2000000 3000000>;
+		charge-cdp-current-microamp = <1150000 1150000>;
+		charge-unknown-current-microamp = <500000 500000>;
+	};
+
+	charger-manager {
+		compatible = "charger-manager";
+		cm-name = "battery";
+		cm-poll-mode = <2>;
+		cm-poll-interval = <15000>;
+		cm-battery-stat = <2>;
+
+		cm-fullbatt-vchkdrop-ms = <30000>;
+		cm-fullbatt-vchkdrop-volt = <60000>;
+		cm-fullbatt-voltage = <4320000>;
+		cm-fullbatt-current = <120000>;
+		cm-fullbatt-capacity = <100>;
+
+		cm-num-chargers = <1>;
+		cm-chargers = "fan54015_charger";
+		cm-fuel-gauge = "sc27xx-fgu";
+
+		/* in deci centigrade */
+		cm-battery-cold = <200>;
+		cm-battery-cold-in-minus;
+		cm-battery-hot = <800>;
+		cm-battery-temp-diff = <100>;
+
+		/* Allow charging for 6hr */
+		cm-charging-max = <18000000>;
+
+		/* the interval to feed charger watchdog */
+		cm-wdt-interval = <60>;
+
+		/* drop voltage in microVolts to allow shutdown */
+		cm-shutdown-voltage = <3100000>;
+
+		/* when 99% of the time is exceeded, it will be forced to 100% */
+		cm-tickle-time-out = <1500>;
+
+		/* how much time to allow capacity change */
+		cm-one-cap-time = <30>;
+
+		/* when the safe charging voltage is exceeded, stop charging */
+		cm-charge-voltage-max = <6500000>;
+		/* drop voltage in microVolts to restart charging */
+		cm-charge-voltage-drop = <700000>;
+
+		regulator@0 {
+			cm-regulator-name = "vddgen0";
+			cable@0 {
+				cm-cable-name = "USB";
+				extcon = <&pmic_typec>;
+			};
+		};
+	};
+
+	gnss-common-ctl {
+		compatible = "sprd,gnss-common-ctl";
+		sprd,name = "gnss-common-ctl";
+	};
+
+	audio-mem-mgr {
+		memory-region = <&audio_reserved &audiodsp_reserved>;
+	};
+
+	tboard_thermistor:thermal-sensor {
+		compatible = "generic-adc-thermal";
+		#thermal-sensor-cells = <0>;
+		io-channels = <&pmic_adc 1>;
+		io-channel-names = "sensor-channel";
+		temperature-lookup-table = <	(-39742) 1131
+						(-29777) 1110
+						(-19480) 1074
+						(-4679) 983
+						10110 838
+						24805 654
+						44922 413
+						54903 316
+						64895 238
+						74884 178
+						84883 133
+						94883 100
+						104880 75
+						114889 57
+						124872 43 >;
+	};
+
+	dvfs_dcdc_cpu0_supply: dvfs-dcdc-cpu0-supply {
+		top-dvfs-adi-state = <0x70 0 0xf>;
+		voltage-grade-num = <7>;
+		voltage-grade = <0 0xe0 0xf4 0 0x1ff>,
+				<1 0xf0 0xf4 9 0x1ff>,
+				<2 0x100 0xf4 18 0x1ff>,
+				<3 0x110 0xf8 0 0x1ff>,
+				<4 0x120 0xf8 9 0x1ff>,
+				<5 0x130 0xf8 18 0x1ff>,
+				<6 0x140 0xfc 0 0x1ff>;
+		voltage-up-delay = <50 0x58 0 0xffff 0x600>,
+				<100 0x58 16 0xffff 0xa00>,
+				<150 0x54 0 0xffff 0xf00>,
+				<200 0x54 16 0xffff 0x1400>,
+				<250 0x50 0 0xffff 0x1900>,
+				<300 0x50 16 0xffff 0x1e00>,
+				<350 0x110 0 0xffff 0x2300>;
+		voltage-down-delay = <50 0x64 0 0xffff 0x600>,
+				<100 0x64 16 0xffff 0xa00>,
+				<150 0x60 0 0xffff 0xf00>,
+				<200 0x60 16 0xffff 0x1400>,
+				<250 0x5c 0 0xffff 0x1900>,
+				<300 0x5c 16 0xffff 0x1e00>,
+				<350 0x114 0 0xffff 0x2300>;
+		tuning-latency-us = <0>;
+		chnl-in-i2c = <0>;
+	};
+
+	dvfs_dcdc_cpu1_supply: dvfs-dcdc-cpu1-supply {
+		supply-type-sel = <0x120 0 1>;
+		top-dvfs-i2c-state = <0x9c 4 0xf>;
+		voltage-grade-num = <6>;
+		voltage-grade = <0 0x2d 0x12c 0 0x7f>,
+				<1 0x32 0x12c 7 0x7f>,
+				<2 0x37 0x12c 14 0x7f>,
+				<3 0x3c 0x12c 21 0x7f>,
+				<4 0x41 0x130 0 0x7f>,
+				<5 0x46 0x130 7 0x7f>;
+		voltage-up-delay = <50 0x84 0 0xffff 0x1600>,
+				<100 0x84 16 0xffff 0x1a00>,
+				<150 0x80 0 0xffff 0x1f00>,
+				<200 0x80 16 0xffff 0x2400>,
+				<250 0x7c 0 0xffff 0x2900>,
+				<300 0x7c 16 0xffff 0x2e00>,
+				<350 0x118 0 0xffff 0x3300>;
+		voltage-down-delay = <50 0x90 0 0xffff 0x600>,
+				<100 0x90 16 0xffff 0xa00>,
+				<150 0x8c 0 0xffff 0xf00>,
+				<200 0x8c 16 0xffff 0x1400>,
+				<250 0x88 0 0xffff 0x1900>,
+				<300 0x88 16 0xffff 0x1e00>,
+				<350 0x11c 0 0xffff 0x2300>;
+		tuning-latency-us = <250>;
+		chnl-in-i2c = <1>;
+	};
+
+	extcon_gpio: extcon-gpio {
+		compatible = "linux,extcon-usb-gpio";
+		vbus-gpio = <&pmic_eic 0 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&thm_zone {
+	bd_thmzone: board-thmzone {
+		polling-delay-passive = <0>;
+		polling-delay = <0>;
+		thermal-sensors = <&tboard_thermistor>;
+	};
+};
+
+&dmc_mpu {
+	status = "okay";
+	sprd,channel-names =
+		"CPU", "GPU", "DPU/DCAM","ISP",
+		"AP/VSP/AON", "WTLCP", "PUBCP/AUDCP",
+		"SHARED0", "SHARED1", "SHARED2",
+		"SHARED3", "SHARED4", "SHARED5",
+		"SHARED6", "SHARED7", "SHARED8";
+	sprd,ranges = <0 0 0 0>, <0 0 0 0>, <0 0 0 0>,
+		<0 0 0 0>, <0 0 0 0>, <0 0x87400000 0 0x9c100000>,
+		<0 0x87400000 0 0x9c100000>, <0 0 0 0>, <0 0 0 0>,
+		<0 0 0 0>, <0 0 0 0>, <0 0 0 0>,
+		<0 0 0 0>, <0 0 0 0>, <0 0 0 0>,
+		<0 0 0 0>;
+	sprd,chn-config =
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<ENABLE MON_OUTSIDE MON_WRITE>,
+		<ENABLE MON_OUTSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>;
+	sprd,panic;
+};
+
+&reserved_memory {
+	fb_reserved: framebuffer-mem {
+		reg = <0x0 0xfd708000 0x0 0x01e5a000>;
+	};
+
+	wb_reserved: writeback {
+		reg = <0x0 0xff562000 0x0 0x00a1e000>;
+	};
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&uart2 {
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+
+	sensor_main: sensor-main@20 {
+		compatible = "sprd,sensor-main";
+		reg = <0x20>;
+
+		clock-names = "clk_src","sensor_eb",
+			"clk_96m","clk_76m8",
+			"clk_48m","clk_26m";
+		clocks = <&mm_clk CLK_SENSOR0>,<&mm_gate CLK_MM_SENSOR0_EB>,
+			<&pll2 CLK_TWPLL_96M>,<&pll2 CLK_TWPLL_76M8>,
+			<&pll2 CLK_TWPLL_48M>,<&ext_26m>;
+		vddio-supply = <&vddcamio>;
+		vddcama-supply = <&vddcama0>;
+		vddcamd-supply = <&vddcamd0>;
+		vddcammot-supply = <&vddcammot>;
+		sprd,phyid = <0>;
+		csi = <&csi0>;
+		reset-gpios = <&ap_gpio 44 0>;
+		power-down-gpios = <&ap_gpio 46 0>;
+		mipi-switch-en-gpios = <&ap_gpio 55 0>;
+		/* 0:front, 1:main sensor */
+		mipi-switch-mode-gpios = <&ap_gpio 156 0>;
+
+		status = "okay";
+	};
+};
+
+&i2c1 {
+	status = "okay";
+
+	sensor_sub: sensor-sub@20 {
+		compatible = "sprd,sensor-sub";
+		reg = <0x20>;
+
+		clock-names = "clk_src","sensor_eb",
+			"clk_96m","clk_76m8",
+			"clk_48m","clk_26m";
+		clocks = <&mm_clk CLK_SENSOR1>,<&mm_gate CLK_MM_SENSOR1_EB>,
+			<&pll2 CLK_TWPLL_96M>,<&pll2 CLK_TWPLL_76M8>,
+			<&pll2 CLK_TWPLL_48M>,<&ext_26m>;
+		vddio-supply = <&vddcamio>;
+		vddcama-supply = <&vddcama0>;
+		vddcamd-supply = <&vddcamd0>;
+		vddcammot-supply = <&vddcammot>;
+		sprd,phyid = <0>;
+		csi = <&csi0>;
+		reset-gpios = <&ap_gpio 41 0>;
+		power-down-gpios = <&ap_gpio 40 0>;
+		mipi-switch-en-gpios = <&ap_gpio 55 0>;
+		/* 0:front, 1:main sensor */
+		mipi-switch-mode-gpios = <&ap_gpio 156 0>;
+
+		status = "okay";
+	};
+
+	sensor_main2: sensor-main2@6c {
+		compatible = "sprd,sensor-main2";
+		reg = <0x6c>;
+
+		clock-names = "clk_src","sensor_eb",
+			"clk_96m","clk_76m8",
+			"clk_48m","clk_26m";
+		clocks = <&mm_clk CLK_SENSOR1>,<&mm_gate CLK_MM_SENSOR1_EB>,
+			<&pll2 CLK_TWPLL_96M>,<&pll2 CLK_TWPLL_76M8>,
+			<&pll2 CLK_TWPLL_48M>,<&ext_26m>;
+		vddio-supply = <&vddcamio>;
+		vddcama-supply = <&vddcama1>;
+		vddcamd-supply = <&vddcamd1>;
+		vddcammot-supply = <&vddcammot>;
+		sprd,phyid = <3>;
+		csi = <&csi1>;
+		reset-gpios = <&ap_gpio 45 0>;
+		power-down-gpios = <&ap_gpio 47 0>;
+
+		status = "okay";
+	};
+};
+
+&i2c4 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	fan54015_chg: charger@6a {
+		compatible = "fairchild,fan54015_chg";
+		reg = <0x6a>;
+		phys = <&hsphy>;
+		monitored-battery = <&bat>;
+		extcon = <&extcon_gpio>;
+		vddvbus:otg-vbus {
+			regulator-name = "vddvbus";
+		};
+	};
+};
+
+&i2c5 {
+	clock-names = "i2c", "source";
+	clocks = <&aon_clk CLK_AON_I2C>, <&pll2 CLK_TWPLL_153M6>;
+
+	status = "okay";
+	clock-frequency = <3400000>;
+
+	ext_pmic: sc2703-buck@49 {
+		compatible = "sprd,sc2703-buck";
+		reg = <0x49>;
+		buck-gpios = <&ap_gpio 136 0>;
+
+		sprd,buck-ch1-b-out = <1000000>;
+
+		regulator-name = "sc2703-buck";
+		regulator-min-microvolt = < 300000>;
+		regulator-max-microvolt = <1570000>;
+		regulator-min-microamp = <5600000>;
+		regulator-max-microamp = <10800000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+
+	flash: sc2703-flash@4a {
+		compatible = "sprd,sc2703-flash";
+		reg = <0x4a>;
+		flash-chip-en-gpios = <&ap_gpio 137 0>;
+	};
+
+	/* A virtual i2c device */
+	cpudvfs@61{
+		compatible = "sprd,cpudvfs-regulator-sharkl5";
+		reg = <0x61>;
+		dvfs-dcdc-i2c = <1>;
+	};
+};
+
+&spi0 {
+	/*used for fingerprint sensor*/
+	status = "okay";
+};
+
+&dpu {
+	status = "okay";
+};
+
+&iommu_dispc {
+	status = "okay";
+};
+
+&iommu_dcam{
+	status = "okay";
+};
+
+&iommu_isp{
+	status = "okay";
+};
+
+&iommu_jpg{
+	status = "okay";
+};
+
+&iommu_cpp{
+	status = "okay";
+};
+
+&iommu_vsp{
+	status = "okay";
+};
+
+&iommu_fd{
+	status = "okay";
+};
+
+&dsi {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	panel: panel {
+		compatible = "sprd,generic-mipi-panel";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0>;
+
+		avdd-gpio = <&ap_gpio 132 GPIO_ACTIVE_HIGH>;
+		avee-gpio = <&ap_gpio 133 GPIO_ACTIVE_HIGH>;
+		reset-gpio = <&ap_gpio 50 GPIO_ACTIVE_HIGH>;
+		port {
+			reg = <1>;
+			panel_in: endpoint {
+				remote-endpoint = <&dphy_out>;
+			};
+		};
+	};
+};
+
+&sdio0 {
+	non-removable;
+	syscons = <&aon_apb_regs REG_AON_APB_AP_SDIO0_PHY_CTRL MASK_AON_APB_AP_SDIO0_CARD_PRESENT_32K>,
+		  <&aon_apb_regs REG_AON_APB_AP_SDIO0_PHY_CTRL MASK_AON_APB_AP_SDIO0_CARD_PROTECT_32K>,
+		  <&aon_apb_regs REG_AON_APB_AP_SDIO0_PHY_CTRL MASK_AON_APB_AP_SDIO0_CARDDET_DBNC_EN_32K>,
+		  <&aon_apb_regs REG_AON_APB_AP_SDIO0_PHY_CTRL MASK_AON_APB_AP_SDIO0_CARDDET_DBNC_THD_32K>;
+	syscon-names = "sd_detect_pol",
+		       "sd_hotplug_protect_en",
+		       "sd_hotplug_debounce_en",
+		       "sd_hotplug_debounce_cn";
+};
+
+&dphy {
+	status = "okay";
+};
+
+&hsphy {
+	vdd-supply = <&vddusb33>;
+	extcon = <&pmic_typec>;
+};
+
+&usb {
+	extcon = <&pmic_typec>;
+	vbus-supply = <&vddvbus>;
+};
+
+&pmic_typec {
+	status = "okay";
+};
+
+&vddldo0 {
+	regulator-always-on;
+};
+
+&pmic_fgu {
+	monitored-battery = <&bat>;
+	sprd,calib-resistance-real = <10000>;
+	sprd,calib-resistance-spec = <20000>;
+};
+
+&pwms {
+	status = "okay";
+};
+
+&vsp {
+	status = "okay";
+};
+
+&jpg {
+
+	status = "okay";
+};
+
+&dcam {
+	status = "okay";
+};
+
+&isp {
+	status = "okay";
+};
+
+&fd {
+	status = "okay";
+};
+
+&cpp {
+	status = "okay";
+};
+
+&csi0 {
+	status = "okay";
+};
+
+&csi1 {
+	status = "okay";
+};
+
+&csi2 {
+	status = "okay";
+};
+
+&mipi_csi_phy {
+	status = "okay";
+};
+
+&csi_phy0{
+	status = "okay";
+};
+
+&csi_phy1{
+	status = "okay";
+};
+
+&csi_phy2{
+	status = "okay";
+};
+
+&csi_phy3{
+	status = "okay";
+};
+
+&csi_phy4{
+	status = "okay";
+};
+
+&sprd_headset {
+	status = "okay";
+	extcon = <&pmic_typec>;
+	mic-gpios = <&ap_gpio 16 GPIO_ACTIVE_HIGH>;
+	lr-gpios = <&ap_gpio 15 GPIO_ACTIVE_HIGH>;
+	switch-supply = <&vddusb33>;
+	sprd,switch-voltage = <3300000>;
+	sprd,3pole-adc-threshold = <112>;
+};
+
+&sprd_audio_codec_ana {
+	status = "okay";
+	hp-use-inter-pa = <1>;
+	fixed-sample-rate = <48000 48000 48000>;
+	digital-codec = <&sprd_audio_codec_dig>;
+};
+
+&sound_vbc_v4_sprd_codec {
+	status = "okay";
+};
+&isp_dvfs {
+	status = "okay";
+};
+&cpp_dvfs {
+	status = "okay";
+};
+&jpg_dvfs {
+	status = "okay";
+};
+&fd_dvfs {
+	status = "okay";
+};
+&mtx_dvfs {
+	status = "okay";
+};
+&dcam_if_dvfs {
+	status = "okay";
+};
+&dcam_axi_dvfs {
+	status = "okay";
+};
+&mmsys_dvfs {
+	status = "okay";
+};
+
+&pin_controller {
+	pinctrl-names =
+	/* keyout0 ~ keyout2 */
+	"gpio_121", "gpio_122", "gpio_123",
+	/* keyin0 ~ keyin2 */
+	"gpio_124", "gpio_125", "gpio_126",
+	/* extint0, extint1, sda3, scl3 */
+	"gpio_144", "gpio_145", "gpio_146", "gpio_147";
+	pinctrl-0 = <&gpio_121>;
+	pinctrl-1 = <&gpio_122>;
+	pinctrl-2 = <&gpio_123>;
+	pinctrl-3 = <&gpio_124>;
+	pinctrl-4 = <&gpio_125>;
+	pinctrl-5 = <&gpio_126>;
+	pinctrl-6 = <&gpio_144>;
+	pinctrl-7 = <&gpio_145>;
+	pinctrl-8 = <&gpio_146>;
+	pinctrl-9 = <&gpio_147>;
+
+	gpio_121: keyout0 {
+		pins = "SHARKL5_KEYOUT0";
+		function = "func4";
+	};
+
+	gpio_122: keyout1 {
+		pins = "SHARKL5_KEYOUT1";
+		function = "func4";
+	};
+
+	gpio_123: keyout2 {
+		pins = "SHARKL5_KEYOUT2";
+		function = "func4";
+	};
+
+	gpio_124: keyin0 {
+		pins = "SHARKL5_KEYIN0";
+		function = "func4";
+	};
+
+	gpio_125: keyin1 {
+		pins = "SHARKL5_KEYIN1";
+		function = "func4";
+	};
+
+	gpio_126: keyin2 {
+		pins = "SHARKL5_KEYIN2";
+		function = "func4";
+	};
+
+	gpio_144: extint0 {
+		pins = "SHARKL5_EXTINT0";
+		function = "func4";
+	};
+
+	gpio_145: extint1 {
+		pins = "SHARKL5_EXTINT1";
+		function = "func4";
+	};
+
+	gpio_146: sda3 {
+		pins = "SHARKL5_SDA3";
+		function = "func4";
+	};
+
+	gpio_147: scl3 {
+		pins = "SHARKL5_SCL3";
+		function = "func4";
+	};
+};
+
+&vddrf18 {
+	status = "disabled";
+};
+
+&adi_bus {
+	sprd,hw-channels = <2 0x18cc>, <3 0x18cc>, <13 0x1854>, <15 0x1874>,
+			<17 0x1844>, <19 0x1844>, <30 0x1820>, <35 0x19b8>, <39 0x19ac>;
+};

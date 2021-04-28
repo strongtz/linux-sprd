@@ -1,0 +1,20 @@
+* Chipone tddi touchscreen interface
+
+Required properties:
+- compatible		: "chipone-tddi"
+- reg			: I2C slave address
+- chipone,rst-gpio	: touch controller reset gpio
+- chipone,irq-gpio	: touch controller interrupt gpio
+- chipone,x-res		: horizontal resolution of tp
+- chipone,y-res		: vertical resolution of tp
+
+Example:
+
+	chipone_tddi@48 {
+		compatible = "chipone-tddi";
+		reg = <0x48>;
+		chipone,rst-gpio = <&ap_gpio 145 0x00>;
+		chipone,irq-gpio = <&ap_gpio 144 0x00>;
+		chipone,x-res = <720>;
+		chipone,y-res = <1520>;
+	};

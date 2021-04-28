@@ -1,0 +1,26 @@
+* Spreadtrum sound fe driver
+
+This node models spreadtrum sound fe driver
+
+Required properties:
+
+this node allow sound use sound fe dai
+- compatible	: "sprd,fe-dai"
+- #sound-dai-cells : it used to select cpu dai number,
+	if equal 0 means use default dai 0, if equal 1,
+	the cpu dai number is determined by the second parameter
+	of sound-dai property.
+
+Example:
+sprd_fe_dai: sprd-fe-dai {
+	compatible = "sprd,fe-dai";
+	#sound-dai-cells = <1>;
+};
+
+sprd-audio-card,dai-link@1 {
+	...
+	cpu {
+		sound-dai = <&sprd_fe_dai 1>;
+	};
+	...
+};

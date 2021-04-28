@@ -1,0 +1,71 @@
+/*
+ * Spreadtrum Sharkl5Pro board common DTS file
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+#include "lcd/lcd_dummy_mipi.dtsi"
+
+/ {
+	display-subsystem {
+		compatible = "sprd,display-subsystem";
+		ports = <&dpu_port>;
+		gsp = <&gsp>;
+	};
+
+	firmware {
+		android {
+			compatible = "android,firmware";
+
+			vbmeta {
+				compatible = "android,vbmeta";
+				parts = "vbmeta,boot,recovery,system,vendor,product";
+			};
+
+			fstab {
+				compatible = "android,fstab";
+				vendor {
+					compatible = "android,vendor";
+					dev = "/dev/block/platform/soc/soc:ap-apb/71400000.sdio/by-name/vendor";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1";
+					fsmgr_flags = "wait";
+				};
+				product {
+					compatible = "android,product";
+					dev = "/dev/block/platform/soc/soc:ap-apb/71400000.sdio/by-name/product";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1";
+					fsmgr_flags = "wait";
+				};
+			};
+		};
+	};
+
+	sprd-sensorhub {
+		 compatible = "sprd,sharkl5Pro-sensorhub";
+	};
+
+	reserved_memory: reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		smem_reserved: sipc-mem@87800000{
+			reg = <0x0 0x87800000 0x0 0x00800000>;
+		};
+
+		cp_reserved: cp-modem@89600000 {
+			reg = <0x0 0x89600000 0x0 0x04b00000>;
+		};
+
+		/* Only used for iq, will be removed in normal mode by uboot */
+		iq_reserved: iq-mem@98100000{
+			compatible = "sprd,iq-mem";
+			reg = <0x0 0x98100000 0x0 0x4000000>;
+		};
+	};
+
+};

@@ -1,0 +1,12 @@
+config SPRD_SYSDUMP
+	bool "Enable SPRD sysdump handler"
+	help
+		This option enables Spreatrum sysdump which prepare debug info
+		for u-boot to write into mmc storage after kernel panics.
+config SPRD_MINI_SYSDUMP
+        depends on SPRD_SYSDUMP
+        bool "Enable SPRD mini sysdump handler"
+        help
+                This option enables Spreatrum mini sysdump which supplies simple
+                debug info for projects can not support external sd card after
+                system occurs kernel panics.

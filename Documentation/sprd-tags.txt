@@ -1,0 +1,165 @@
+标题示例如下：
+Bug[空格]#bug_id[空格]attributetag:[空格]subsystemtag1:[空格]subsystemtag2:[空格]summary phrase
+
+    |bug_id为合法的Bug号，系统会根据Bug级别排列Review优先级
+    |summary phase用命令句式
+    |标题不能折行，结尾无句号
+    |每个patch至少有一个tag，最多有两个attribute tag和三个subsystem tag
+    |attribute tag为全大写，subsystem tag为全小写(Documentation除外)
+    |每个tag后面带一个英文的冒号(":")，用一个空格和后面内容分开
+    |tag必须在对应的tag范围内，超过范围的tag不允许使用
+
+    attribute tag范围及描述：
+        ANDROID: 解决android特有问题。必须注明出处，一般可免于Review，直接+2。
+        UPGRADE: 来自其他分支merged的提交。必须注明出处，一般可免于Review，直接+2。
+        FROMLIST: 来自社区邮件列表，但还未合入，或被拒绝。必须注明出处，一般可免于Review，直接+2。
+        UPSTREAM: 来自linux mainline分支。必须注明commit id，一般可免于Review，直接+2。
+        BACKPORT: 带UPSTREAM标签需要修改才能合入，需用BACKPORT代替UPSTREAM；带FROMGIT、FROMLIST需要修改才能合入，
+                  就在对应标签前面加上"BACKPORT:"。
+        FROMGIT: 来自非linux mainline的其他仓库。必须注明commit id，如无commit id注明出处，一般可免于Review，直接+2。
+        REVERT: 需要回退的patch。必须填写回退patch的commit id。
+        SECURITY: 安全patch（特指Kernel漏洞修复）。
+        PRIVATE: 表示经开源委员会审定无需upstream。
+        WORKAROUND: 临时性合入，针对某些极端问题（多是硬件BUG）的特殊解决方法。代码量一般不多。可调低代码审查标准。
+        DIRTY: 一般为对公共代码的修改，且不具备Upstream资质。比如调试性代码、内部功能等。可调低代码审查标准。
+        TEST: 测试case相关代码。
+
+自动检查脚本对属性标签检查执行如下规则：
+    [ANDROID:FROMLIST]:不检查commit id，不检查subsystem tag
+    [UPSTREAM:REVERT]:检查commit id，不检subsystem tag
+    [SECURITY:DIRTY]:不检查commit id，检查subsystem tag
+不带属性标签,检查subsystem tag。
+所有标签必须和标签范围内容一致，大小写敏感。
+
+subsystem tag和修改文件的检查规则：
+    |subsystem tag必须至少在一个修改文件的路径上
+    |dts、Documentation作为标签或在修改文件路径上时，subsystem tag必须在每一个修改文件的路径上
+    |不检查subsystem tag的属性标签，不做此检查
+    |只有一级标签能带*，带*的一级标签在只检查一级标签，忽略其他标签的修改文件和标签一致的检查
+
+标签范围：
+[info]
+ANDROID,UPGRADE,FROMLIST,UPSTREAM,BACKPORT,FROMGIT,REVERT,SECURITY,PRIVATE,WORKAROUND,DIRTY,TEST
+
+include:dt-bindings:
+clk:sprd:
+spi:sprd:
+serial:sprd:
+spi:sprd:
+i2c:sprd:
+usb:typec:
+usb:gadget:
+usb:dwc3:
+usb:musb:
+usb:misc:
+usb:phy:
+gpio:sprd:
+pinctrl:sprd:
+watchdog:sprd:
+regulator:sprd:
+rtc:sc27xx:
+dmaengine:sprd:
+hwspinlock:sprd:
+power:supply:charger-manager:
+power:supply:fan54015:
+power:supply:sc27xx:
+power:suspends:
+soc:sprd:busmonitor:
+iio:adc:
+thermal:core:
+thermal:sprd:
+nvmem:sprd:
+crypto:
+drm:sprd:cabc:
+drm:sprd:dpu:
+drm:sprd:dphy:
+drm:sprd:dsi:
+drm:sprd:dummy:
+drm:sprd:sysfs:
+drm:sprd:
+video:backlight:
+mmc:core:
+mmc:sprd:
+drm:sprd:gsp:
+input:keyboard:
+leds:trigger:
+leds:sc27xx:
+input:sprd:
+input:touchscreen:
+iio:sprd:
+misc:sprd_vsp:
+misc:sprd_jpg:
+staging:sprd:sipa:
+staging:android:ion:
+soc:sprd:iommu:
+misc:audio:
+asoc:usb:
+asoc:sprd:codec:
+asoc:sprd:dai:
+asoc:sprd:platform:
+asoc:sprd:include:
+asoc:sprd:
+misc:sprd_camera:
+scsi:ufs:sprd:
+fs:f2fs:
+fs:sdcardfs:
+fs:
+lib:e_show_mem:
+mm:memblock:
+mm:vmscan:
+mm:
+clocksource:sprd:
+irqchip:
+mfd:sprd:
+coresight:
+hwtracing:stm:
+cpuidle:
+cpufreq:sprd:
+cpufreq:
+devfreq:sprd:
+cpuhotplug:sprd:
+tee:
+security:selinux:
+security:
+gpu:sprd:
+pwm:sprd:
+soc:sprd:modem:
+staging:sprd:modem:
+soc:sprd:dmc_mpu:
+soc:sprd:cpu_usage:
+soc:sprd:irq:
+soc:sprd:djtag:
+soc:sprd:last_regs:
+soc:sprd:sysdump:
+soc:sprd:debug:
+arm:dts:
+arm64:dts:
+x86:dts:
+arm:configs:
+arm64:configs:
+x86:configs:
+net:
+soc:sprd:pub:
+soc:sprd:domain:
+soc:sprd:memdisk:
+soc:sprd:ptm:
+soc:sprd:
+soc:sprd:
+power:
+pci:dwc:
+pci:dwc:sprd:
+scripts:dtc:
+scripts:sprd:
+sched:*
+trace:
+trusty:
+firmware:sprd:
+firmware:psci:
+time:
+printk:
+arm:topology:
+arm64:topology:
+x86:topology:
+include:*
+dt-bindings:*
+Documentation:*

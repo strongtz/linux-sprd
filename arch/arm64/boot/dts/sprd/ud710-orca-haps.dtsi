@@ -1,0 +1,99 @@
+/*
+ * Spreadtrum UD710 SoC DTS file
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+#include <dt-bindings/clock/sprd,roc1-clk.h>
+#include "roc1-haps.dtsi"
+#include "ud710-orca-haps-modem.dtsi"
+
+/ {
+
+	cpus {
+		#address-cells = <2>;
+		#size-cells = <0>;
+
+		cpu-map {
+			cluster0 {
+				core0 {
+					cpu = <&CPU0>;
+				};
+			};
+		};
+
+		CPU0: cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a55","arm,armv8";
+			reg = <0x0 0x0>;
+		};
+	};
+
+	gic: interrupt-controller@12000000 {
+		compatible = "arm,gic-v3";
+		#interrupt-cells = <3>;
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+		redistributor-stride = <0x0 0x20000>;	// 128KB stride
+		#redistributor-regions = <1>;
+		interrupt-controller;
+		reg = <0x0 0x12000000 0 0x20000>,	// GICD
+			<0x0 0x12040000 0 0x100000>;	// GICR
+		interrupts = <1 9 4>;
+	};
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <GIC_PPI 13 IRQ_TYPE_LEVEL_HIGH>, /* Physical Secure PPI */
+			<GIC_PPI 14 IRQ_TYPE_LEVEL_HIGH>, /* Physical Non-Secure PPI */
+			<GIC_PPI 11 IRQ_TYPE_LEVEL_HIGH>, /* Virtual PPI */
+			<GIC_PPI 10 IRQ_TYPE_LEVEL_HIGH>; /* Hipervisor PPI */
+		arm,no-tick-in-suspend;
+	};
+
+	soc {
+		apahb_gate: apahb-gate {
+			compatible = "sprd,roc1-apahb-gate";
+			sprd,syscon = <&ap_ahb_regs>; /* 0x20100000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+
+		aonapb_gate: aonapb-gate {
+			compatible = "sprd,roc1-aon-gate";
+			sprd,syscon = <&aon_apb_regs>; /* 0x32090000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+
+		apapb_gate: apapb-gate {
+			compatible = "sprd,roc1-apapb-gate";
+			sprd,syscon = <&ap_apb_regs>; /* 0x71000000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+	};
+
+};
+
+&sdio0 {
+	clock-names = "sdio_clk_source", "sdio_ahb_enable";
+	clocks = <&ext_26m>, <&apapb_gate 22>;
+};
+
+&sdio1 {
+	clock-names = "sdio_clk_source", "sdio_ahb_enable";
+	clocks = <&ext_26m>, <&apapb_gate 23>;
+};
+
+&sdio2 {
+	clock-names = "sdio_clk_source", "sdio_ahb_enable";
+	clocks = <&ext_26m>, <&apapb_gate 24>;
+};
+
+&sdio3 {
+	clock-names = "sdio_clk_source", "sdio_ahb_enable";
+	clocks = <&ext_26m>, <&apapb_gate 25>;
+};

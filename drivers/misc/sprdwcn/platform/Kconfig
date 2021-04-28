@@ -1,0 +1,38 @@
+config WCN_BOOT
+	tristate "Core Support"
+	help
+	Choose Y here if you have this FM radio chip.
+
+	In order to control your ext wcn chip, you will need enable it.
+	that include "boot, log, procfs, debugfs, at cmd, loopcheck, dumpmem,
+	reset, reboot,etc"
+
+config WCN_UTILS
+	bool "wcn debug for read and write register"
+	help
+	Choose Y here if you need to read/write register of wcn chip,
+	this is used for RD debug.
+
+	In order to control or debug your marlin chip, you will need to support
+	procfs command to read/write register of marlin chip on.
+
+config WCN_PLATFORM
+	tristate "Platform Support"
+	depends on SC2342_INTEG
+	default y
+	help
+	Enable this module for Spreadtrum WCN integration
+	chip debug and manage function.
+
+	In order to control or debug your marlin chip, you will need to
+	support procfs command and memory dump,cp log and so on.
+
+config WCN_SWD
+	bool "wcn swd support"
+	depends on UMW2653
+	help
+	Choose Y here if you need to support SWD driver to access arm registers,
+	this is used for RD debug.
+
+	In order to control or debug your marlin chip, you will need to support
+	swd driver to access arm registers.

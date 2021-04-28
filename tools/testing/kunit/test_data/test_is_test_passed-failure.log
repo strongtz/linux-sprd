@@ -1,0 +1,12 @@
+kunit example: initializing
+kunit example: example_simple_test passed
+kunit example: exiting
+kunit example: initializing
+kunit example: EXPECTATION FAILED at test/example-test.c:34
+	Expected 3 == mock->example.foo(&mock->example, 5), but is not.
+kunit example: example_mock_test failed
+kunit example: exiting
+kunit example: one or more tests failed
+dummy 0-0053: hwmon0: sensor 'lm75'
+kunit lm75: lm75_test_read passed
+kunit lm75: all tests passed

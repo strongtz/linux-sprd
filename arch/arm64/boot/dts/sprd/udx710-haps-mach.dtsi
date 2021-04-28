@@ -1,0 +1,41 @@
+/*
+ * Spreadtrum UDX710 Haps board common DTS file
+ *
+ * Copyright (C) 2017, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+#include "udx710-haps-modem.dtsi"
+
+/ {
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		ddrbist_reserved: ddrbist-mem@80000000 {
+			reg = <0x0 0x80000000 0x0 0x00000080>;
+		};
+
+		sml_reserved: sml-mem@85300000 {
+			reg = <0x0 0x85300000 0x0 0x00020000>;
+		};
+
+		audio_reserved: audio-mem@86e00000 {
+			reg = <0x0 0x86e00000 0x0 0x00400000>;
+		};
+
+		audiodsp_reserved: audiodsp-mem@87200000 {
+			reg = <0x0 0x87200000 0x0 0x00600000>;
+		};
+
+		smem_reserved: sipc-mem@87800000 {
+			reg = <0x0 0x87800000 0x0 0x00800000>;
+		};
+
+		cp_reserved: cp-modem@88000000 {
+			reg = <0x0 0x88000000 0x0 0x15000000>;
+		};
+	};
+};

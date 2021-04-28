@@ -1,0 +1,14 @@
+Spreadtrum Camera devices
+
+This node provides properties for controlling the Spreadtrum Camera device.
+
+Required properties:
+
+ - compatible should be one of following:
+	"sprd,sharkl3-cam"
+	"sprd,sharkl5pro-cam"
+
+Example:
+dcam: dcam@60a00000 {
+	compatible = "sprd,sharkl3-cam";
+}

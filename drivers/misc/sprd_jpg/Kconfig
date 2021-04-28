@@ -1,0 +1,13 @@
+config SPRD_JPG
+	tristate "SPRD jpg driver"
+
+if SPRD_JPG
+
+config SPRD_JPG_CALL_VSP_PW_DOMAIN
+	bool "SPRD jpg call vsp power domain"
+	---help---
+	say Y if in whale series chip, such as SHARKL3;
+	otherwise, N.
+	this is to power on jpg domain.
+
+endif

@@ -1,0 +1,73 @@
+/*
+ * Spreadtrum UD710 board common DTS file
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+/ {
+	firmware {
+		android {
+			compatible = "android,firmware";
+
+			fstab {
+				compatible = "android,fstab";
+
+				data {
+				    compatible = "android,data";
+				    dev = "/dev/block/memdisk0p2";
+				    type = "ext4";
+				    mnt_flags = "noatime,nosuid,nodev,noauto_da_alloc,errors=panic";
+				    fsmgr_flags = "wait";
+				};
+
+				vendor {
+				    compatible = "android,vendor";
+				    dev = "/dev/block/memdisk0p3";
+				    type = "ext4";
+				    mnt_flags = "ro,barrier=1";
+				    fsmgr_flags = "wait";
+				};
+
+			};
+		};
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+		system_memdisk_reserved: system_memdisk_reserved@c0000000{
+			reg = <0x0 0xc0000000 0x0 0x60000000>;  /* system 1536M */
+		};
+
+		userdata_memdisk_reserved: userdata_memdisk_reserved@120000000{
+			reg = <0x1 0x20000000 0x0 0x20000000>; /* userdata 512M */
+		};
+
+		vendor_memdisk_reserved: vendor_memdisk_reserved@140000000{
+			reg = <0x1 0x40000000 0x0 0x12c00000>; /* vendor 300M */
+		};
+	};
+
+	sprd_memdisk {
+		compatible = "sprd,memdisk";
+
+		system {
+			memory-region = <&system_memdisk_reserved>;
+			label = "memdisk0p1";
+		};
+
+		userdata {
+			memory-region = <&userdata_memdisk_reserved>;
+			label = "memdisk0p2";
+		};
+
+		vendor {
+			memory-region = <&vendor_memdisk_reserved>;
+			label = "memdisk0p3";
+		};
+	};
+};
+

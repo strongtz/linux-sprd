@@ -1,0 +1,99 @@
+Spreadtrum DMC MPU
+
+Required properties:
+- compatible: "sprd,sharkl3-dmc-mpu", "sprd,sharkl5-dmc-mpu", "sprd,sharkl5pro-dmc-mpu".
+	There will be different IP versions for different Spreadtrum
+	SoC families. So we use specified IP to compatible different SoC.
+	e.g. sprd,dmc-mpu-r4p0 for SHARKL3.
+- reg: Address range of dmc mpu registers.
+- syscon-names: Should contain following entries:
+	"irq_clr" for clear MPU irq.
+	"irq_enable" for enable MPU irq.
+- syscons: Should contain the base address, offset and bit for each entry in syscon-names.
+- sprd,ddr-interleaved: Used to indicate whether the DDR is interleaved.
+- interrupts: Should contain the bus-monitor interrupt number.
+- sprd,channel-num: Should contain DDR hardware channel number.
+- sprd,mpu-num: Should contain MPU module number.
+- sprd,channel-names: Should contain the name of each DDR hardware channel.
+- sprd,ranges: Should contain DMC MPU monitored range address each channel.
+- sprd,chn-config: Should contain enable channel, monitor range and monitor mode.
+- sprd,id-config: Should contain DMC MPU monitored ID type, master ID and mask bits.
+- sprd,panic: Used to indicate whether panic when occurred the address violate event
+- sprd,shared-chn: Should contain the channel name which used for shared.
+- sprd,port-map: Should contain the mapping table from the MPU channel to
+	the DDR channel.
+- sprd,ddr-offset: The value is the offset of the AXI accessing address to
+	the DDR hardware address
+- status: Used to indicate whether open the MPU device.
+
+Configuration related macro definitions:
+/*MPU property*/
+#define ENABLE		1
+#define DISABLE		0
+#define MON_WRITE	1
+#define MON_READ	2
+#define MON_WRITEREAD	(MON_WRITE | MON_READ)
+#define MON_OUTSIDE	0
+#define MON_INSIDE	1
+
+/*ID property*/
+#define USERID	1
+#define MPUID	0
+
+Example:
+
+dmc_mpu: dmc-mpu@300e0000 {
+	compatible = ""sprd,sharkl5-dmc-mpu";
+	reg = <0 0x300e0000 0 0x20000>;
+	interrupts = <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>;
+	syscon-names = "irq_clr", "irq_en";
+	syscons = <&pub_apb_regs REG_PUB_APB_PUB_INT_CTRL
+		MASK_PUB_APB_DMC_MPU_VIO_INT_CLR>,
+		<&pub_apb_regs REG_PUB_APB_PUB_INT_CTRL
+		MASK_PUB_APB_DMC_MPU_VIO_INT_EN>;
+	sprd,channel-num = <8>;
+	sprd,mpu-num = <16>;
+	sprd,channel-names =
+		"MM", "GPU", "DPU","CPU",
+		"AP/PUBCP", "WTLCP", "AON/WCN/ETR",
+		"VSP", "SHARED0", "SHARED1",
+		"SHARED2","SHARED3", "SHARED4",
+		"SHARED5","SHARED6", "SHARED7";
+	sprd,ranges = <0 0>, <0 0>, <0 0>, <0 0>,
+		<0 0>, <0 0>, <0 0>, <0 0>,
+		<0 0>, <0 0>, <0 0>, <0 0>,
+		<0 0>, <0 0>, <0 0>, <0 0>;
+	sprd,chn-config =
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>,
+		<DISABLE MON_INSIDE MON_WRITE>;
+	sprd,id-config =
+			<MPUID 0 0>, <MPUID 0 0>,
+			<MPUID 0 0>, <MPUID 0 0>,
+			<MPUID 0 0>, <MPUID 0 0>,
+			<MPUID 0 0>, <MPUID 0 0>,
+			<MPUID 0 0>, <MPUID 0 0>,
+			<MPUID 0 0>, <MPUID 0 0>,
+			<MPUID 0 0>, <MPUID 0 0>,
+			<MPUID 0 0>, <MPUID 0 0>;
+	sprd,port-map = <0>, <1>, <2>, <3>, <4>,
+			<5>, <6>, <7>, <0>, <0>,
+			<0>, <0>, <0>, <0>, <0>,
+			<0>;
+	sprd,ddr-offset = <0x80000000>;
+	sprd,panic;
+	status = "disabled";
+};

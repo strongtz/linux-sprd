@@ -1,0 +1,39 @@
+= Spreadtrum thermal device tree bindings =
+
+Required properties:
+- compatible : "sprd,sharkl5-thermal"
+- reg : Address range of the thermal registers
+- clock-names: "enable" for thermal module enable clock.
+- clocks: Should contain a clock specifier for each entry in clock-names.
+- reg: sensor number.
+- nvmem-cells: A phandle to the calibration data provided by a nvmem device.
+- nvmem-cell-names: Should be "thm_sign_cal" and "thm_ratio_cal", in sensor node
+		    should is "sen_delta_cal".
+
+Example:
+
+	ap_thm0: thermal@32200000 {
+		 compatible = "sprd,sharkl5-thermal";
+		 reg = <0 0x32200000 0 0x10000>;
+		 clock-names = "enable";
+		 clocks = <&aonapb_gate CLK_THM0_EB>;
+		 #thermal-sensor-cells = <1>;
+		 nvmem-cells = <&thm0_sign>, <&thm0_ratio>;
+		 nvmem-cell-names = "thm_sign_cal", "thm_ratio_cal";
+
+		 prometheus0-sensor@0{
+				reg = <0>;
+				nvmem-cells = <&thm0_sen0>;
+				nvmem-cell-names = "sen_delta_cal";
+		};
+
+		ank1-sensor@1{
+				reg = <1>;
+				nvmem-cells = <&thm0_sen1>;
+				nvmem-cell-names = "sen_delta_cal";
+		};
+
+		.....
+		.....
+		.....
+	};

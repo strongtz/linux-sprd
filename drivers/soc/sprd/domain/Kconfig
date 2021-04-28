@@ -1,0 +1,31 @@
+config DISP_PM_DOMAIN_SHARKL3
+	bool "SPRD Display PM Generic Domain for SharkL3"
+	select PM_GENERIC_DOMAINS if PM
+	help
+	  When you select this feature, it will enable the pm generic
+	  power domain for SharkL3 display module.
+
+config SPRD_MM_PW_DOMAIN_R6P0
+	bool "Unisoc MM System Power Domain r6p0"
+	help
+	  This is a power domain driver for mm sys.
+
+config SPRD_CAM_PW_DOMAIN_R5P0
+	bool "SPRD Cam System Power Domain r5p0"
+	help
+	  This is a power domain driver for cam sys.
+
+config SPRD_CAM_PW_DOMAIN_R5P1
+	bool "SPRD Cam System Power Domain r5p1"
+	help
+	  This is a power domain driver for cam sys.
+
+config SPRD_CAM_PW_DOMAIN_R7P0
+	bool "SPRD Cam System Power Domain r7p0"
+	help
+	  This is a power domain driver for cam sys.
+
+config SPRD_CAM_PW_DOMAIN_R4P0
+        bool "SPRD Cam System Power Domain r4p0"
+        help
+          This is a power domain driver for cam sys.

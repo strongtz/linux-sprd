@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Unisoc Qogirn6pro platform DTS file
+ *
+ * Copyright (C) 2019, Unisoc Communications Inc.
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include "ums7520-haps.dtsi"
+#include "ums7520-haps-mach.dtsi"
+
+/ {
+	model = "Unisoc UMS7520 Haps board";
+
+	compatible = "sprd,ums7520";
+
+	sprd,sc-id = <7520 1 0x20000>;
+
+	aliases {
+		serial0 = &uart0;
+		serial1 = &uart1;
+	};
+
+	memory: memory {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0xd2c00000>;
+	};
+
+	chosen {
+		stdout-path = &uart1;
+		bootargs = "earlycon=sprd_serial,0x70100000,115200n8 console=ttyS1,115200n8 loglevel=7 init=/init root=/dev/ram0 rw androidboot.hardware=ums7520_haps androidboot.dtbo_idx=0 printk.devkmsg=on androidboot.selinux=permissive";
+	};
+
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};

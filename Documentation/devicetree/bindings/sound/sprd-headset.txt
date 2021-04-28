@@ -1,0 +1,61 @@
+* Spreadtrum headset driver
+
+This node models spreadtrum headset driver
+
+Required properties:
+
+- compatible : "sprd,headset",
+- sprd,jack-type: headset jack type, normal open/close
+- io-channels: adc channel used to read headset adc
+- io-channel-names: adc channel name
+- gpios: TOP EIC GPIO
+- sprd,debounce-interval: headset plugin/plugout debounce time
+- gpio-names: the GPIO name of TOP EIC
+- sprd,3pole-adc-threshold: threshold value to distinguish 3 pole or 4 pole
+- sprd,adc-gnd: GND adc value
+- sprd,half-adc-gnd: half of GND adc value
+- sprd,coefficient: coefficient used to calculate voltage
+- sprd,irq-threshold-button: button threshold value
+- nvmem-cells: cells used to read efuse value
+- nvmem-cell-names: names of cells
+- sprd,headset-button: headset key
+- adc-min: minimum adc value of a headset key
+- adc-max: maximum adc value of a headset key
+- code: headset key ID
+
+Optional properties:
+- extcon: phandle for the extcon device pmic_typec uses to detect
+- mic-gpios: typec analog headset MIC/GND switch
+- lr-gpios: typec analog headset LR/USB switch
+- switch-supply: typec analog headset power supply
+- sprd,switch-voltage: typec analog headset voltage value
+- sprd,spk-route-hp: boolean,ext speaker use hp path
+
+Example:
+sprd_headset: sprd-headset {
+		compatible = "sprd,headset";
+		sprd,jack-type = <0>;
+		io-channels = <&pmic_adc 20>;
+		io-channel-names = "headmic_in_little";
+		gpios = <&pmic_eic 6 GPIO_ACTIVE_HIGH>;
+		sprd,debounce-interval = <10>;
+		gpio-names = "aud_int_all";
+		sprd,3pole-adc-threshold = <3054>;
+		sprd,adc-gnd = <336>;
+		sprd,half-adc-gnd = <131>;
+		sprd,coefficient = <906270>;
+		sprd,irq-threshold-button = <5>;
+		nvmem-cells = <&headset_adc_fir>, <&headset_adc_sec>;
+		nvmem-cell-names = "hp_adc_fir_calib", "hp_adc_sec_calib";
+		extcon = <&pmic_typec>;
+		mic-gpios = <&ap_gpio 52 GPIO_ACTIVE_LOW>;
+		lr-gpios = <&ap_gpio 55 GPIO_ACTIVE_LOW>;
+		switch-supply = <&vddusb33>;
+		sprd,switch-voltage = <3300000>;
+
+		sprd,headset-button@0 {
+			adc-min = <0>;
+			adc-max = <399>;
+			code = <226>;
+		};
+	};

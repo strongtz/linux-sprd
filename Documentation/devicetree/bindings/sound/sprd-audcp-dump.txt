@@ -1,0 +1,24 @@
+* Spreadtrum sound audio cp dump driver
+
+This node models spreadtrum sound audio cp dump driver
+
+Required properties:
+- compatible : "sprd,audio_dsp_log", "sprd,audio_dsp_mem"
+	"sprd,audio_dsp_pcm"
+- sprd-usemem-type : allocated memory block id for dump
+- sprd-dst : communicate target, should be 1 for audio cp
+- sprd-channel : communicate channel id, negotiate with dsp
+- sprd-rxblocknum : share memory is divided several blocks.
+	and sprd-rxblocknum is defined the block counts.
+- sprd-rxblocksiz: eshare memory is divided several blocks.
+	and sprd-rxblocknum is defined the size of one block.
+
+Example:
+audio-dsp-dump@0 {
+	compatible = "sprd,audio_dsp_log";
+	sprd-usemem-type =<0x5>;
+	sprd-dst = /bits/ 8 <1>;
+	sprd-channel =/bits/ 8 <4>;
+	sprd-rxblocknum=<0x8>;
+	sprd-rxblocksize=<0x2000>;
+};

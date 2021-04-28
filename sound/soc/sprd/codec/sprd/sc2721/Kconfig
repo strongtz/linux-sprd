@@ -1,0 +1,4 @@
+config SND_SOC_SPRD_CODEC_SC2721
+	tristate "Sprd codec sc2721"
+	help
+	  If the codec is the series of sc2721, set this to Y or M, else N.

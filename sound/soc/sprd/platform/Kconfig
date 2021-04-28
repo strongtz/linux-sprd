@@ -1,0 +1,8 @@
+menu "SPRD Platform"
+
+config SND_SOC_SPRD_AUDIO_TWO_STAGE_DMAENGINE_SURPPORT
+	bool "Use 2 stage dma engine"
+	help
+	  Say Y if you want to use 2stage dma engine, 2 stage dma is
+           designed for low power.
+endmenu

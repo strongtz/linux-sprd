@@ -1,0 +1,26 @@
+Spreadtrum USB PAMU3
+===========================================================
+
+Required properties:
+  - compatible: should be one of following:
+    "sprd,roc1-pamu3",
+    "sprd,orca-pamu3"
+  - reg: index0 must be the pamu3 base address and length
+	index1 must be the dwc3 base address and length
+  - reg-names: "pam_glb_regs" for the pamu3 registers
+	"dwc3_core_regs" for dwc3 core registers
+  - sprd,syscon-ipa-ahb: "ipa_ahb_regs" for ipa ahb syscon
+
+Example
+-------
+
+Board specific DT entry:
+
+	pamu3: pamu3@21100000 {
+		compatible = "sprd,roc1-pamu3";
+		reg = <0 0x21100000 0 0x10000>,
+			<0 0x20f00000 0 0x100000>;
+		reg-names = "pam_glb_regs",
+			"dwc3_core_regs";
+		sprd,syscon-ipa-ahb = <&ipa_ahb_regs>;
+	};

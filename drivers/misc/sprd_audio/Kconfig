@@ -1,0 +1,67 @@
+menu "Spreadtrum Audio Assistant Modules"
+config SPRD_AUDIO_AGDSP_ACCESS
+	tristate "Sprd audio agdsp access"
+	depends on SPRD_MAILBOX
+	help
+	  This module is used to enable the access
+	  of agdsp registers.
+	  If audio use audio cp, this config should be selected.
+	  If r3p0 vbc is used, this must be set to Y.
+
+config SPRD_AUDIO_MEMORY_MANAGER
+	tristate "Sprd audio memory manager"
+	help
+	  This module is used to manager memories that needed by offlad play(mp3 play),
+	  music data buffer used by dma, audio sipc and share memory.
+	  If r3p0 vbc is used, this must be set to Y.
+	  Say Y if you support audio memory manager.
+
+config SPRD_AUDIO_DSP_DUMP
+	tristate "Sprd audio dsp dump"
+	depends on SPRD_SIPC
+	help
+		This module is used to dump dsp log,
+		memory and pcm data.
+		The main purpers is support debug information.
+		Say Y if you support dsp dump.
+
+config SPRD_AUDIO_SIPC
+	tristate "Sprd audio sipc"
+	depends on SPRD_MAILBOX && SPRD_AUDIO_MEMORY_MANAGER
+	help
+		This module is used to communication with
+		other processor(e.g. agdsp).
+		It depends on mailbox and audio memeroy manager.
+		Say Y if you support sipc.
+
+config SPRD_AUDIO_SAUDIO
+	tristate "Sprd saudio driver in call mode based on sipc"
+	depends on SPRD_SIPC
+	default N
+	help
+	  Say Y if you want to built in to kernel, Say M for ko module.
+	  SAudio is a bridge to connect AP and CP system.
+
+config SPRD_AUDIO_MCDT
+	bool "Spreadtrum MCDT support"
+	default n
+	help
+	  MCDT(Multi-Channel Data Transfer) is a Hardware module
+	  that can be used to transfer data between AP and DSP,
+	  normally we use it transfer audio data.
+	  Say Y if your platform supports hardware MCDT.
+
+config SPRD_HW_DEVICE_DVFS_AGCP
+	tristate "Spreadtrum AGCP dvfs driver"
+	depends on SPRD_MAILBOX && SPRD_AUDIO_MEMORY_MANAGER
+	help
+	   This driver supports dvfs interfaces for PUBCP DVFS and WTLCP DVFS at user specidied.
+
+config SPRD_AUDIO_CPBOOT
+	tristate "Spreadtrum AGCP boot driver"
+	depends on SPRD_AUDIO_MEMORY_MANAGER
+	help
+	  Audio cp boot driver is used for reboot audio cp in kernel.
+	  It support interface for userspace to stop audio cp, download dsp bin and
+	  start audio cp.
+endmenu

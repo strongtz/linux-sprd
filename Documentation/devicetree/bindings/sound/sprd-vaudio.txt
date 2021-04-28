@@ -1,0 +1,16 @@
+* Spreadtrum cpu dai driver
+
+This dai for voice call
+
+Required properties:
+
+- compatible : "sprd,vaudio"
+- clocks : the tuned clock node that need to wwitch for voice call
+- clock-names : the clock name that need to switch for voice call
+
+Example:
+This dai for voice call and witch the 26M tuned clock for voice call
+&vaudio {
+	clocks = <&clk_audio_gate 8>;
+	clock-names = "tuned_26m";
+};

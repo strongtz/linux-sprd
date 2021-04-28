@@ -1,0 +1,30 @@
+menu "SPRD Codec"
+
+source "sound/soc/sprd/codec/sprd/sc2730/Kconfig"
+source "sound/soc/sprd/codec/sprd/sc2721/Kconfig"
+source "sound/soc/sprd/codec/sprd/ucp1301/Kconfig"
+
+config SND_SOC_SPRD_CODEC_EAR_WITH_IN_SPK
+	bool "Earpiece with in Speaker"
+	help
+	  Say Y if your device is use ear&spk in one,
+	  and ear have TDD noise when in call mode.
+	  Under normal conditions,this feature should to be open.
+
+config SND_SOC_SPRD_CODEC_NO_HP_POP
+	bool "Codec no HP POP"
+	help
+	  Say Y if you want *NOT* the CODEC do hp pop ramp up/down process.
+	  Some customer use the external hp amplifier will need this feature,
+	  Or will cause headset pop noise serious.
+
+config SND_SOC_SPRD_HP_POP_DELAY_TIME
+	int "HP Switch delay time(0-1000) unit(MS)"
+	depends on SND_SOC_SPRD_CODEC_NO_HP_POP
+	range 0 1000
+	default 350
+	help
+	  if defined CODEC_NO_HP_POP , maybe need this delay
+	  for reduce external hp amplifier noise.
+	  this delay time value, unit is MS.
+endmenu

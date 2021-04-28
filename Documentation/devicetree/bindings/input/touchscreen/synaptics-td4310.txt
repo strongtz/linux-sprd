@@ -1,0 +1,19 @@
+Synaptics TD4310 I2C touchscreen controller
+
+Required properties:
+ - compatible: "synaptics,dsx"
+ - gpios: 	the reset and interrupt GPIO number
+ - reg: 	I2C slave address of the chip
+
+Example nodes:
+
+&i2c3 {
+	/* ... */
+	synaptics-touch@20 {
+		compatible = "synaptics,dsx";
+		reg = <0x20>;
+		gpios = <&ap_gpio 145 GPIO_ACTIVE_HIGH
+			&ap_gpio 144 GPIO_ACTIVE_HIGH>;
+	};
+	/* ... */
+};

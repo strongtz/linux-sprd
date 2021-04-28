@@ -1,0 +1,11 @@
+config SPRD_EIRQSOFF
+	bool "spreadtrum IRQ disable time debug"
+	depends on IRQSOFF_TRACER && SPRD_DEBUG
+	default y
+
+config SPRD_IRQS_MONITOR
+	bool "spreadtrum IRQ brusty debug"
+	depends on SPRD_DEBUG
+	default n
+	help
+	    debug Sudden increase interruption for a period of time

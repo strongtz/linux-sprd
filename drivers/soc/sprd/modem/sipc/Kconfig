@@ -1,0 +1,73 @@
+menu "SIPC modules"
+
+config SPRD_SIPC
+	bool "Sprd IPC"
+	default n
+	help
+	  SIPC is a module for spreadtrum AP/CP communicaiton system.
+
+config SPRD_SIPC_V2
+	bool "Sprd IPC V2"
+	default n
+	depends on SPRD_SIPC
+	help
+	  This driver is a sipc v2 driver for support pcie external modem.
+	  the sipc v2 dirver also can support the old sipc, but it has not
+	  beem fully verified, so we still keep the old sipc driver. After
+	  orca bringup, we will only keep the new version, and the feature
+	  SPRD_SIPC_V2 will be remove.
+
+config SPRD_SIPC_SPIPE
+	bool "SPRD pipe driver based on SBUF"
+	default n
+	depends on SPRD_SIPC
+	help
+	  This driver is a pipe driver base on SBUF, which create
+	  general pipes between AP & CP.
+
+config SPRD_SIPC_SPOOL
+	bool "SPRD pool driver based on SBLOCK"
+	default n
+	depends on SPRD_SIPC
+	help
+	  This driver is a pool driver base on SBLOCK, which create
+	  general pools between AP & CP.
+
+config SPRD_SIPC_ZERO_COPY_SIPX
+	bool "Enable SETH use SIPX to transfer IP packets"
+	default n
+	depends on SPRD_SIPC
+	help
+	  Starting from SharkL5.1, use SIPX to replace SBlock or Seblock for SETH.
+
+config SPRD_SIPC_MEM_CACHE_EN
+	bool "Enable cache from sipc memory "
+	default n
+	depends on SPRD_SIPC_ZERO_COPY_SIPX
+	help
+	  Enable cache from sipc memory.
+
+config SPRD_SIPC_SETH
+    bool "Sprd Ethernet driver"
+    default n
+    depends on SPRD_SIPC
+    help
+       This driver supports the Spreadtrum Ethernet based on share
+       memory. Say Y here if you want to use it.
+
+config SPRD_SIPC_SETH_RAWIP
+	bool "Enable SETH  transfer RawIP packets"
+	default n
+	depends on SPRD_SIPC
+	help
+		Starting from SharkL5.1, use zero copy rawip transfer.
+
+config SPRD_SIPC_SWCNBLK
+	bool "Enable WCN use wcnblk to transfer IP packets"
+	default n
+	depends on SPRD_SIPC
+	help
+	  This driver supports wcn sblock special function.
+	  Starting from SharkLe, wcn use swcnblk to replace sblock.
+
+endmenu

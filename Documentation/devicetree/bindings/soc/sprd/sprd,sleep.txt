@@ -1,0 +1,27 @@
+SPRD light sleep binding for pike2
+
+Required properties:
+
+- compatible: must be "sprd,pike2-sleep".
+- sprd,sys-ap-ahb: ap ahb controller.
+- sprd,sys-ap-apb: ap apb controller.
+- sprd,sys-aon-apb: aon apb controller.
+- sprd,sys-pmu-apb: aon pmu controller.
+- sprd,sys-ap-intc0: ap interrupt controller0.
+- sprd,sys-ap-intc1: ap interrupt controller1.
+- sprd,sys-ap-intc2: ap interrupt controller2.
+- sprd,sys-ap-intc3: ap interrupt controller3.
+
+Example:
+
+	sprd-sleep {
+		compatible = "sprd,pike2-sleep";
+		sprd,sys-ap-ahb = <&ap_ahb_regs>;
+		sprd,sys-ap-apb = <&ap_apb_regs>;
+		sprd,sys-aon-apb = <&aon_apb_regs>;
+		sprd,sys-pmu-apb = <&pmu_apb_regs>;
+		sprd,sys-ap-intc0 = <&intc0_controller>;
+		sprd,sys-ap-intc1 = <&intc1_controller>;
+		sprd,sys-ap-intc2 = <&intc2_controller>;
+		sprd,sys-ap-intc3 = <&intc3_controller>;
+	};

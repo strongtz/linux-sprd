@@ -1,0 +1,31 @@
+Unisoc cpdvfs bindings
+
+Unisoc's some SoCs integrates hardware DVFS. This DVFS driver controls settings and tuning
+for communication processor include pubcp and wtlcp.
+
+Required Properties:
+- compatible: should be one of the following.
+  - "sprd,sharkl5-pubcp-dvfs": for Sharkl5-compatible PUBCP DVFS,
+  - "sprd,sharkl5-wtlcp-dvfs": for Sharkl5-compatible WTLCP DVFS,
+  - "sprd,roc1-pubcp-dvfs": for Roc1-compatible PUBCP DVFS,
+  - "sprd,roc1-wtlcp-dvfs": for Roc1-compatible WTLCP DVFS,
+  - "sprd,sharkl5Pro-pubcp-dvfs": for Sharkl5Pro-compatible PUBCP DVFS,
+  - "sprd,sharkl5Pro-wtlcp-dvfs": for Sharkl5Pro-compatible WTLCP DVFS.
+
+- sprd,core_id : core identification of the dvfs processor.
+
+- sprd,record_num: number of dvfs running recorder.
+
+
+Example:
+	dvfs_pubcp {
+		compatible = "sprd,sharkl5-pubcp-dvfs";
+		sprd,core_id = <0>;
+		sprd,record_num = <10>;
+	};
+
+	dvfs_wtlcp {
+		compatible = "sprd,sharkl5-wtlcp-dvfs";
+		sprd,core_id = <1>;
+		sprd,record_num = <6>;
+	};

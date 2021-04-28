@@ -1,0 +1,335 @@
+/*
+ * Spreadtrum UDX710 MODEM board DTSI file
+ * This dt is used for modem drivers
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+/ {
+	scproc-pubcp {
+		compatible = "sprd,scproc_pubcp";
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		scproc_pubpm: scproc@0 {
+			sprd,name = "pmic";
+			syscons = <&aon_apb_regs 0xff 0x0>,
+				  <&pmu_apb_regs 0xff 0x100000>,
+				  <&aon_apb_regs 0x210 0x1>,
+				  <&aon_apb_regs 0xff 0x10>,
+				  <&aon_apb_regs 0xff 0x0>;
+			syscon-names = "shutdown", "deepsleep", "corereset",
+				       "sysreset", "getstatus";
+			reg = <0x0 0xb000 0x0 0xdc00>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+			/* segnr=1 */
+			ranges = <0x0 0x0 0xb000 0xd000>;
+			pm-sys@0 {
+				cproc,name = "pm_sys";
+				reg = <0x0 0xd000>;
+			};
+		};
+
+		scproc_pubcp: scproc@1 {
+			sprd,name = "cptl";
+			sprd,decoup = "cproc-use-decoup";
+			syscons = <&pmu_apb_regs 0x58 0x2000000>,
+				  <&pmu_apb_regs 0x544 0x8>,
+				  <&aon_apb_regs 0x214 0x3000>,
+				  <&pmu_apb_regs 0xb0 0x2>,
+				  <&pmu_apb_regs 0x3a0 0x100>;
+			syscon-names = "shutdown", "deepsleep", "corereset",
+				       "sysreset", "getstatus";
+			reg = <0x0 0x2000 0x0 0x1000>;
+		};
+
+		scproc_v3phy: scproc@2 {
+			sprd,name = "v3phy";
+			sprd,decoup = "cproc-use-decoup";
+			syscons = <&pmu_apb_regs 0x54 0x2000000>,
+			<&pmu_apb_regs 0x544 0x4>,
+			<&aon_apb_regs 0x80000220 0x07>,
+			<&pmu_apb_regs 0xb0 0x1>,
+			<&pmu_apb_regs 0xff 0x100>,
+			<&pmu_apb_regs 0xff 0x100>,
+			<&pmu_apb_regs 0x48 0x2000000>;
+			syscon-names = "shutdown", "deepsleep", "corereset",
+				       "sysreset", "getstatus", "dspreset",
+				       "fshutdown";
+			reg = <0x0 0x4000 0x0 0x1000>;
+		};
+
+		scproc_nrphy: scproc@3 {
+			sprd,name = "nrphy";
+			sprd,decoup = "cproc-use-decoup";
+			syscons = <&pmu_apb_regs 0x18 0x2000000>,
+			<&pmu_apb_regs 0x544 0x1>,
+			<&aon_apb_regs 0x218 0x7e00>,
+			<&pmu_apb_regs 0xb0 0x20000>,
+			<&pmu_apb_regs 0xff 0x100>;
+			syscon-names = "shutdown", "deepsleep", "corereset",
+				       "sysreset", "getstatus";
+			reg = <0x0 0x5000 0x0 0x1000>;
+		};
+	};
+
+	/* PM subsystem: 8KB */
+	sipc_sp: sipc@0 {
+		compatible = "sprd,sipc";
+		sprd,name = "sipc-pmsys";
+		sprd,type = "mbox";
+		sprd,dst = <6>;
+		sprd,core = <1>;
+		sprd,smem-info = <0x8400 0x60008400 0x2000>;
+	};
+
+	/* PSP: 3MB */
+	sipc_lte: sipc@1 {
+		compatible = "sprd,sipc";
+		sprd,name = "sipc-lte";
+		sprd,type = "mbox";
+		sprd,dst = <5>;
+		sprd,core = <2>;
+		sprd,smem-info = <0x87800000 0x87800000 0x300000>;
+	};
+
+	/* New Radio PHY: 2.0MB */
+	sipc_nrphy: sipc@2 {
+		compatible = "sprd,sipc";
+		sprd,name = "sipc-nr-phy";
+		sprd,type = "mbox";
+		sprd,dst = <7>;
+		sprd,core = <6>;
+		sprd,smem-info = <0x87b00000 0x87b00000 0x200000>;
+	};
+
+	/* MODEM v3 PHY: 2.0MB */
+	sipc_v3phy: sipc@3 {
+		compatible = "sprd,sipc";
+		sprd,name = "sipc-v3-phy";
+		sprd,type = "mbox";
+		sprd,dst = <8>;
+		sprd,core = <4>;
+		sprd,smem-info = <0x87d00000 0x87d00000 0x200000>;
+	};
+
+	/*XC4500_0: 0.5MB */
+	sipc_xc4500_0: sipc@4 {
+		compatible = "sprd,sipc";
+		sprd,name = "sipc-xc4500-0";
+		sprd,type = "mbox";
+		sprd,dst = <1>;
+		sprd,core = <7>;
+		sprd,smem-info = <0x87f00000 0x87f00000 0x80000>;
+	};
+
+	/* XC4500_1: 0.5MB */
+	sipc_xc4500_1: sipc@5 {
+		compatible = "sprd,sipc";
+		sprd,name = "sipc-xc4500-1";
+		sprd,type = "mbox";
+		sprd,dst = <2>;
+		sprd,core = <8>;
+		sprd,smem-info = <0x87f80000 0x87f80000 0x80000>;
+	};
+
+	/* Roc1: 48MB */
+	sipc_nr: sipc@6 {
+		compatible = "sprd,sipc";
+		sprd,name = "sipc-nr";
+		sprd,type = "pcie";
+		sprd,dst = <0>;
+		sprd,client = <1>;
+		sprd,ep-fun = <0>;
+		sprd,smem-type = <1>;
+		sprd,smem-info = <0x89600000 0x89600000 0x3000000>;
+		sprd,high-offset = <0x00000000  0x00000000>;
+		interrupts = <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	spipe_splog: spipe@0 {
+		compatible = "sprd,spipe";
+		sprd,name = "slog_pm";
+		sprd,dst = <6>;
+		sprd,channel = <5>;
+		sprd,ringnr = <1>;
+		sprd,size-rxbuf = <0x1400>;	/* 5KB */
+		sprd,size-txbuf = <0x20>;	/* 32 */
+	};
+
+	spipe_spctl: spipe@1 {
+		compatible = "sprd,spipe";
+		sprd,name = "sctl_pm";
+		sprd,dst = <6>;
+		sprd,channel = <6>;
+		sprd,ringnr = <1>;
+		sprd,size-rxbuf = <0x40>;
+		sprd,size-txbuf = <0x40>;
+	};
+
+	/* PSP spipe: 8KB x 15 = 120KB */
+	spipe_lte: spipe@2 {
+		compatible = "sprd,spipe";
+		sprd,name = "spipe_lte";
+		sprd,dst = <5>;
+		sprd,channel = <4>;
+		sprd,ringnr = <15>;
+		sprd,size-rxbuf = <0x1000>; /* 4*1024 */
+		sprd,size-txbuf = <0x1000>; /* 4*1024 */
+	};
+
+	/* PSP diag: 288KB */
+	sdiag_lte: spipe@3 {
+		compatible = "sprd,spipe";
+		sprd,name = "sdiag_lte";
+		sprd,dst = <5>;
+		sprd,channel = <21>;
+		sprd,ringnr = <1>;
+		sprd,size-rxbuf = <0x40000>; /* 256*1024*/
+		sprd,size-txbuf = <0x8000>; /* 32*1024 */
+	};
+
+	/* PSP tty: 4KB x 32 = 128KB */
+	stty_lte: spipe@4 {
+		compatible = "sprd,spipe";
+		sprd,name = "stty_lte";
+		sprd,dst = <5>;
+		sprd,channel = <6>;
+		sprd,ringnr = <32>;
+		sprd,size-rxbuf = <0x0800>; /* 2*1024*/
+		sprd,size-txbuf = <0x0800>; /* 2*1024 */
+	};
+
+	spipe_nr: spipe@5 {
+		compatible = "sprd,spipe";
+		sprd,name = "spipe_nr";
+		sprd,dst = <0>;
+		sprd,channel = <4>;
+		sprd,ringnr = <15>;
+		sprd,size-rxbuf = <0x1000>; /* 4*1024 */
+		sprd,size-txbuf = <0x1000>; /* 4*1024 */
+	};
+
+	sdiag_nr: spipe@6 {
+		compatible = "sprd,spipe";
+		sprd,name = "sdiag_nr";
+		sprd,dst = <0>;
+		sprd,channel = <21>;
+		sprd,ringnr = <1>;
+		sprd,size-rxbuf = <0x40000>; /* 256*1024*/
+		sprd,size-txbuf = <0x8000>; /* 32*1024 */
+	};
+
+	stty_nr: spipe@7 {
+		compatible = "sprd,spipe";
+		sprd,name = "stty_nr";
+		sprd,dst = <0>;
+		sprd,channel = <6>;
+		sprd,ringnr = <32>;
+		sprd,size-rxbuf = <0x0800>; /* 2*1024*/
+		sprd,size-txbuf = <0x0800>; /* 2*1024 */
+	};
+
+	snv_lte: spipe@8 {
+		compatible = "sprd,spipe";
+		sprd,name = "snv_lte";
+		sprd,dst = <5>;
+		sprd,channel = <40>;
+		sprd,ringnr = <1>;
+		sprd,size-rxbuf = <0x40400>; /* 257*1024*/
+		sprd,size-txbuf = <0x1000>; /* 4*1024 */
+	};
+
+	snv_nr: spipe@9 {
+		compatible = "sprd,spipe";
+		sprd,name = "snv_nr";
+		sprd,dst = <0>;
+		sprd,channel = <40>;
+		sprd,ringnr = <1>;
+		sprd,size-rxbuf = <0x40400>; /* 257*1024*/
+		sprd,size-txbuf = <0x1000>; /* 4*1024 */
+	};
+
+	/* PSP log: 2KB x 800 = 1600k */
+	slog_lte: spool@0 {
+		compatible = "sprd,spool";
+		sprd,name = "slog_lte";
+		sprd,dst = <5>;
+		sprd,channel = <5>;
+		sprd,preconfigured = <1>;
+		sprd,tx-blksize = <0>;
+		sprd,tx-blknum = <0>;
+		sprd,rx-blksize = <0x800>;
+		sprd,rx-blknum = <800>;
+	};
+
+	/* New Radio PHY log: 2KB x 1000 = 2000K */
+	slog_nrphy: spool@1 {
+		compatible = "sprd,spool";
+		sprd,name = "slog_nr_phy";
+		sprd,dst = <7>;
+		sprd,channel = <5>;
+		sprd,preconfigured = <1>;
+		sprd,tx-blksize = <0>;
+		sprd,tx-blknum = <0>;
+		sprd,rx-blksize = <0x800>;
+		sprd,rx-blknum = <1000>;
+	};
+
+	/* MODEM v3 PHY log: 2KB x 1000 = 2000K */
+	slog_v3phy: spool@2 {
+		compatible = "sprd,spool";
+		sprd,name = "slog_v3_phy";
+		sprd,dst = <8>;
+		sprd,channel = <5>;
+		sprd,preconfigured = <1>;
+		sprd,tx-blksize = <0>;
+		sprd,tx-blknum = <0>;
+		sprd,rx-blksize = <0x800>;
+		sprd,rx-blknum = <1000>;
+	};
+
+	/* XC4500_0 log: 2KB x 250 = 500K */
+	slog_xc4500_0: spool@3 {
+		compatible = "sprd,spool";
+		sprd,name = "slog_xc4500_0";
+		sprd,dst = <1>;
+		sprd,channel = <5>;
+		sprd,tx-blksize = <0>;
+		sprd,tx-blknum = <0>;
+		sprd,rx-blksize = <0x800>;
+		sprd,rx-blknum = <250>;
+	};
+
+	/* XC4500_1 log: 2KB x 250 = 500k */
+	slog_xc4500_1: spool@4 {
+		compatible = "sprd,spool";
+		sprd,name = "slog_xc4500_1";
+		sprd,dst = <2>;
+		sprd,channel = <5>;
+		sprd,tx-blksize = <0>;
+		sprd,tx-blknum = <0>;
+		sprd,rx-blksize = <0x800>;
+		sprd,rx-blknum = <250>;
+	};
+
+	slog_nr: spool@5{
+		compatible = "sprd,spool";
+		sprd,name = "slog_nr";
+		sprd,dst = <0>;
+		sprd,channel = <5>;
+		sprd,tx-blksize = <0>;
+		sprd,tx-blknum = <0>;
+		sprd,rx-blksize = <0x10000>; /* 64k*/
+		sprd,rx-blknum = <128>;
+	};
+
+	crypto {
+		compatible = "sprd,crypto_modem_verify";
+	};
+
+};

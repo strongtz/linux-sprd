@@ -1,0 +1,432 @@
+DT binding for Unisoc apcpu hardware dvfs driver in platforms whose dvfs ip is similar to sharkl5
+=================================================================================================
+
+Both topdvfs_controller and cpudvfs_dev nodes listed below  must be defined.
+
+Node topdvfs_controller
+------------------------
+Required properties:
+- compatible: must select one config from following options
+	sprd,sharkl5-topdvfs and syscon,
+	sprd,roc1-topdvfs and syscon,
+	sprd,sharkl5pro-topdvfs and syscon,
+	sprd,orca-topdvfs and syscon.
+- sprd,syscon-enable: A phandle to the aon apb controller node
+- module-enable-cfg: A property describing how to enable or disable the
+			topdvfs_controller configuration. for example, <0x4 7>
+			means the register offset in aon apb controller is 0x4,
+			the control bit is 7.
+- reg: physical base address and the length of the register set for
+	the top dvfs device.
+- cpu-dcdc-cells: A phandle to the power domains supplying for cpus,
+	every power domain which supports hardware dvfs function has its own
+	dvfs controller in top dvfs device.
+	- dcdc_cpuX: child node of topdvfs_controller node, X represets the
+		number of cpu power domain.
+		- dcdc-dvfs-enable: A property describing some necessary
+			information to control the dcdc's hardware dvfs function,
+			including the register offset, the control bit and the
+			flag indicating whether the current cpu power domain's
+			hw dvfs function is enabled or not. for example,
+			<0x68 20 1> means the register offset is 0x68, the
+			control bit is 20, and the current cpu power domain's
+			hw dvfs function should be enabled.
+		- dcdc-judge-vol-sw: A property describing some necessary
+			information for the judge voltage which must matched
+			witch the real voltage value before enable the hardware
+			dvfs function.
+		- dcdc-subsys-tune-enable: A property describing how to control
+			the dvfs functon of a system supplied by dcdc_cpuX.
+                        for example, <0x150 6 1> means that the register offset
+			is 0x150, the control bit is 6, and the hw dvfs
+			function is should be enabled.
+		- dcdc-supply-mode-cfg: A phandle to the configurations related
+		  	to power supply mode of dcdc_cpuX
+			- voltage-grade-num: A property describing the total number of
+				voltage grade for the dcdc_cpuX.
+			- voltage-grade: The list of voltage grade for dcdc_cpuX, every
+				entry of this list describes how to set a voltage grade.
+				for example, <2 0x100 0xF4 18 0x1FF> means that the
+				voltage grade is 2, the voltage value of this grade is
+				0x100(0.8V), the register offset in topdvfs_controller
+				is 0xF4, the left shift base bit is 0, the mask is 0x1FF
+			- chnl-in-i2c: A property to determine if this power domain uses
+				an i2c channel to adjust voltage.
+			- tuning-latency-us: The delay time(in microsecond)
+				needed to wait after configuring a work index to
+				hardware dvfs module
+- device-dcdc-cells: A phandle to the power domains supplying for devices
+			excluding DSU and cores, every power domain which supports
+			hardware dvfs function has its own dvfs controller in
+			top dvfs device.
+	- dcdc_XX: child node of topdvfs_controller node, XX represents the
+		  device name such as mm, modem
+		- dcdc-dvfs-enable: A property describing how to control the
+			dvfs function of power domain dcdc_XX. for example,
+			<0x18 20 0> means that the register offset is 0x18, the
+			function control bit is 20, and the hw dvfs function
+			should be disabled.
+		- dcdc-judge-vol-sw: A property describing some necessary
+			information of the judge voltage which must be matched
+			with the real voltage value before enable the hardware
+			dvfs function. for exapmple, <0x18 1 0x7 7> means the
+			register offset is 0x18, the left shift base bit is 1,
+			the mask is 0x7, the current real voltage for this
+			dcdc_XX power domain is 7(1.0v).
+		- dcdc-subsys-cells: A phandle to the subsystem supplied by
+		 	 dcdc_XX.
+			- YY_sys: child node of dcdc_XX, YY represents the name
+			  of a subsystem.
+				-dcdc-subsys-tune-enable: A property describing
+					how to control the hw dvfs function of
+					the YY_sys.for example, <0x150 5 0>
+					means the register offset is 0x150, the
+					control bit is 5, and the hw dvfs
+					function should be disabled.
+Optional properties:
+- dcdc-modem-mm-share-en: The register information to enable dcdc-modem and
+			dcdc-mm shared, for example, <0x170 0> means the
+			register offest in top dvfs is 0x170, the control bit is
+			0.
+- supply-type-sel: A property to select power supply mode for dcdc cpu
+- top-dvfs-adi-state: A property describing the way to get
+			current top dvfs fsm state. for example,<0x70 0 0xF>
+			means the register offset in top dvfs controller is 0x70
+			the left shift base bit is 0, the mask is 0xF, so you
+			should get current top dvfs fsm state from bit[3:0] in
+			the top dvfs register whose offset is 0x70.
+- top-dvfs-i2c-state: A property describing the way to get
+			current top dvfs fsm state, if the domain uses an i2c
+			channel to adjust the voltage for dcdc_cpuX, the detail
+			method.
+- voltage-up-delay: An array to store the delay time for hardware dvfs module to
+			wait the PMIC to increase voltage to target value, different
+			target voltages have different delay time.
+- voltage-down-delay: An array to store the delay time for hardware dvfs module to
+			wait the PMIC to decrease voltage to target value, different
+			target voltages have different delay time.
+- syscons: A phandle to PMU controller register to enable dvfs module to block
+			the dcdc shutdown while dvfs module is working.
+- syscon-names: The name of the current syscon.
+- dcdc-idle-voltage: The cpu voltage gear when apcpu top shutdown. For example,
+			<0x16c 3 0x7 6> means the register offset in top dvfs
+			controller is 0x16c, the left shift base bit is 3, the
+			mask is 0x7, the idle voltage grade to set into the
+			register whose offset is 0x16c is 6.
+- dcdc-modem-mm-share: A bool flag, if this flag is defined in board dts, it
+			means the power domains dcdc-modem and dcdc-mm are
+			shared in hardware design.
+
+- pmic-type-num: The PMIC type number that provided power for current cpu cluster,
+		for example, 0 means sc2730, 1 means sc2703, and so on.
+- slew-rate: The voltage in microvolt for the current pmic can raise per microsecond
+		by default.
+
+Node cpudvfs_dev
+-----------------------------------
+- cpudvfs_dev:  Represent a ap cpu hardwre dvfs device
+	- compatible: select one config from following options
+		sprd,sharkl5-cpudvfs,
+		sprd,roc1-cpudvfs,
+		sprd,sharkl5pro-cpudvfs,
+		sprd,orca-cpudvfs.
+	- sprd,syscon-enable: A phandle to aon apb controller.
+	- module-enable-cfg: A property describing how to enable or disable the
+			topdvfs_controller configuration. for example, <0x4 7>
+			means the register offset in aon apb controller is 0x4,
+			the control bit is 7.
+	- topdvfs-controller: A phandle to the topdvfs_controller node.
+	- reg: physical base address and the length of the register set for
+		the top dvfs device.
+	- mpll-cells: A phandle to mpll node
+		- mpll_x: A specific mpll node
+			- sprd,syscon-ang: A phandle to an analog register
+			  controller.
+			- mpll-rst: A property describing how to set the clock
+				output from mpll_x by hardware dvfs not by
+				software.for example, <0x44 4 6 7> means the
+				register offset in analog register is 0x44, the
+				MPLLx_POSTDIV is bit 4, the MPLLx_ICP is bit 6,
+				the MPLLx_N is bit 7; only all those bits are 0,
+				the clock output is controlled by hardware dvfs.
+			- relock-cfg: A property describing how to enable the
+				relock function of the mpll_x.for example,
+				<0x244 1> means the register offset in apcpu
+				dvfs controller is 0x244, if the bit[1] of that
+				reigster is 1, the relock function of the mpll_x
+				is enabled, or disabled.
+			- pd-cfg: A property describing how to enable the power
+				down function of the mpll_x.for example,
+				<0x244 0> means the register offset in apcpu
+				dvfs controller is 0x244, if the bit[0] of that
+				register is 1, the power function of the mpll_x
+				is enabled, or disabled.
+	- apcpu-dvfs-dcdc-cells: A phandle to cpu power domain nodes
+			- apcpu_cpuX: A specific apcpu power domain
+				- subsys-dcdc-vol-sw: A property describing how
+					to inform the current voltage of the
+					apcpu_cpux to apcpu_cpuX dvfs fsm.
+				- dcdc-dvfs-fsm-state: A property describing the
+					way how to get the current dvfs fsm
+					state of a subsystem.for example,
+					<0x44 0 0x7> means you can get the dvfs
+					fsm state of apcpu_cpuX from bit[2:0] in
+					register in apcpu dvfs controller whose
+					offset is 0x44.
+
+	- cpudvfs-clusters: A phandle to cpu clusters in cpudvfs_dev
+		- XXX_cluster: A specific cluster whose pair of voltage and
+			frequency varies differently from other clusters.
+			- cluster-name: The name of XXX_cluster.
+			- row-num: The row number of hardware dvfs map table of
+				XXX_cluster.
+			- column-num: The column number of hardware dvfs map
+				table of XXX_cluster.
+			- XXX-dvfs-tbl: The table of hardware dvfs map table of
+				XXX_cluster, every entry of the table organized
+				in a certain way described as follows:
+				|sel|div|volt|scu_idx|peri_idx|gic_idx|mpll_idx|
+				  1   1   0     1       1        1	0
+			- work-index-cfg: A property describing the way how to
+				set a work index to XXX_cluster or get the
+				current work index of XXX_cluster.for example,
+				<0x214 0xF> means the register offset in apcpu
+				dvfs controller is 0x214, the default base bit
+				is 0, the mask is 0xF, so you should set a work
+				index to bit[3:0] in apcpu dvfs controller whose
+				offset is 0x214, in the same way you can get the
+				current work index from that register.
+			- idle-index-cfg: A property describing the way how to
+				set a idle index to XXX_cluster or get the
+				current idle index of XXX_cluster, for detail
+				method, please refer to the previous description
+				of work-index-cfg.
+			- tuning-result-judge: Tell software the dvfs tuning
+			  	result is needed to judge or not needed to judge
+			- dcdc-name: The name of a cpu power domain which the
+			  	XXX_cluster is belong to.
+			- map-tbl-regs: An array of apcpu dvfs register which is
+				used to store the table entry information of
+				XXX-dvfs-tbl, the size of the register array is
+				same with the row number of XXX-dvfs-tbl.
+			- column-entry-start-bit: An array which is used to
+			  	store the left shift base bit for every column
+				information of XXX-dvfs-tbl.
+			- column-entry-mask: An array of which is used to store
+				the left shift mask for every column information
+				of XXX-dvfs-tbl.
+			- cluster-devices: A phandle to device node
+				-XXX_dev: A specific device or module who is in
+					XXX_cluster
+					- device name: The name of a specific
+						device or module whose voltage
+						and frequency are both
+						controlled by hardware dvfs fsm
+					- sel-get: A property describing the way
+						how to get current clock sel of
+						the XXX_dev.for example,
+						<0x38 0 3> means the register
+						offset in apcpu dvfs controller
+						is 0x38, the right shift base
+						bit is 0, the right shift mask
+						is 0x3, so you can get the
+						current clock source from
+						bit[1:0] in the apcpu dvfs
+						register whose offset is 0x38.
+					- div-get: A property describing the way
+						how to get current clock div of
+						the XXX_dev.for example,
+						<0x38 2 0x7> means the register
+						offset in apcpu dvfs controller
+						is 0x38, the right shift base
+						bit is 2, the right shift mask
+						is 0x7, so you can get the
+						current clock division from
+						bit[4:2] in the apcpu dvfs
+						register whose offset is 0x38.
+					- vol-get: A property describing the way
+						how to get current clock voted
+						voltage of the XXX_dev.for
+						example, <0x30 0 0x7> means the
+						register offset in apcpu dvfs
+						controller is 0x30, the right
+						shift base bit is 0, the right
+						shift mask is 0x7, so you can
+						get the current clock division
+						from bit[4:2] in the apcpu dvfs
+						register whose offset is 0x30.
+
+Optional properties:
+- dfs-idle-disable: Disable hardware to switch the voting dvfs index for current
+		module to idle dvfs index. For example, <0x1c 0 1> means the
+		register offset in apcpu dvfs controller is 0x1c, the bit to
+		enable or disable dfs idle function is 0, and 1 means you want
+		to disable the dfs idle function.
+Example 1: Example for topdvfs_controller
+---------
+topdvfs_controller: topdvfsctrl@322A0000 {
+	compatible = "sprd,sharkl5-topdvfs", "syscon";
+	sprd,syscon-enable = <&aon_apb_regs>;
+	module-enable-cfg = <0x4 7>;
+	reg = <0 0x322A0000 0 0x8000>;
+	cpu-dcdc-cells = <&dcdc_cpu0>;
+	device-dcdc-cells = <&dcdc_mm>;
+	dcdc_cpu0: dcdc-cpu0{
+		dcdc-dvfs-enable = <0x68 20 1>;
+		dcdc-judge-vol-sw = <0x68 1 0x7 7>;
+		dcdc-subsys-tune-enable = <0x150 6 1>;
+		dcdc-supply-mode-cfg = <&dvfs_dcdc_cpu0_supply>;
+		syscons = <&pmu_apb_regs REG_PMU_APB_DVFS_BLOCK_SHUTDOWN_CFG MASK_PMU_APB_DCDC_CPU0_DVFS_BLOCK_SHUTDOWN_EN>;
+		syscon-names = "dvfs-blk-dcdc-sd";
+		dcdc-idle-voltage = <0x16c 3 0x7 6>
+	};
+
+	<...>
+
+	dcdc_mm: dcdc-mm {
+		dcdc-dvfs-enable = <0x18 20 0>;
+		dcdc-judge-vol-sw = <0x18 1 0x7 7>;
+		dcdc-subsys-cells =	<&audcp_sys>,
+					<&gpu_sys>,
+					<&mm_sys>;
+		audcp_sys: audcp-sys {
+			dcdc-subsys-tune-enable = <0x150 5 0>;
+		};
+
+		<...>
+	};
+
+	<...>
+};
+
+dvfs_dcdc_cpu0_supply: dvfs-dcdc-cpu0-supply {
+	pmic-type-num = <0>;
+	top-dvfs-adi-state = <0x70 0 0xF>;
+	voltage-grade-num = <7>;
+	voltage-grade = <0 0xE0 0xF4 0 0x1FF>,
+			<1 0xF0 0xF4 9 0x1FF>,
+			<2 0x100 0xF4 18 0x1FF>,
+			<3 0x110 0xF8 0 0x1FF>,
+			<4 0x120 0xF8 9 0x1FF>,
+			<5 0x130 0xF8 18 0x1FF>,
+			<6 0x140 0xFC 0 0x1FF>;
+	voltage-up-delay = <50 0x58 0 0xffff 0x600>,
+			<100 0x58 16 0xffff 0xa00>,
+			<150 0x54 0 0xffff 0xf00>,
+			<200 0x54 16 0xffff 0x1400>,
+			<250 0x50 0 0xffff 0x1900>,
+			<300 0x50 16 0xffff 0x1e00>,
+			<350 0x110 0 0xffff 0x2300>;
+	voltage-down-delay = <50 0x64 0 0xffff 0x600>,
+			<100 0x64 16 0xffff 0xa00>,
+			<150 0x60 0 0xffff 0xf00>,
+			<200 0x60 16 0xffff 0x1400>,
+			<250 0x5c 0 0xffff 0x1900>,
+			<300 0x5c 16 0xffff 0x1e00>,
+			<350 0x114 0 0xffff 0x2300>;
+	chnl-in-i2c = <0>;
+	tuning-latency-us = <200>;
+	slew-rate = <9375>;
+};
+
+dvfs_dcdc_cpu1_supply: dvfs-dcdc-cpu1-supply {
+	supply-type-sel = <0x120 0 1>;
+	top-dvfs-i2c-state = <0x9c 4 0xF>;
+	voltage-grade-num = <6>;
+	voltage-grade = <0 0x2d 0x12c 0 0x7f>,
+			<1 0x32 0x12c 7 0x7f>,
+			<2 0x37 0x12c 14 0x7f>,
+			<3 0x3c 0x12c 21 0x7f>,
+			<4 0x41 0x130 0 0x7f>,
+			<5 0x46 0x130 7 0x7f>;
+	voltage-up-delay = <50 0x84 0 0xffff 0x1600>,
+			<100 0x84 16 0xffff 0x1a00>,
+			<150 0x80 0 0xffff 0x1f00>,
+			<200 0x80 16 0xffff 0x2400>,
+			<250 0x7c 0 0xffff 0x2900>,
+			<300 0x7c 16 0xffff 0x2e00>,
+			<350 0x118 0 0xffff 0x3300>;
+	voltage-down-delay = <50 0x90 0 0xffff 0x600>,
+			<100 0x90 16 0xffff 0xa00>,
+			<150 0x8c 0 0xffff 0xf00>,
+			<200 0x8c 16 0xffff 0x1400>,
+			<250 0x88 0 0xffff 0x1900>,
+			<300 0x88 16 0xffff 0x1e00>,
+			<350 0x114 0 0xffff 0x2300>;
+	chnl-in-i2c = <1>;
+	tuning-latency-us = <200>;
+};
+
+&topdvfs_controller {
+	dcdc-modem-mm-share-en = <0x170 0>;
+	dcdc-modem-mm-share;
+};
+
+Example 2: Example for cpudvfs_dev
+---------
+
+cpudvfs_dev: cpudvfs-dev@322A8000 {
+	compatible = "sprd,sharkl5-cpudvfs";
+	sprd,syscon-enable = <&aon_apb_regs>;
+	module-enable-cfg = <0x4 7>;
+	topdvfs-controller = <&topdvfs_controller>;
+	reg = <0 0x322A8000 0 0x1000>;
+	mpll-cells = <&mpll_0>;
+	apcpu-dvfs-dcdc-cells =	<&apcpu_cpu0>,
+	cpudvfs-clusters =	<&lit_core_cluster>;
+	lit_core_cluster: lit-core-cluster {
+		cluster-name = "lit-core-cluster";
+		row-num = <10>;
+		column-num = <7>;
+		work-index-cfg = <0x214 0xF>;
+		idle-index-cfg = <0x218 0xF>;
+		tuning-result-judge = <1>;
+		dcdc-name = "DCDC_CPU0";
+		dcdc-dvfs-fsm-state = <0x44 0 7>;
+		map-tbl-regs = <0x60 0x64 0x68 0x6c 0x70 0x74 0x78 0x7c 0x80 0x84>;
+		column-entry-start-bit = <0 2 15 5 9 18 12>;
+		column-entry-mask = <0x3 0x7 0x7 0xF 0x7 0x7 0x7>;
+		cluster-devices =	<&lit_core0_dev>,
+		lit-core-dvfs-tbl = <
+					0 0 0 0 0 0 0
+					1 1 0 1 1 1 0
+					2 1 2 2 2 2 0
+					3 0 2 3 2 3 0
+					3 0 2 4 3 4 1
+					1 0 2 5 4 4 0
+					3 0 6 6 4 4 2
+					2 0 6 7 4 4 0
+					3 0 6 8 4 5 3
+					3 0 6 9 5 5 4
+				>;
+		lit_core0_dev:	lit-core0-dev {
+				device-name = "cpu0";
+				sel-get = <0x38 0 3>;
+				div-get = <0x38 2 7>;
+				vol-get = <0x30 0 7>;
+				dfs-idle-disable = <0x1c 0 1>;
+		};
+
+		<...>
+	};
+
+	<...>
+
+	mpll_0: mpll-ananke{
+		sprd,syscon-ang = <&anlg_phy_g3_regs>;
+		mpll-rst = <0x98 4 6 7>;
+		relock-cfg = <0x244 1>;
+		pd-cfg = <0x244 0>;
+	};
+
+	<...>
+
+	apcpu_cpu0: apcpu-cpu0 {
+		subsys-dcdc-vol-sw = <0x20 4 0x7 7>;
+		subsys-dvfs-state = <0x44 0 7>;
+	};
+
+	<...>
+};
+
+

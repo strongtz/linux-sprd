@@ -1,0 +1,42 @@
+I2C for Spreadtrum platforms
+
+Required properties:
+- compatible: should be one of following:
+	  "sprd,sharkl5-hw-i2c",
+	  "sprd,roc1-hw-i2c",
+	  "sprd,sharkl3-hw-i2c",
+	  "sprd,orca-hw-i2c",
+	  "sprd,sharkl5pro-hw-i2c".
+- reg: physical base address of the controller and length of memory mapped region.
+- interrupts: Should contain I2C interrupt.
+- clock-names: The i2C for spreadtrum clock-names should contain i2c source
+	  clk node, source clk enable, i2c clock node, clock for hardware
+	  i2c enable.
+	  Clock-names is fixed in i2c drivers, and its purpose is to
+	  constrain the order of clocks property.Consumers drivers
+	  will use clock-names to match clock input names with clocks
+	  specifiers.
+- clocks: The freq of source clk connected to i2c.List of clock input name
+	  strings sorted in the same order as the clocks property, the
+	  source clk enable must config, and the i2c source clk node,
+	  i2c clock node, clock for hardware i2c enable are options.
+- clock-frequency: The property is communication frequency of i2c controller
+- #address-cells: Should be <1> address cells for i2c device address
+- #size-cells: Should be <0> as i2c addresses have no size component
+
+Optional properties:
+- Child nodes conforming to i2c bus binding
+
+Examples:
+i2c5: i2c@32060000 {
+	compatible = "sprd,sharkl5-hw-i2c";
+	reg = <0 0x32060000 0 0x1000>;
+	interrupts = <GIC_SPI 68 IRQ_TYPE_LEVEL_HIGH>;
+	clock-names = "source", "enable", "i2c",
+		"clk_hw_i2c";
+	clocks = <&ext_26m>,  <&aonapb_gate CLK_I2C_EB>,
+		<&clk_hw_i2c>, <&clk_aon_top_gates 11>;
+	clock-frequency = <400000>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+};

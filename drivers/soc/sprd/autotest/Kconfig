@@ -1,0 +1,23 @@
+#
+# SPRD Soc autotest support
+#
+config SPRD_AUTOTEST
+	tristate
+
+config SPRD_AUTOTEST_GPIO
+	tristate "Spreadtrum gpio autotest support"
+	select SPRD_AUTOTEST
+	help
+	  Enable this to support gpio autotest.
+
+config SPRD_AUTOTEST_PINCTRL
+	tristate "Spreadtrum pinctrl autotest support"
+	select SPRD_AUTOTEST
+	help
+	  Enable this to support pinctrl autotest.
+
+config SPRD_AUTOTEST_OTG
+	tristate "Spreadtrum otg autotest support"
+	select SPRD_AUTOTEST
+	help
+	  Enable this to support otg autotest.

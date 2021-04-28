@@ -1,0 +1,13 @@
+# UAPI Header export list
+header-y += edid.h
+header-y += sisfb.h
+header-y += uvesafb.h
+header-y += sprd_sensor_k.h
+header-y += sprd_img.h
+header-y += sprd_dma_copy_k.h
+header-y += sprd_cpp.h
+header-y += sprd_isp_r6p10.h
+header-y += sprd_isp_r6p12.h
+header-y += sprd_rot_k.h
+header-y += sprd_scale_k.h
+

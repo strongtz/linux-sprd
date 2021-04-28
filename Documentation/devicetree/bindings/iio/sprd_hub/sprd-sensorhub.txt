@@ -1,0 +1,17 @@
+Unisoc sensor hub bindings
+
+Unisoc's some SoCs integrates sensor hub. This sensor hub driver collect and
+analyze data uploaded from sensors.
+
+Required Properties:
+- compatible: should be the following.
+  - "sprd,sharkl3-sensorhub": for Sharkl3-compatible sensor hub,
+  - "sprd,sharkl5-sensorhub": for Sharkl5-compatible sensor hub,
+  - "sprd,sharkl5Pro-sensorhub": for Sharkl5pro-compatible sensor hub,
+  - "sprd,roc1-sensorhub": for Roc1-compatible sensor hub
+
+
+Example:
+	sprd-sensorhub {
+		compatible = "sprd,sharkl5-sensorhub";
+	};

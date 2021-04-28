@@ -1,0 +1,45 @@
+*Spreadtrum SoCs based PWM Subsystem
+=============================================
+
+Spreadtrum SoCs contain PWM controller which can be used for system clock
+event timers,as well as to drvier SoC output wiht PWM signal.Each controller
+provides 4 PWM channels.
+
+Required porperties:
+- compatible : Should be one of the following:
+		"sprd,sharkl5-pwm"
+
+- reg: base address and size of register area
+
+- clock-names: should contain all following required clock names:
+	- "clk_parent" - parent clock for pwm clock,
+	- "clk_pwm0" - pwm base clock used to generate PWM signals.
+	- "clk_pwm0_eb" - pwm global switch.
+	- "clk_pwm1" - pwm base clock used to generate PWM signals.
+	- "clk_pwm1_eb" - pwm global switch.
+	- "clk_pwm2" - pwm base clock used to generate PWM signals.
+	- "clk_pwm2_eb" - pwm global switch.
+	- "clk_pwm3" - pwm base clock used to generate PWM signals.
+	- "clk_pwm3_eb" - pwm global switch.
+
+- clocks: phandle of the clock used by the PWM module.
+
+See pwm.txt in this directory for a description of the cells format.
+More information refer to <Documention/devicetree/bindings/pwm.txt>.
+
+Example:
+	pwms: pwm@32260000 {
+		compatible = "sprd,sharkl5-pwm";
+		reg = <0 0x32260000 0 0x10000>;
+		clock-names = "clk_parent",
+			"clk_pwm0", "clk_pwm0_eb",
+			"clk_pwm1", "clk_pwm1_eb",
+			"clk_pwm2", "clk_pwm2_eb",
+			"clk_pwm3", "clk_pwm3_eb";
+		clocks = <&ext_26m>,
+			<&aon_clk CLK_PWM0>, <&aonapb_gate CLK_PWM0_EB>,
+			<&aon_clk CLK_PWM1>, <&aonapb_gate CLK_PWM1_EB>,
+			<&aon_clk CLK_PWM2>, <&aonapb_gate CLK_PWM2_EB>,
+			<&aon_clk CLK_PWM3>, <&aonapb_gate CLK_PWM3_EB>;
+		#pwm-cells = <2>;
+	};

@@ -1,0 +1,5 @@
+config SND_SOC_SPRD_VBC_R1P0V3
+	tristate "VBC R1P0 V3"
+	help
+	  If the chip is the series of sharkl2(sp9833),
+          set Y or M, else N.

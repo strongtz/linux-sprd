@@ -1,0 +1,69 @@
+Spreadtrum SoC Display Processor Unit (DPU)
+============================================================================
+
+DPU (Display Processor Unit) is the Display Controller for the SPRD SoCs
+which transfers the image data from a video memory buffer to an internal
+LCD interface.
+
+Required properties:
+  - compatible: value should be "sprd,display-processor";
+  - reg: physical base address and length of the DPU registers set.
+  - interrupts: the interrupt signal from DPU.
+  - clocks: must include clock specifiers corresponding to entries in the
+	    clock-names property.
+  - clock-names: list of clock names sorted in the same order as the clocks
+                 property.
+  - sprd,ip: the IP version of the DPU.
+  - sprd,soc: the SoC family that contains this DPU hardware.
+  - dma-coherent: with this property, the dpu driver can allocate large and
+		  continuous memorys.
+  - port: a port node with endpoint definitions as defined in document [1].
+
+[1]: Documentation/devicetree/bindings/media/video-interfaces.txt.
+
+Optional Properties:
+  - iommus: a phandle to DPU iommu node.
+  - power-domains: a phandle to DPU power domain node.
+
+
+Example:
+
+SoC specific DT entry:
+
+	dpu: dpu@63000000 {
+	        compatible = "sprd,display-processor";
+	        reg = <0x0 0x63000000 0x0 0x1000>;
+	        interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
+		clock-names = "clk_src_128m",
+				"clk_src_153m6",
+				"clk_src_384m",
+				"clk_dpu_core",
+				"clk_dpu_dpi",
+				"clk_aon_apb_disp_eb";
+
+		clocks = <&clk_twpll_128m>,
+			<&clk_twpll_153m6>,
+			<&clk_twpll_384m>,
+			<&clk_dpu>,
+			<&clk_dpu_dpi>,
+			<&clk_aon_top_gates 2>;
+	        status = "disabled";
+
+	        dma-coherent;
+
+	        sprd,ip = "dpu-r2p0";
+	        sprd,soc = "sharkl3";
+
+	        dpu_port: port {
+	                dpu_out: endpoint {
+	                        remote-endpoint = <&dsi_in>;
+	                };
+	        };
+	};
+
+
+Board specific DT entry:
+
+	&dpu {
+		status = "okay";
+	};

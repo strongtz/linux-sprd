@@ -1,0 +1,40 @@
+* Powerventure Semiconductor PV88080 Voltage Regulator
+
+Required properties:
+- compatible: "sprd,sc2703-regulator".
+- reg: I2C slave address, 0x49.
+- interrupts: the interrupt outputs of the controller
+- regulators: A node that houses a sub-node for each regulator within the
+  device. Each sub-node is identified using the node's name, with valid
+  values listed below. The content of each sub-node is defined by the
+  standard binding for regulators; see regulator.txt.
+  BUCK1.
+
+Optional properties:
+- enable-gpio: Enable external gpio control for the Core BUCK.
+	this property should be enable if the OTP value(GPIO control bit) is 1:
+	(If SYSCTRL_SEQ_MODE_CONTROL1[bit 0],
+	COREBUCK_POWER_CTRL_SELECT bit is 1)
+	Please see the datasheet further details.
+- sprd,buck-ch1-b-out: Initialize Core BUCK output voltage for SoC special requirement.
+- Any optional property defined in regulator.txt
+
+Example
+
+	pmic: sc2703-buck@49 {
+		compatible = "sprd,sc2703-buck";
+		reg = <0x49>;
+		interrupt-parent = <&gpio6>;
+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
+
+		sprd,buck-ch1-b-out = <1000000>;
+		enable-gpio = <&gpio4 10 GPIO_ACTIVE_HIGH>;
+
+		regulator-name = "sc2703-buck";
+		regulator-min-microvolt = < 300000>;
+		regulator-max-microvolt = <1570000>;
+		regulator-min-microamp 	= <5600000>;
+		regulator-max-microamp 	= <10800000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};

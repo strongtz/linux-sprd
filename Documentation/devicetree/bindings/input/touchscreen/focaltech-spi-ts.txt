@@ -1,0 +1,25 @@
+Focaltech touch controller with SPI interface
+
+Required properties:
+ - compatible:	"focaltech,fts"
+ - gpios: 	the reset and interrupt GPIO number
+ - reg: 	SPI chipselect
+ - interrupts:	An interrupt node describing the IRQ line the chip's
+
+Example nodes:
+
+&spi2 {
+	/* ... */
+	focaltech@0 {
+		compatible = "focaltech,fts";
+		reg = <0x0>;
+		spi-max-frequency = <6000000>;
+		interrupt-parent = <&ap_gpio>;
+		interrupts = <144 0x2000>;
+		focaltech,reset-gpio = <&ap_gpio 145 GPIO_ACTIVE_HIGH>;
+		focaltech,irq-gpio = <&ap_gpio 144 GPIO_ACTIVE_HIGH>;
+		focaltech,max-touch-number = <5>;
+		focaltech,display-coords =  <0 0 720 1600>;
+	};
+	/* ... */
+};

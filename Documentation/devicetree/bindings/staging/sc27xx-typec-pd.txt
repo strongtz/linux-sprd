@@ -1,0 +1,25 @@
+= Spreadtrum SC27XX PMIC Typec Power Delivery device tree bindings =
+
+Required properties:
+- compatible: Should be one of the following.
+	"sprd,sc2730-typec-pd"
+- reg: Specify the address offset of pd controller and typec controller.
+- interrupt-parent: phandle for the interrupt controller.
+- interrupts: pd interrupt and typec interrupt.
+
+Optional properties :
+- sprd,max-sink-mv : Maximum voltage to negotiate when configured as sink
+- sprd,max-sink-ma : Maximum current to negotiate when configured as sink
+- sprd,max-sink-mw : Maximum power to negotiate when configured as sink If this is less than
+		     max-sink-mv * max-sink-ma then the configured current will be clamped.
+Example:
+	pmic_typec_pd: pd@e00 {
+		compatible = "sprd,sc2730-typec-pd";
+		reg = <0xe00>, <0x380>;
+		interrupt-parent = <&sc2730_pmic>;
+		interrupts = <9 IRQ_TYPE_LEVEL_HIGH
+			      8 IRQ_TYPE_LEVEL_HIGH>;
+		sprd,max-sink-mv = <12000>;
+		sprd,max-sink-ma = <3000>;
+		sprd,max-sink-mw = <36000>;
+	};

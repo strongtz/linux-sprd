@@ -1,0 +1,110 @@
+/*
+ * JD9365Z King LCD config dtsi file for spreadtrum
+ *
+ * Copyright (C) 2019, Spreadtrum Communications Inc.
+ *
+ * SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+ */
+
+/ { lcds {
+	lcd_jd9365z_king_mipi_hdp: lcd_jd9365z_king_mipi_hdp {
+
+		sprd,dsi-work-mode = <1>; /* video burst mode */
+		sprd,dsi-color-format = "rgb888";
+		sprd,dsi-lane-number = <4>;
+
+		sprd,phy-bit-clock = <550000>; /* kbps */
+
+		sprd,esd-check-enable = <1>;
+		sprd,esd-check-mode = <1>;
+		sprd,esd-check-period = <2000>;
+
+		sprd,width-mm = <65>;
+		sprd,height-mm = <145>;
+
+		sprd,reset-on-sequence = <1 10>, <0 10>, <1 50>;
+		sprd,reset-off-sequence = <1 5>;
+
+		sprd,initial-command = [
+			39 00 00 04 DF 93 65 F8
+			39 00 00 04 CC 33 08 24
+			39 00 00 08 B0 10 13 06 00 64 06 01
+			39 00 00 03 B2 00 3D
+			39 00 00 03 B3 00 3D
+			39 00 00 03 B5 64 84
+			39 00 00 07 B7 00 BF 01 00 BF 01
+			39 00 00 05 B9 00 04 13 07
+			39 00 00 0C BB 0F 01 24 00 2F 13 28 04 DD DD DD
+			39 00 00 03 BC 0F 04
+			39 00 00 03 BE 1E F2
+			39 00 00 03 C0 26 03
+			39 00 00 03 C1 00 12
+			39 00 00 08 C3 04 02 02 66 01 80 80
+			39 00 00 0A C4 24 F8 B4 81 12 0F 16 00 00
+			39 00 00 27 C8 5F 44 36 2A 28 1A 20 0B 25 24 25 44 33 3E 30 2C 20 12 08 5F 44 36 2A 28 1A 20 0B 25 24 25 44 33 3E 30 2C 20 12 08
+			39 00 00 17 D0 1E 1F 57 58 44 46 48 4A 40 1F 1F 1F 1F 1F 1F 50 1F 1F 1F 1F 1F 1F
+			39 00 00 17 D1 1E 1F 57 58 45 47 49 4B 41 1F 1F 1F 1F 1F 1F 51 1F 1F 1F 1F 1F 1F
+			39 00 00 17 D2 1F 1E 17 18 0B 09 07 05 11 1F 1F 1F 1F 1F 1F 01 1F 1F 1F 1F 1F 1F
+			39 00 00 17 D3 1F 1E 17 18 0A 08 06 04 10 1F 1F 1F 1F 1F 1F 00 1F 1F 1F 1F 1F 1F
+			39 00 00 17 D4 00 00 00 04 0B 30 01 02 00 58 55 FF 30 03 04 1C 74 73 0D 00 58 00
+			39 00 00 12 D5 00 08 3F 08 30 00 00 00 00 00 BC 50 00 06 12 18 60
+			39 00 00 04 DD 2C A3 00
+			23 00 00 02 DE 02
+
+			39 01 00 08 BB 38 05 23 24 34 35 44
+			39 00 00 03 C5 03 19
+			39 00 00 02 C6 02
+			39 00 00 02 D7 12
+			39 00 00 02 E9 06
+
+			39 00 00 03 B2 32 1C
+			39 00 00 05 B7 1F 00 00 04
+			23 00 00 02 C1 11
+			//23 00 00 02 CF 00
+			23 00 00 02 DE 00
+
+			39 00 00 05 C5 09 5D F0 10
+
+			//23 00 00 02 36 08
+
+			23 00 00 02 35 00
+			23 78 00 02 11 00
+
+			23 00 00 02 DE 02
+			39 00 00 03 BC 10 FF
+			23 00 00 02 DE 00
+			39 00 00 05 E8 00 00 00 AF
+
+			23 32 00 02 29 00
+			23 00 00 02 DE 00
+			39 00 00 04 DF 09 B1 7F
+			];
+
+		sprd,sleep-in-command = [
+			39 00 00 04 DF 69 96 55
+			39 00 00 04 DF 93 65 F8
+			39 00 00 05 E8 00 00 00 00
+			13 32 00 01 28
+			13 78 00 01 10
+			];
+
+		sprd,sleep-out-command = [
+			13 78 00 01 11
+			13 32 00 01 29
+			];
+
+		display-timings {
+			timing0 {
+				clock-frequency = <76800000>;
+				hactive = <720>;
+				vactive = <1520>;
+				hback-porch = <42>;
+				hfront-porch = <42>;
+				vback-porch = <28>;
+				vfront-porch = <18>;
+				hsync-len = <8>;
+				vsync-len = <4>;
+			};
+		};
+	};
+};};

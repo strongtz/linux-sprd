@@ -1,0 +1,65 @@
+* Spreadtrum asoc machine driver of i2s
+
+This node models the spreadtrum ASoC machine driver
+
+Required properties:
+- compatible		: "sprd,i2s-null-codec", "sprd,vbc-r3p0-codec-sc2731",
+				"sprd,vbc-r1p0v3-codec-sc2721", "sprd,vbc-r1p0v3-codec-sc2731",
+				"sprd,vbc-r2p0-codec-sc2723", "sprd,vbc-v4-codec-sc2730"
+- sprd-audio-card,name : card name
+- sprd-audio-card,widgets : simple widigets of the card
+- sprd-audio-card,routing :
+	A list of the connections between audio components.
+	Each entry is a pair of strings, the first being the
+	connection's sink, the second being the connection's
+	source.
+- sprd-audio-card,headset : reference node of sprd_headset
+
+Dai-link subnode properties and subnodes:
+
+Required dai-link subnodes:
+
+- cpu					: CPU   sub-node
+- codec					: CODEC sub-node
+- plat					: PLATFORM sub-node
+
+Required CPU/CODEC subnodes properties:
+-sound-dai		: phandle/s and port of CPU/CODEC
+
+Example:
+sound_vbc_v4_sprd_codec: sound@0 {
+	compatible = "sprd,vbc-v4-codec-sc2730";
+	sprd-audio-card,name = "sprdphone-sc2730";
+	sprd-audio-card,widgets =
+		"Headphone", "inter HP PA",
+		"Speaker", "inter Spk PA",
+		"Speaker", "inter Ear PA";
+	sprd-audio-card,routing =
+		"HPMIC", "HPMIC Pin",
+		"MIC", "MIC Pin",
+		"AUXMIC", "MIC2 Pin",
+		"inter HP PA", "HP Pin",
+		"inter Spk PA", "SPK Pin",
+		"inter Ear PA", "EAR Pin";
+	sprd,ucp-smart-pa;
+	sprd-audio-card,headset = <&sprd_headset>;
+	sprd-audio-card,dai-link@0 {
+		link-name = "FE_NORMAL_AP01";
+		stream-name = "FE_ST_NORMAL_AP01";
+		ignore-suspend = <0>;
+		dynamic = <1>;
+		trigger = <1 1>;
+		dpcm-playback = <1>;
+		dpcm-capture = <1>;
+		be-id = <0>;
+		plat {
+			sound-dai = <&sprd_pcm>;
+		};
+		cpu {
+			sound-dai = <&sprd_fe_dai 0>;
+		};
+		codec {
+			sound-dai = <0 0>;
+		};
+	};
+}

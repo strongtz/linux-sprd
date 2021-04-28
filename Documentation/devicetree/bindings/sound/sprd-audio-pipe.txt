@@ -1,0 +1,30 @@
+* Spreadtrum sound audio pipe driver
+
+This node models spreadtrum sound audio pipe driver
+
+Required properties:
+
+- compatible  : "sprd,audio_pipe_voice","sprd,audio_pipe_effect",
+	"sprd,audio_pipe_recordproc","sprd,audio_pipe_bthal".
+- sprd,writesync :  synchronous or asynchronous for pipe write,
+	we can not dependent user space f_flags O_NONBLOCK to decide
+	if write to pipe is synchronous or asynchronous, driver guarantee it.
+	1 write operation is synchronous
+	0 write operation is asynchronous
+- sprd,maxuserwritebuffer: buffer max size for userwritebuffer,
+	user data size is not fix, we would not alloc too many memory
+	to adept all user data size.
+- sprd,channel : communication channel with audio co-processor,
+	the channel number is defined in "sprd,audio_pipe_voice"
+	is for voice process, in "sprd,"audio_pipe_effect"
+	is for audio effect function, in "sprd,audio_pipe_recordproc"
+	is for audio record process function. These channel number is
+	negotiated with audio co-processor.
+Example:
+
+audio_pipe_voice {
+	compatible = "audio_pipe_voice";
+	sprd,writesync = <0>;
+	sprd,maxuserwritebufsize = <0>;
+	sprd,channel = <2>;
+};

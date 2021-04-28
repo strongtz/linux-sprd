@@ -1,0 +1,96 @@
+DT binding for Unisoc apcpu hardware dvfs driver in platforms whose dvfs ip is similar to sharkl3
+=================================================================================================
+
+Both hwdvfs_regulator and sprd_hwdvfs nodes listed below must be defined.
+
+node hwdvfs_regulator
+------------------------
+Required properties:
+- compatible: must include sprd,hwdvfs-regulator-sharkl3.
+- reg: regulator i2c slave address.
+
+Node sprd_hwdvfs
+------------------------
+Required properties:
+- compatible: must include: sprd,hwdvfs-sharkl3.
+- sprd,syscon-enable: A phandle to the aon apb controller node.
+- sprd,anlg-phy-g4-ctrl: A phandle to the analog4 controller node.
+- reg: physical base address and the length of the register.
+- interrupts: Interrupt source, Interrupt num, Trigger level.
+- hwdvfs_clusterX: hwdvfs channel for littel cluster & big cluster.
+	-reg: physical base address.
+	-dcdc-ctrl: A phandle to dcdc-controller.
+- hwdvfs_dsu: hwdvfs channel for dsu.
+	-reg: physical base address.
+	-dcdc-ctrl: A phandle to dcdc-controller.
+- dcdc_ctrlX: dcdc-controller.
+	-reg: controller register and dcdc register index.
+	-volt-via-adi: bool value for indicateing data via ADI.
+	-volt-via-i2c: bool value for indicateing data via I2C.
+	-volt-hold-us: hold time us before set voltage .
+	-volt-pause-us: puase time us after set voltage.
+	-volt-timeout-us: waiting ACK time us after set voltage.
+	-volt-stable-us: voltage stable time us.
+	-volt-max-step-microvolt: max step volt permitted by regulator.
+
+Optional properties:
+- None
+
+
+Example 1: Example for hwdvfs_regulator
+---------
+&i2c7 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	/*virtual i2c device for cpu hw dvfs*/
+	hwdvfs_regulator@61 {
+		compatible = "sprd,sharkl3-hwdvfs";
+		reg = <0x61>;
+	};
+}
+
+Example 2: Example for sprd_hwdvfs
+---------
+sprd_hwdvfs: hwdvfs@40300000 {
+	compatible = "sprd,sharkl3-hwdvfs";
+	sprd,syscon-enable = <&aon_apb_regs>;
+	sprd,anlg-phy-g4-ctrl = <&anlg_phy_g4_regs>;
+	reg = <0x40300000 0x1000>;
+	interrupts = <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>;
+
+	hwdvfs_cluster0: cluster@0 {
+		reg = <0x0>;
+		dcdc-ctrl = <&dcdc_ctrl1>;
+	};
+
+	hwdvfs_cluster1: cluster@1 {
+		reg = <0x1>;
+		dcdc-ctrl = <&dcdc_ctrl0>;
+	};
+
+	hwdvfs_dsu: dsu@0 {
+		reg = <0x0>;
+		dcdc-ctrl = <&dcdc_ctrl0>;
+	};
+
+	dcdc_ctrl0: dcdc-controller@0 {
+		reg = <0x0 0x0>;
+		volt-via-adi;
+		volt-hold-us = <50>;
+		volt-pause-us = <5>;
+		volt-timeout-us = <800>;
+		volt-stable-us  = <5>;
+		volt-max-step-microvolt = <25000>;
+	};
+
+	dcdc_ctrl1: dcdc-controller@1 {
+		reg = <0x1 0x2>;
+		volt-via-i2c;
+		volt-hold-us = <25>;
+		volt-pause-us = <20>;
+		volt-timeout-us = <800>;
+		volt-stable-us  = <25>;
+		volt-max-step-microvolt = <1200004>;
+	};
+};

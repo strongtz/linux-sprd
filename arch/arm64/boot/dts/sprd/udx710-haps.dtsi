@@ -1,0 +1,123 @@
+/*
+ * Spreadtrum UDX710 Haps SoC DTS file
+ *
+ * Copyright (C) 2017, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+#include "dt-bindings/clock/sprd,orca-clk.h"
+#include "orca-haps.dtsi"
+
+/ {
+	cpus {
+		#address-cells = <2>;
+		#size-cells = <0>;
+
+		cpu-map {
+			cluster0 {
+				core0 {
+					cpu = <&CPU0>;
+				};
+				core1 {
+					cpu = <&CPU1>;
+				};
+			};
+		};
+
+		CPU0: cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a55","arm,armv8";
+			reg = <0x0 0x0>;
+			enable-method = "psci";
+			cpu-idle-states = <&CORE_PD>;
+		};
+		CPU1: cpu@100 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a55","arm,armv8";
+			reg = <0x0 0x100>;
+			enable-method = "psci";
+			cpu-idle-states = <&CORE_PD>;
+		};
+	};
+
+	idle-states {
+		entry-method = "arm,psci";
+		CORE_PD: core_pd {
+			compatible = "arm,idle-state";
+			entry-latency-us = <0xffffffff>;
+			exit-latency-us = <0xffffffff>;
+			min-residency-us = <0xffffffff>;
+			local-timer-stop;
+			arm,psci-suspend-param = <0x00010000>;
+		};
+	};
+
+	psci {
+		compatible = "arm,psci-0.2";
+		method = "smc";
+	};
+
+	gic: interrupt-controller@12000000 {
+		compatible = "arm,gic-v3";
+		#interrupt-cells = <3>;
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+		redistributor-stride = <0x0 0x20000>;	/* 128KB stride */
+		#redistributor-regions = <1>;
+		interrupt-controller;
+		reg = <0x0 0x12000000 0 0x20000>,	/* GICD */
+			<0x0 0x12040000 0 0x100000>;	/* GICR */
+		interrupts = <1 9 4>;
+		v2m_0: v2m@0 {
+			compatible = "arm,gic-v2m-frame";
+			msi-controller;
+			reg = <0 0 0 0x1000>;
+		};
+	};
+
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <GIC_PPI 13 IRQ_TYPE_LEVEL_HIGH>, /* Physical Secure PPI */
+			<GIC_PPI 14 IRQ_TYPE_LEVEL_HIGH>, /* Physical Non-Secure PPI */
+			<GIC_PPI 11 IRQ_TYPE_LEVEL_HIGH>, /* Virtual PPI */
+			<GIC_PPI 10 IRQ_TYPE_LEVEL_HIGH>; /* Hipervisor PPI */
+		arm,no-tick-in-suspend;
+	};
+
+	soc {
+		apahb_gate: apahb-gate {
+			compatible = "sprd,orca-apahb-gate";
+			sprd,syscon = <&ap_ahb_regs>; /* 0x21000000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+
+		apapb_gate: apapb-gate {
+			compatible = "sprd,orca-apapb-gate";
+			sprd,syscon = <&ap_apb_regs>; /* 0x24000000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+
+		aonapb_gate: aonapb-gate {
+			compatible = "sprd,orca-aon-gate";
+			sprd,syscon = <&aon_apb_regs>; /* 0x64020000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+
+		ipa_gate: ipa-gate {
+			compatible = "sprd,orca-ipa-gate";
+			sprd,syscon = <&ap_ipa_ahb_regs>;
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+	};
+};
+
+&uart0 {
+	clock-names = "enable", "uart", "source";
+	clocks = <&apapb_gate CLK_AP_UART0_EB>;
+};

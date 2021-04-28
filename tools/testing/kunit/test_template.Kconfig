@@ -1,0 +1,5 @@
+config ${caps_test_prefix}
+	bool "KUnit test for ${test_prefix}"
+	depends on TEST
+	help
+	  TODO: Describe config fully.

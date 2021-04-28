@@ -1,0 +1,58 @@
+Spreadtrum modem bindings
+
+Required properties:
+- compatible: "sprd,modem", "sprd,pcie-modem".
+	There will be different modem connection for different project
+	"sprd,modem' is used for common soc chip, like sharkl2, sharkl3.
+	"sprd,pcie-modem" is used for external modem that is connected
+	with AP by pcie, like Roc1 + orca.
+- syscon-names: Should contain following entries:
+	"shutdowm" for modem shutdown/poweron.
+	"deepsleep" for modem deepsleep enable/disable.
+	"corereset" for modem core reset hold/release
+	"sysreset" for modem system reset hold/release
+	"getstatus" for get modem boot status
+- syscons: Should contain the base address, offset and bit for each entry in syscon-names.
+- 5g-modem-support: Used for support 5g modem.
+- poweron-gpio: Used fo extenal modem poweron.
+- reset-gpio: Used fo extenal modem reset.
+- status: Used to indicate whether enable modem.
+
+Example:
+
+	sprd-modem {
+		compatible = "simple-bus";
+		ranges;
+
+		lte_pm: modem@0 {
+			compatible = "sprd,modem";
+			syscons = <&aon_apb_regs 0xff 0x0>,
+					<&pmu_apb_regs 0xff 0x100000>,
+					<&aon_apb_regs 0x8c 0x1>,
+					<&aon_apb_regs 0xff 0x0>,
+					<&aon_apb_regs 0xff 0x0>;
+			syscon-names = "shutdown", "deepsleep", "corereset",
+					"sysreset", "getstatus";
+		};
+
+		lte_pubcp: modem@1 {
+			compatible = "sprd,modem";
+			syscons = <&pmu_apb_regs 0x58 0x2000000>,
+				<&pmu_apb_regs 0x544 0x8>,
+				<&aon_apb_regs 0x174 0x400>,
+				<&pmu_apb_regs 0xb0 0x2>,
+				<&aon_apb_regs 0xff 0x0>;
+			syscon-names = "shutdown", "deepsleep", "corereset",
+					"sysreset", "getstatus";
+		};
+
+		nr_dp: modem@1 {
+			compatible = "sprd,pcie-modem";
+			5g-modem-support;
+		};
+
+		nr_pscp: modem@2 {
+			compatible = "sprd,pcie-modem";
+			5g-modem-support;
+		};
+	};

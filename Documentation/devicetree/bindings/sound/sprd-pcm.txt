@@ -1,0 +1,37 @@
+* Spreadtrum sound pcm platform driver
+
+This node models spreadtrum sound pcm platform driver
+
+Required properties:
+
+- compatible : "sprd,sharkl5-pcm-platform", "sprd,roc1-pcm-platform", "sprd,sharkl3-pcm-platform",
+	"sprd,sharkl5pro-pcm-platform",sprd,7731e-pcm-platform
+- dmas : pcm platform used dma channels
+- dma-names : dma names of dma channels
+- #sound-dai-cells : only support 0, it means use default
+	asoc platform.
+
+dmas and dma-names have a one-to-one correspondence.
+
+Example:
+sprd_pcm: sprd-pcm-audio {
+	compatible = "sprd,sharkl5-pcm-platform";
+	#sound-dai-cells = <0>;
+	dmas = <&agcp_dma 1 &agcp_dma 2
+		&agcp_dma 3 &agcp_dma 4
+		&agcp_dma 5 &agcp_dma 6
+		&agcp_dma 7 &agcp_dma 8
+	dma-names =
+		"normal_p_l", "normal_p_r",
+		"normal_c_l", "normal_c_r",
+		"normal23_p_l", "normal23_p_r",
+		"normal23_c_l", "normal23_c_r";
+};
+
+sprd-audio-card,dai-link@1 {
+	...
+	plat {
+		sound-dai = <&sprd_pcm>;
+	};
+	...
+};

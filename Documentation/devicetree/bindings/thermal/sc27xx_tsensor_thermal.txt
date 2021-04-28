@@ -1,0 +1,24 @@
+= SC27xx temperature sensor thermal device tree bindings =
+
+Required properties:
+- compatible : Should be "sprd,sc2730-tsensor"
+- reg : Address range of the tsensor registers
+- #thermal-sensor-cells : Should be 1. See ./thermal.txt for a description.
+Child nodes properties:
+- reg : sensor number id
+
+Example:
+
+	pmic_tsensor: tsensor@1b34 {
+		compatible = "sprd,sc27xx-tsensor", "sprd,sc2730-tsensor";
+		#thermal-sensor-cells = <1>;
+		reg = <0x1b34>;
+
+		osc_tsensor: osc-tsensor@0{
+			reg = <0>;
+		};
+
+		tout_tsensor: tout-tsensor@1{
+			reg = <1>;
+		};
+	};

@@ -1,0 +1,56 @@
+#
+# Spreadtrum WCN device (NEW )configuration
+#
+menu "Spreadtrum WCN Device Drivers"
+config SC23XX
+	bool "SC23XX chip Support"
+	#depends on MMC
+	default n
+	help
+	  This is support wcn chip for spreadtrum.
+	  if you want to use 23xx series wcn chip of spreadtrum.
+	  please say "y".
+
+config SC2342_INTEG
+	tristate "SC2342 Integrated chip Support"
+	depends on SC23XX
+	default n
+	help
+	  This is support wcn chip for spreadtrum.
+	  If you want to use sc2342 integrated chip of spreadtrum.
+	  Please say "y".
+
+config SC2355
+	tristate "SC2355 chip Support"
+	depends on SC23XX
+	default n
+	help
+	  This is support wcn chip for spreadtrum.
+	  If you want to use sc2355 chip of spreadtrum.
+	  Please say "y".
+
+config UMW2652
+	tristate "UMW2652 chip Support"
+	depends on SC23XX
+	default n
+	help
+	  This is support wcn chip for spreadtrum.
+	  If you want to use umw2652 chip of spreadtrum.
+	  Please say "y".
+
+# sprd's SDIO device driver based on SC2355...,etc
+source "drivers/misc/sprdwcn/sdio/Kconfig"
+
+# sprd's SIPC device driver based on SC2342 integ...,etc
+source "drivers/misc/sprdwcn/sipc/Kconfig"
+
+# sprd's sleep device driver based on SC2355...,etc
+source "drivers/misc/sprdwcn/sleep/Kconfig"
+
+# sprd's PCIe device driver based on SC2355...,etc
+source "drivers/misc/sprdwcn/pcie/Kconfig"
+
+# sprd's wcn platform driver based on SC2355/SC2342...,etc
+source "drivers/misc/sprdwcn/platform/Kconfig"
+
+endmenu

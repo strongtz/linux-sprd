@@ -1,0 +1,35 @@
+TI BQ2560X PMIC battery charger binding
+
+Required properties:
+ - compatible: Should be "ti,bq2560x_chg".
+ - reg: Address offset of charger register.
+ - phys: Contains a phandle to the USB phy.
+
+Optional Properties:
+- monitored-battery: phandle of battery characteristics devicetree node.
+  The charger uses the following battery properties:
+- charge-term-current-microamp: current for charge termination phase.
+- constant-charge-voltage-max-microvolt: maximum constant input voltage.
+  See Documentation/devicetree/bindings/power/supply/battery.txt
+- extcon: used to detect if vbus is high level.
+Example:
+
+	bat: battery {
+		compatible = "simple-battery";
+		charge-term-current-microamp = <120000>;
+		constant-charge-voltage-max-microvolt = <4350000>;
+		......
+	};
+
+	&i2c4 {
+		status = "okay";
+		clock-frequency = <400000>;
+
+		bq2560x_chg: charger@6a {
+			compatible = "ti,bq2560x_chg";
+			reg = <0x6a>;
+			phys = <&hsphy>;
+			monitored-battery = <&bat>;
+			extcon = <&extcon_gpio>;
+		};
+	};

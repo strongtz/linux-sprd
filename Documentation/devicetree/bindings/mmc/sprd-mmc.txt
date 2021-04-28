@@ -1,0 +1,58 @@
+* Spreadtrum MMC Host Controller
+
+The Spreadtrum MMC Host Controller provides an interface for MMC, SD, and SDIO
+types of memory cards. This file documents differences between the core
+properties described by mmc.txt and the properties used by the Spreadtrum MMC
+driver.
+
+Required properties:
+- compatible:
+ should be "sprd,sdhc-r11p1",
+ in order to compatible with MMC controller version
+- reg: Registers location and length
+- interrupts: exactly one interrupt specifier
+- clock-names: The clock-names must have "sdio_clk", "sdio_clk_source" and
+	       "sdio_ahb_enable".
+	       The sdio for spreadtrum clock-names should contain sdio
+	       clock node, source clk node ,sdio module enable clock node.
+	       Clock-names is fixed in sdio drivers, and its purpose is to
+	       constrain the order of clocks property.Consumers drivers
+	       will use clock-names to match clock input names with clocks
+	       specifiers.
+- clocks: The freq of source clk connected to sdio.List of clock input name
+	  strings sorted in the same order as the clocks property.
+
+Optional properties:
+- cd-gpios: specify GPIOs for card detection, see gpio binding.and that will
+  delete "non-removable" in sprd driver code.
+- vmmc-supply: phandle to input sdio core voltage
+- vqmmc-supply: phandle to input sdio signal voltage
+- voltage-ranges: VDD voltage ranges
+- cap-mmc-hw-reset: eMMC hardware reset is supported
+- sprd,dly-invert : clock data write line invert
+
+*NOTE*
+- The following properties are defined by spreadtrum. They are not standard
+ properties of SDIO
+- sprd,name: The name of the MMC device. For Example, "emmc", "wifi" and "sd".
+  The capabilities of different MMC device can be set by this property in
+  spreadtrum MMC host driver
+- sprd,delay: This property value that obtained by hardware testing are fixed.
+ prop-encoded-array <wr-dl rd-pos-dl rd-neg-dl> where:
+    * wr-dl is the delay value between sdio clock signal and data write in
+        milliseconds
+    * rd-pos-dl is the delay value between sdio clock signal and posedge data
+        read in milliseconds
+    * rd-neg-dl is the delay value between sdio clock signal and negedge data
+        read in milliseconds
+
+Example:
+
+sdio0: sdio@1100000 {
+	compatible  = "sprd,sdhc-r11p1";
+	reg = <0x1100000 0x1000>;
+	interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+	clock-names = "sdio_clk", "sdio_clk_source","sdio_apb_enable";
+	clocks = <&clk_sdio0>, <&clk_twpll_384m>, <&clk_ap_apb_gates 22>;
+	status = "disabled";
+};

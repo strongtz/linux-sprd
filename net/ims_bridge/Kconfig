@@ -1,0 +1,22 @@
+#
+# IMS Bridge configuration
+#
+
+config SPRD_IMS_BRIDGE
+	tristate "Spreadtrum ims stack bridge support"
+	depends on INET && NETFILTER && SPRD_SIPC
+	default y
+	help
+	  This option adds ims stack bridge support to the kernel. We will
+	  *route* the packets to the proper interface and ims stack, and
+	  all of these are transparent to the ims stacks.
+	  To compile it as a module, choose M here.  If unsure, say N.
+
+config SPRD_IMS_BRIDGE_TEST
+	bool "Spreadtrum ims stack bridge test suite feature"
+	depends on SPRD_IMS_BRIDGE
+	default y
+	help
+	  Support for ims bridge kernel test suite, the supported lists
+	  can be retrived by /d/ims_bridge/test-suite.
+	  If unsure, say N.

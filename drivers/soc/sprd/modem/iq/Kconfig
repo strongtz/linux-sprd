@@ -1,0 +1,10 @@
+
+menu "SPRD IQ modules"
+
+config SPRD_IQ
+	bool "Sprd IQ"
+	default n
+	help
+	  capture the iq data.
+
+endmenu

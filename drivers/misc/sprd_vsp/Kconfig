@@ -1,0 +1,19 @@
+# to add sprd vsp configs in the future
+config SPRD_VSP
+	tristate "SPRD vsp driver"
+	depends on ION_SPRD
+
+config SPRD_VSP_PW_DOMAIN
+	bool "SPRD vsp power domain"
+	depends on SPRD_VSP
+	---help---
+	say Y if in whale series chip; otherwise, N.
+	this is to power on vsp domain.
+
+config SPRD_VSP_CALL_CAM_PW_DOMAIN
+	bool "SPRD VSP call camera power domain"
+	depends on SPRD_VSP
+	---help---
+	say Y if in R6P0 chip, such as PIKE2; otherwise, N.
+	this is to power on vsp which calls the interface implemented by camera domain.
+

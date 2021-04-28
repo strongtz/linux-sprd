@@ -1,0 +1,170 @@
+Unisoc power-debug bindings
+
+This node is used to define the power and interrupt state. The power debug
+driver will use this node to initialize power state structure and output debug
+information into kernel log, which will help to analyze the SoC system power
+exception.
+
+Required properties:
+- compatible: "sprd,power-debug".
+		There will be IP for power debug used in Spreadtrum SoC families.
+- sprd,sys-ap-ahb: Specify the ap-ahb address space node in the soc system
+- sprd,ap-ahb-reg-tbl: define the register records which should be checked in
+		the ap-ahb address space. each record includes three element:
+		1) a register address offset in this address space
+		2) a mask value which used to identified the required checked bit
+		3) a 32 bits value which indicates the expected value if the reg_val
+		& mask is not equal to the expected value, This driver will print
+		these information into kernel log.
+- sprd,sys-ap-apb: Specify the ap-apb address space node in the soc system
+- sprd,ap-apb-reg-tbl: define the register records which should be checked in
+		the ap-apb address space.
+- sprd,sys-pmu-apb: Specify the pmu-apb address space node in the soc system
+- sprd,pmu-apb-reg-tbl: define the register records which should be checked in
+		the pmu-apb address space.
+- sprd,sys-aon-apb: Specify the aon-apb address space node in the soc system
+- sprd,aon-apb-reg-tbl: define the register records which should be checked in
+		the aon-apb address space.
+- sprd,sys-ap-intc: Specify a list in which every element expresses a INTC0
+		controller's address space.
+- sprd,ap-intc: define the sprd_ap_intcx list.
+- sprd,pdm-name: define the sprd_pwr_statusx list.
+- sprd_pwr_statusx: define the pwr_status node information, details refer to the
+		following section-"subnode definattion" description.
+- sprd_ap_intcx: define the ap_intc node information, details refer to the
+		following section-"subnode definattion" description.
+
+optional properties:
+- sprd,sys-aon-sec: Specify the aon-sec address space node in the soc system
+- sprd,aon-sec-reg-tbl: define the register records which should be checked in
+		the aon-sec address space.
+
+subnode definition:
+1, sprd_pwr_statusx: describe a power state register
+- reg: the register address offset in the pmu-apb address space.
+- sprd,bit-width: define the bit width in the register of each power domain
+- sprd,bit-index: a list, each element in it define the bit start offset in
+		the register of the corresponding power domain
+- sprd,pdm-names: a string list which includes some sub power domain names. if
+		there is no definition to someone bits, uses "null" as
+		its name. the element number of the list is
+		[32 / pmu-state-bit-num].
+
+2, sprd_ap_intcx: describe a interrupt state register
+- reg: the register address offset in the INTC controller's address
+		space
+- sprd,int-names: a interrupt names list which includes 32 interrupts. if there is
+		no interrupt to someone bit, uses "null" as its name.
+
+Example:
+power: power-debug {
+		compatible = "sprd,power-debug";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		sprd,sys-ap-ahb = <&ap_ahb_regs>;
+
+		/* <reg-addr mask expect-value> */
+		sprd,ap-ahb-reg-tbl =
+			<REG_AP_AHB_AHB_EB
+			( MASK_AP_AHB_CKG_EB
+			| MASK_AP_AHB_DMA_EB
+			| MASK_AP_AHB_DMA_ENABLE
+			| MASK_AP_AHB_VSP_EB
+			| MASK_AP_AHB_DISPC_EB
+			| MASK_AP_AHB_DSI_EB )
+			MASK_AP_AHB_CKG_EB>,
+			......
+			<REG_AP_AHB_AP_ASYNC_BRG MASK_AP_AHB_AP_ASYNC_BRG_LP_EB MASK_AP_AHB_AP_ASYNC_BRG_LP_EB>;
+
+		sprd,sys-ap-apb = <&ap_apb_regs>;
+
+		sprd,ap-apb-reg-tbl =
+			<REG_AP_APB_APB_EB
+			( MASK_AP_APB_CE_PUB_EB
+			| MASK_AP_APB_CE_SEC_EB
+			| MASK_AP_APB_EMMC_EB
+			| MASK_AP_APB_SDIO2_EB
+			| MASK_AP_APB_SDIO1_EB
+			| MASK_AP_APB_SDIO0_EB
+			| MASK_AP_APB_UART2_EB
+			| MASK_AP_APB_UART1_EB
+			| MASK_AP_APB_UART0_EB
+			| MASK_AP_APB_I2C4_EB
+			| MASK_AP_APB_I2C3_EB
+			| MASK_AP_APB_I2C2_EB
+			| MASK_AP_APB_I2C1_EB
+			| MASK_AP_APB_I2C0_EB
+			| MASK_AP_APB_SPI3_EB
+			| MASK_AP_APB_SPI2_EB
+			| MASK_AP_APB_SPI1_EB
+			| MASK_AP_APB_SPI0_EB
+			| MASK_AP_APB_IIS2_EB
+			| MASK_AP_APB_IIS1_EB
+			| MASK_AP_APB_IIS0_EB
+			| MASK_AP_APB_SIM0_EB )
+			0x00000000>,
+			REG_AP_APB_APB_MISC_CTRL
+			( MASK_AP_APB_I2C4_SEC_EB
+			| MASK_AP_APB_I2C3_SEC_EB
+			| MASK_AP_APB_I2C2_SEC_EB
+			| MASK_AP_APB_I2C1_SEC_EB
+			| MASK_AP_APB_I2C0_SEC_EB
+			| MASK_AP_APB_SPI3_SEC_EB
+			| MASK_AP_APB_SPI2_SEC_EB
+			| MASK_AP_APB_SPI1_SEC_EB
+			| MASK_AP_APB_SPI0_SEC_EB )
+			0x00000000>;
+
+		sprd,sys-pmu-apb = <&pmu_apb_regs>;
+
+		sprd,pmu-apb-reg-tbl =
+			<REG_PMU_APB_PUB_SYS_AUTO_LIGHT_SLEEP_ENABLE MASK_PMU_APB_PUB_SYS_AUTO_LIGHT_SLEEP_ENABLE 0x00000000>,
+			......
+			<REG_PMU_APB_AXI_LP_CTRL_DISABLE MASK_PMU_APB_AXI_LP_CTRL_DISABLE MASK_PMU_APB_AXI_LP_CTRL_DISABLE>;
+
+		sprd,sys-aon-apb = <&aon_apb_regs>;
+
+		sprd,aon-apb-reg-tbl =
+			<REG_AON_APB_APB_EB0
+			( MASK_AON_APB_PROBE_EB
+			| MASK_AON_APB_AUX1_EB )
+			0x00000000>,
+			......
+			<REG_AON_APB_APCPU_DDR_AB_LPC_CTRL MASK_AON_APB_APCPU_DDR_AB_LP_EB 0x00000000>;
+
+		sprd,sys-ap-intc = <&ap_intc0_regs &ap_intc1_regs
+				&ap_intc2_regs &ap_intc3_regs
+				&ap_intc4_regs &ap_intc5_regs>;
+
+		sprd,ap-intc = <&sprd_ap_intc0 &sprd_ap_intc1 &sprd_ap_intc2
+				&sprd_ap_intc3 &sprd_ap_intc4 &sprd_ap_intc5>;
+
+		sprd,pdm-name = <&sprd_pwr_status0 &sprd_pwr_status1
+				&sprd_pwr_status2 &sprd_pwr_status3
+				&sprd_pwr_status4 &sprd_apcpu_pwr_state0
+				&sprd_apcpu_pwr_state1>;
+
+		sprd_pwr_status0: pwr-status@bc {
+			reg = <REG_PMU_APB_PWR_STATUS0_DBG>;
+			sprd,bit-width = <8>;
+			sprd,bit-index = <0 8 16 24>;
+			sprd,pdm-names = "PD_AP_SYS", "PD_AP_VSP",
+				"null", "null";
+		};
+		......
+
+		sprd_ap_intc0: ap-intc@0 {
+			reg = <0x0000>;
+			sprd,int-names = "null", "null", "AP_UART0", "AP_UART1",
+				"AP_UART2", "AP_SPI0",	"AP_SPI1", "AP_SPI2",
+				"AP_SPI3", "AP_SIM", "AP_EMMC",	"AP_I2C0",
+				"AP_I2C1", "AP_I2C2", "AP_I2C3", "AP_I2C4",
+				"AP_IIS0", "AP_IIS1", "AP_IIS2", "AP_SDIO0",
+				"AP_SDIO1", "AP_SDIO2", "CE_SEC", "CE_PUB",
+				"AP_DMA", "DMA_SEC_AP", "GSP", "DISPC",
+				"SLV_FW_AP_INTERRUPT", "DSI_PLL", "DSI0",
+				"DSI1";
+		};
+		......
+	};

@@ -1,0 +1,99 @@
+sipa system for Spreadtrum platforms
+
+Required properties:
+- compatible: should be one of following:
+	"sprd,roc1-sipa-sys",
+	"sprd,roc1-ipa-sys-power-domain".
+- syscons: Should contain the base address, offset and bit for each entry in "syscon-names".
+- syscon-names: global register bits name, order and name should the same as code.
+	ipa-sys-pciepllhsel: clear bit will unbind between PCIEPLL_H and IPA_SYS.
+	ipa-sys-pciepllvsel: clear bit will unbind between PCIEPLL_V and IPA_SYS.
+	ipa-sys-xtlbufpciehsel: clear bit will unbind between XTLBUF_PCIEH and IPA_SYS.
+	ipa-sys-xtlbufpcievsel: clear bit will unbind between XTLBUF_PCIEV and IPA_SYS.
+- clocks: Reference to a phandle of a clock provider node, see the common clock bindings.
+- clock-names: the following clocks are required:
+  * "ipa_core"
+  * "ipa_core_source"
+Optional Properties:
+- vddipa: Provide a handle to the modules ipa_sys to operate power supply.
+- #power-domain-cells: Must be 0
+
+Examples:
+	pd_ipa_sys: sipa-sys {
+		compatible = "sprd,roc1-ipa-sys-power-domain";
+		syscons = <&pmu_apb_regs
+			  REG_PMU_APB_IPA_FORCE_WAKEUP_CFG
+			  MASK_PMU_APB_IPA_FORCE_WAKEUP>,
+			  <&pmu_apb_regs
+			  REG_PMU_APB_PD_IPA_SYS_CFG
+			  MASK_PMU_APB_PD_IPA_SYS_FORCE_SHUTDOWN>,
+			  <&pmu_apb_regs
+			  REG_PMU_APB_PD_IPA_SYS_CFG
+			  MASK_PMU_APB_PD_IPA_SYS_AUTO_SHUTDOWN_EN>,
+			  <&pmu_apb_regs
+			  REG_PMU_APB_FORCE_DEEP_SLEEP_CFG
+			  MASK_PMU_APB_IPA_FORCE_DEEP_SLEEP>,
+			  <&pmu_apb_regs
+			  REG_PMU_APB_IPA_DSLP_ENA
+			  MASK_PMU_APB_IPA_DSLP_ENA>,
+			  <&pmu_apb_regs
+			  REG_PMU_APB_FORCE_LIGHT_SLEEP_CFG
+			  MASK_PMU_APB_IPA_FORCE_LIGHT_SLEEP>,
+			  <&pmu_apb_regs
+			  REG_PMU_APB_LIGHT_SLEEP_ENABLE
+			  MASK_PMU_APB_IPA_LSLP_ENA>,
+			  <&pmu_apb_regs
+			  REG_PMU_APB_LIGHT_SLEEP_ENABLE
+			  MASK_PMU_APB_IPA_SMART_LSLP_ENA>,
+			  <&ipa_ahb_regs
+			  REG_IPA_AHB_IPA_EB
+			  MASK_IPA_AHB_IPA_EB>,
+			  <&ipa_ahb_regs
+			  REG_IPA_AHB_IPA_EB
+			  MASK_IPA_AHB_CM4_EB>,
+			  <&ipa_ahb_regs
+			  REG_IPA_AHB_MAIN_MTX_LPC
+			  MASK_REG_FW0_IPA_S3_LPC_RD_SEC>,
+			  <&ipa_ahb_regs
+			  REG_IPA_AHB_S5_LPC
+			  MASK_REG_FW0_IPA_S3_LPC_WR_SEC>,
+			  <&pmu_apb_regs
+			  REG_PMU_APB_PCIEPLL_H_REL_CFG
+			  MASK_PMU_APB_PCIEPLL_H_IPA_SEL>,
+			  <&pmu_apb_regs
+			  REG_PMU_APB_PCIEPLL_V_REL_CFG
+			  MASK_PMU_APB_PCIEPLL_V_IPA_SEL>,
+			  <&pmu_apb_regs
+			  REG_PMU_APB_XTLBUF_PCIEH_REL_CFG
+			  MASK_PMU_APB_XTLBUF_PCIEH_IPA_SEL>,
+			  <&pmu_apb_regs
+			  REG_PMU_APB_XTLBUF_PCIEV_REL_CFG
+			  MASK_PMU_APB_XTLBUF_PCIEV_IPA_SEL>;
+
+		syscon-names =
+			"ipa-sys-forcewakeup",
+			"ipa-sys-forceshutdown",
+			"ipa-sys-autoshutdown",
+			"ipa-sys-forcedslp",
+			"ipa-sys-dslpen",
+			"ipa-sys-forcelslp",
+			"ipa-sys-lslpen",
+			"ipa-sys-smartlslpen",
+			"ipa-sys-ipaeb",
+			"ipa-sys-cm4eb",
+			"ipa-sys-autogaten",
+			"ipa-sys-s5-autogaten",
+			"ipa-sys-pciepllhsel",
+			"ipa-sys-pciepllvsel",
+			"ipa-sys-xtlbufpciehsel",
+			"ipa-sys-xtlbufpcievsel";
+		#power-domain-cells = <0>;
+
+		clocks = <&ipa_clk CLK_IPA_CORE>,
+			<&g12_pll CLK_LPLL_409M6>;
+		clock-names = "ipa_core", "ipa_core_source";
+
+		vddipa:vdd-ipa {
+			regulator-name = "IPA_SYS_VPOWER";
+		};
+	};

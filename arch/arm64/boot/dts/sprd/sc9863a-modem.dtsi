@@ -1,0 +1,272 @@
+/*
+ * Spreadtrum SC9863A modem board DTSI file
+ * These dt is used for modem drivers
+ *
+ * Copyright (C) 2017, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+/ {
+	aliases {
+		seth0 = &seth_ch7;
+		seth1 = &seth_ch8;
+		seth2 = &seth_ch9;
+		seth3 = &seth_ch18;
+		seth4 = &seth_ch19;
+		seth5 = &seth_ch20;
+		seth6 = &seth_ch24;
+		seth7 = &seth_ch25;
+		seth8 = &seth_ch26;
+		seth9 = &seth_ch27;
+		seth10 = &seth_ch28;
+		seth11 = &seth_ch29;
+		seth12 = &seth_ch30;
+		seth13 = &seth_ch31;
+	};
+
+	scproc-pubcp {
+		compatible = "sprd,scproc_pubcp";
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+		scproc_pubpm: scproc@800000 {
+			sprd,name = "pmic";
+			/* 0xff is invaild register offset */
+			syscons = <&aon_apb_regs 0xff 0x0>,
+					<&pmu_apb_regs 0xff 0x100000>,
+					<&pmu_apb_regs 0xb0 0x80>,
+					<&aon_apb_regs 0xff 0x0>,
+					<&aon_apb_regs 0xff 0x0>;
+			syscon-names = "shutdown", "deepsleep", "corereset",
+						"sysreset", "getstatus";
+			reg = <0x0 0x800000 0x0 0x40000>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+			/* segnr=1 */
+			/*TODO: ranges use to limit pm-sys & cali_lib memory region. it's not
+				standard use. need modify if possible*/
+			ranges = <0x0 0x0 0x800000 0x3b000>,
+					<0x3b000 0x0 0x83b000 0x5000>;
+			pm-sys@0 {
+				cproc,name = "pm_sys";
+				reg = <0x0 0x3b000>;
+			};
+
+			cali_lib@3b000 {
+				cproc,name = "cali_lib";
+				reg = <0x3b000 0x5000>; /* <cali_lib_addr size> */
+			};
+		};
+
+		scproc_pubcp: scproc@f000 {
+			sprd,decoup = "cproc-use-decoup";
+			sprd,name = "cptl";
+			/* 0xff is invaild register offset */
+			syscons = <&pmu_apb_regs 0x48 0x2000000>,
+					<&pmu_apb_regs 0xcc 0x40000>,
+					<&aon_apb_regs 0x284 0x400>,
+					<&pmu_apb_regs 0xb0 0x2>,
+					<&aon_apb_regs 0xff 0x0>;
+			syscon-names = "shutdown", "deepsleep", "corereset",
+						"sysreset", "getstatus";
+			reg = <0x0 0xf000 0x0 0x1000>;
+			interrupts = <GIC_SPI 83 0x0>;
+		};
+	};
+
+	sprd-sipc {
+		compatible = "sprd,sipc";
+		sipc0: sipc@87800000 {
+			sprd,name = "sipc-lte";
+			sprd,dst = <5 2>; /* <dst core-id> */
+			/* <ap-addr dst-maped-addr size> */
+			sprd,smem-info = <0x87800000 0x87800000 0x800000>;
+		};
+
+		sipc1: sipc@d000 {
+			sprd,name = "sipc-pmsys";
+			sprd,dst = <6 1 7>; /* <dst core-id> */
+			/* <ap-addr dst-maped-addr size> */
+			sprd,smem-info = <0xd000 0x2000b000 0x2000>;
+		};
+	};
+
+	sprd-spipe {
+		compatible = "sprd,spipe";
+		spipe@0 {
+			sprd,name = "spipe_pm";
+			sprd,dst = <6>;
+			sprd,channel = <4>;
+			sprd,ringnr = <2>;
+			sprd,size-rxbuf = <0xb00>;
+			sprd,size-txbuf = <0x180>;
+		};
+
+		spipe@1 {
+			sprd,name = "slog_pm";
+			sprd,dst = <6>;
+			sprd,channel = <5>;
+			sprd,ringnr = <1>;
+			sprd,size-rxbuf = <0x5c0>;
+			sprd,size-txbuf = <0x20>;
+		};
+
+		spipe@2 {
+			sprd,name = "sctl_pm";
+			sprd,dst = <6>;
+			sprd,channel = <6>;
+			sprd,ringnr = <1>;
+			sprd,size-rxbuf = <0x40>;
+			sprd,size-txbuf = <0x20>;
+		};
+
+		spipe@3 {
+			sprd,name = "spipe_lte";
+			sprd,dst = <5>;
+			sprd,channel = <4>;
+			sprd,ringnr = <15>;
+			sprd,size-rxbuf = <0x1000>; /* 4*1024 */
+			sprd,size-txbuf = <0x1000>; /* 4*1024 */
+		};
+
+		spipe@4 {
+			sprd,name = "sdiag_lte";
+			sprd,dst = <5>;
+			sprd,channel = <21>;
+			sprd,ringnr = <1>;
+			sprd,size-rxbuf = <0x20000>; /* 128*1024*/
+			sprd,size-txbuf = <0x8000>; /* 32*1024 */
+		};
+
+		spipe@5 {
+			sprd,name = "stty_lte";
+			sprd,dst = <5>;
+			sprd,channel = <6>;
+			sprd,ringnr = <32>;
+			sprd,size-rxbuf = <0x0800>; /* 2*1024*/
+			sprd,size-txbuf = <0x0800>; /* 2*1024 */
+		};
+	};
+
+	sprd-spool {
+		compatible = "sprd,spool";
+		sprd,name = "slog_lte";
+		sprd,dst = <5>;
+		sprd,channel = <5>;
+		sprd,tx-blksize = <0>;
+		sprd,tx-blknum = <0>;
+		sprd,rx-blksize = <0x10000>; /* 64k*/
+		sprd,rx-blknum = <4>;
+	};
+
+	sprd-sipx {
+		compatible = "sprd,sipx";
+		sprd,name = "sipx_lte";
+		sprd,dst = <5>;
+		sprd,dl-pool = <2048>;
+		sprd,dl-ack-pool = <64>;
+		sprd,ul-pool = <2048>;
+		sprd,ul-ack-pool = <1024>;
+	};
+
+	seth_ch7: seth@0 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <7>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch8: seth@1 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <8>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch9: seth@2 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <9>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch18: seth@3 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <18>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch19: seth@4 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <19>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch20: seth@5 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <20>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch24: seth@6 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <24>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch25: seth@7 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <25>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch26: seth@8 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <26>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch27: seth@9 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <27>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch28: seth@10 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <28>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch29: seth@11 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <29>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch30: seth@12 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <30>;
+		sprd,blknum = <256>;
+	};
+
+	seth_ch31: seth@13 {
+		compatible = "sprd,seth";
+		sprd,dst = <5>;
+		sprd,channel = <31>;
+		sprd,blknum = <256>;
+	};
+};
+
+

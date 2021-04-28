@@ -1,0 +1,322 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Spreadtrum Sharkl5 platform DTS file
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/gpio/gpio.h>
+
+#include "ums312-haps.dtsi"
+#include "ums312-haps-mach.dtsi"
+#include "sc2730.dtsi"
+#include "lcd/lcd_nt35597_boe_mipi_hd.dtsi"
+
+/ {
+	model = "Unisoc UMS312 Haps board";
+
+	compatible = "sprd,ums312";
+
+	sprd,sc-id = <312 1 0x20000>;
+
+	aliases {
+		serial0 = &uart0;
+		serial1 = &uart1;
+	};
+
+	memory: memory {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x80000000>;
+	};
+
+	chosen {
+		stdout-path = &uart1;
+		bootargs = "earlycon=sprd_serial,0x70100000,115200n8 console=ttyS1,115200n8 loglevel=11 maxcpus=1 init=/init root=/dev/mmcblk0p30 rootfstype=ext4 rw rootwait androidboot.hardware=ums312_haps androidboot.selinux=permissive printk.devkmsg=on";
+	};
+
+	ipi: interrupt-controller {
+		compatible = "android,CustomIPI";
+		#interrupt-cells = <1>;
+		interrupt-controller;
+	};
+
+	trusty {
+		compatible = "android,trusty-smc-v1";
+		irq {
+			compatible = "android,trusty-irq-v1";
+			interrupt-templates = <&ipi 0>,
+				<&gic 1 GIC_PPI 0>,
+				<&gic 1 GIC_SPI 0>;
+			interrupt-ranges = < 0  15 0>,
+					<16  31 1>,
+					<32 223 2>;
+		};
+
+		virtio {
+			compatible = "android,trusty-virtio-v1";
+		};
+
+		log {
+			compatible = "android,trusty-log-v1";
+		};
+	};
+
+	reserved_memory: reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		smem_reserved: sipc-mem@87800000{
+			reg = <0x0 0x87800000 0x0 0x00800000>;
+		};
+
+		fd_reserved: face-mem@be5c0000{
+			reg = <0x0 0xbe5c0000 0x0 0x00a00000>;
+		};
+	};
+
+	sprd-sysdump {
+		memory-region = <&memory>;
+		memory-region-re = <&ddrbist_reserved>, <&cp_reserved>, <&smem_reserved>, <&scproc_pubpm>;
+		memory-region-se = <&tos_reserved>, <&sml_reserved>;
+	};
+
+	sprd-iq {
+		compatible = "sprd,iq";
+		sprd,region = <&iq_reserved>;
+		sprd,mapping-offs = <0x0>;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+
+		key-volumedown {
+			label = "Volume Down Key";
+			linux,code = <KEY_VOLUMEDOWN>;
+			gpios = <&eic_debounce 2 GPIO_ACTIVE_LOW>;
+			debounce-interval = <2>;
+			wakeup-source;
+		};
+
+		key-volumeup {
+			label = "Volume Up Key";
+			linux,code = <KEY_VOLUMEUP>;
+			gpios = <&pmic_eic 10 GPIO_ACTIVE_HIGH>;
+			debounce-interval = <2>;
+			wakeup-source;
+		};
+
+		key-power {
+			label = "Power Key";
+			linux,code = <KEY_POWER>;
+			gpios = <&pmic_eic 1 GPIO_ACTIVE_HIGH>;
+			debounce-interval = <2>;
+			wakeup-source;
+		};
+	};
+
+	ion {
+		compatible = "sprd,ion";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		heap@1 {
+			reg = <1>;
+			label = "carveout_mm";
+			type = <2>;
+		};
+
+		heap@2 {
+			reg = <2>;
+			label = "carveout_overlay";
+			type = <2>;
+			memory-region = <&overlay_reserved>;
+		};
+
+		heap@3 {
+			reg = <3>;
+			label = "carveout_fb";
+			type = <2>;
+			memory-region = <&fb_reserved>;
+		};
+	};
+
+	sprd-mtty {
+		compatible = "sprd,mtty";
+		sprd,name = "ttyBT";
+	};
+
+	sprd-fm {
+		compatible = "sprd,marlin3-fm";
+		sprd,name = "sprd-fm";
+	};
+
+	sprd-wlan {
+		compatible = "sprd,sc2355-wifi";
+	};
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&i2c3 {
+	status = "okay";
+
+	adaptive-touchscreen@38 {
+		compatible = "adaptive-touchscreen";
+		reg = <0x38>;
+		gpios = <&ap_gpio 145 GPIO_ACTIVE_HIGH
+			&ap_gpio 144 GPIO_ACTIVE_HIGH>;
+		controller = "focaltech,FT5436";
+		virtualkeys = <580 60 1320 60 45
+			172 360 1320 60 45
+			158 600 1320 60 45>;
+		status = "disabled";
+		private-data {
+			a8 = /bits/ 8 <0x5a>;
+		};
+	};
+};
+
+&dpu {
+	status = "okay";
+};
+
+&iommu_dispc {
+	status = "okay";
+};
+
+&dsi {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	panel {
+		compatible = "sprd,generic-mipi-panel";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0>;
+
+		sprd,force-attached = "lcd_nt35597_boe_mipi_hd";
+
+		port {
+			reg = <1>;
+			panel_in: endpoint {
+				remote-endpoint = <&dphy_out>;
+			};
+		};
+	};
+};
+
+&lcd_nt35597_hd_timing0 {
+	clock-frequency = <6500000>;
+};
+
+&dphy {
+	status = "okay";
+};
+
+&sdio0 {
+	bus-width = <4>;
+	sprd,name = "sdio_sd";
+	sprd,sdio-adma;
+	no-sdio;
+	no-mmc;
+	status = "disabled";
+};
+
+&sdio1 {
+	bus-width = <4>;
+	sprd,name = "sdio_wifi";
+	sprd,sdio-adma;
+	no-sd;
+	no-mmc;
+	status = "disabled";
+};
+
+&sdio2 {
+	bus-width = <4>;
+	sprd,name = "sdio_wifi";
+	sprd,sdio-adma;
+	no-sd;
+	no-mmc;
+	status = "disabled";
+};
+
+&sdio3 {
+	bus-width = <8>;
+	non-removable;
+	cap-mmc-hw-reset;
+	sprd,name = "sdio_emmc";
+	no-sdio;
+	no-sd;
+	status = "okay";
+};
+
+&hsphy {
+	vdd-supply = <&vddusb33>;
+};
+
+&usb {
+	extcon = <&pmic_typec>;
+};
+
+&pmic_typec {
+	status = "okay";
+};
+
+&dcam {
+	status = "okay";
+};
+
+&isp {
+	status = "okay";
+};
+
+&fd {
+	status = "okay";
+};
+
+&cpp {
+	status = "okay";
+};
+
+&csi0 {
+	status = "okay";
+};
+
+&csi1 {
+	status = "okay";
+};
+
+&csi2 {
+	status = "okay";
+};
+
+&mipi_csi_phy0 {
+	status = "okay";
+};
+
+&mipi_csi_phy1 {
+	status = "okay";
+};
+
+&mipi_csi_phy2 {
+	status = "okay";
+};
+
+&mipi_csi_phy1_m {
+	status = "okay";
+};
+
+&mipi_csi_phy1_s {
+	status = "okay";
+};

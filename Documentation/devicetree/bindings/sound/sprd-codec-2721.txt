@@ -1,0 +1,35 @@
+* Spreadtrum cpu dai driver
+
+This node models spreadtrum codec dai driver
+
+Required properties:
+
+- compatible : "sprd,sc2721-audio-codec", "sprd,sc27xx-audio-codec",
+	       "sprd,sc2720-audio-codec", "sprd,sc27xx-audio-codec",
+- reg : analog codec registor offset
+- interrupts : irq num of analog codec
+- sprd,syscon-pmu-apb : pmu apb node
+- nvmem-cells : A phandle to the calibration cells provided by eFuse device.
+- nvmem-cell-names : A name list of nvmem-cells.
+- #sound-dai-cells : it used to select codec dai number,
+	if equal 0 means use default dai 0, if equal 1,
+	the cpu dai number is determined by the second parameter
+	of sound-dai property.
+
+Example:
+sprd_audio_codec_ana: audio-codec@700 {
+	compatible = "sprd,sc2721-audio-codec", "sprd,sc27xx-audio-codec";
+	#sound-dai-cells = <1>;
+	reg = <0x700>;
+	interrupts = <6 IRQ_TYPE_NONE>;
+	sprd,syscon-pmu-apb = <&pmu_regs>;
+};
+
+
+sprd-audio-card,dai-link@1 {
+	...
+	codec {
+		sound-dai = <&sprd_codec 1>;
+	};
+	...
+};

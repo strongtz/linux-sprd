@@ -1,0 +1,54 @@
+Spreadtrum Camera Flash devices
+
+This node provides properties for controlling the Spreadtrum Camera Flash device.
+
+Required properties:
+
+ - compatible should be one of followings:
+	"sprd,flash-sc2731"
+	"sprd,sc2721-flash"
+	"sprd,sc2720-flash"
+	"sprd,flash-sgm37891"
+	"sprd,sc2703-flash"
+	"sprd,lcd-flash"
+	"sprd,flash-wd3124da"
+
+Example:
+
+flash-sc2731 {
+	compatible = "sprd,flash-sc2731";
+	sprd,pmic-flash = <&pmic_flash>;
+	flash0-gpios = <&ap_gpio 167 0>;
+	flash1-gpios = <&ap_gpio 168 0>;
+};
+
+pmic_flash: flash@2a8 {
+	compatible = "sprd,sc2721-flash";
+	reg = <0x2a8>;
+};
+
+pmic_flash: flash@1f4 {
+	compatible = "sprd,sc2720-flash";
+	reg = <0x1f4>;
+};
+
+flash-gpios {
+	compatible = "sprd,flash-sgm37891";
+	flash-ic = <37891>;
+	flash-1w-gpios = <&ap_gpio 30 0>;
+	flash-torch-en-gpios = <&ap_gpio 87 0>;
+	flash-en-gpios = <&ap_gpio 89 0>;
+};
+
+flash: sc2703-flash@4a {
+	compatible = "sprd,sc2703-flash";
+	reg = <0x4a>;
+	flash-chip-en-gpios = <&ap_gpio 137 0>;
+};
+
+flash_lcd: flash-lcd {
+	compatible = "sprd,lcd-flash";
+	sprd,dpu = <&dpu>;
+	sprd,backlight = <&pwm_backlight>;
+	status = "okay";
+};

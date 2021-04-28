@@ -1,0 +1,66 @@
+Spreadtrum QOS bindings
+
+Quality of Service (QOS) is designed for reducing the delay between
+master, such as arm core/GPU, and DDR by configuring the QOS value
+and urgent mechanisms. The urgent mechanism is working with such QOS
+threshold. The QOS values and thresholds are limited to binary numbers
+in the range of 0x0 to 0xf, where 0x0 represents the lowest priority
+and 0xf represents the highest priority. Normally, each master
+communicate with DDR in priority order. And when the QOS value is bigger
+than the corresponding threshold, which results in 'urgent', this master
+will preempt communication rights with DDR.
+
+Required properties:
+- reg: Used to distinguish different masters in different sub_systems.
+
+Optional properties:
+- arqos: Represents a master's QOS value in issuing read operations
+to DDR.
+- awqos: Represents a master's QOS value in issuing write operations
+to DDR.
+- awrqos: Represents a master's QOS value in issuing write and read
+operations to DDR.
+- arqos-high: If one master has two sets of QOS value, this parameter
+repersents the high priority QOS value in issuing read operations to DDR.
+- awqos-high: If one master has two sets of QOS value, this parameter
+repersents the hith priority QOS value in issuing write opertions to DDR.
+- arqos-low: If one master has two sets of QOS value, this parameter
+repersents the low priority QOS value in issing read opertions to DDR.
+- awqos-low: If one master has two sets of QOS value, this parameter
+repersents the low priority QOS value in issing write opertions to DDR.
+
+Note 1: If necessary, the QOS value of different master/sub_systems
+can be expressed by suffixing arqos and awqos, like arqos-ce/awqos-dma.
+
+- arqos-threshold: Repersents the urgent threshold in issuing read
+operations to DDR.
+- awqos-threshold: Repersents the urgent threshold in issuing write
+operations to DDR.
+
+Note 2: Thresholds can also have corresponding suffixes, like
+arqos-threshold-main and awqos-threshold-merge.
+
+Examples:
+	gpu_qos: qos@0 {
+			reg = <0>;
+			arqos = [06];
+			awqos = [06];
+			arqos-threshold = [0f];
+			awqos-threshold = [0f];
+	};
+	dpu_qos: qos@1 {
+			reg = <1>;
+			awqos-high      = [0a];
+			awqos-low       = [0a];
+			arqos-high      = [0d];
+			arqos-low       = [0c];
+			arqos-threshold = [0c];
+			awqos-threshold = [0f];
+	};
+	vsp_qos: qos@2 {
+			reg = <2>;
+			awqos           = [01];
+			arqos-high      = [07];
+			arqos-low       = [01];
+	};
+

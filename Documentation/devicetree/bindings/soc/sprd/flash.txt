@@ -1,0 +1,570 @@
+/*
+ * Spreadtrum sharkl3 board DTS file
+ *
+ * Copyright (C) 2017, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+/dts-v1/;
+
+#include "sc9863a.dtsi"
+#include "sp9863a-common.dtsi"
+#include "sc9863a-wcn.dtsi"
+
+/ {
+	model = "Spreadtrum SC9863A10c10 Board";
+
+	compatible = "sprd,sp9863a", "sprd,sc9863a";
+
+	sprd,sc-id = <9863 1 0x20000>;
+
+	aliases {
+		serial0 = &uart0;
+		serial1 = &uart1;
+	};
+
+	memory: memory@80000000 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x80000000>;
+	};
+
+	chosen {
+		stdout-path = &uart1;
+		bootargs = "earlycon=sprd_serial,0x70100000,115200n8 console=ttyS1,115200n8 loglevel=1 init=/init root=/dev/mmcblk0p30 rootfstype=ext4 ro rootwait androidboot.hardware=s9863a10c10 androidboot.dtbo_idx=0 androidboot.selinux=permissive swiotlb=1";
+	};
+
+	ipi: interrupt-controller {
+		compatible = "android,CustomIPI";
+		#interrupt-cells = <1>;
+		interrupt-controller;
+	};
+
+	trusty {
+		compatible = "android,trusty-smc-v1";
+
+		irq {
+			compatible = "android,trusty-irq-v1";
+			interrupt-templates = <&ipi 0>,
+						<&gic 1 GIC_PPI 0>,
+						<&gic 1 GIC_SPI 0>;
+			interrupt-ranges = < 0  15 0>,
+						<16  31 1>,
+						<32 223 2>;
+		};
+
+		virtio {
+			compatible = "android,trusty-virtio-v1";
+		};
+
+		log {
+			compatible = "android,trusty-log-v1";
+		};
+	};
+
+	sprd-sysdump {
+		memory-region = <&memory>;
+		memory-region-re = <&cp_reserved>, <&smem_reserved>,
+				   <&scproc_pubpm>, <&gnss_reserved>,
+				   <&wcn_reserved>;
+		memory-region-se = <&tos_reserved>, <&sml_reserved>;
+	};
+
+	sprd_map_user {
+		compatible = "sprd,sprd_map_user";
+	};
+
+	ion {
+		compatible = "sprd,ion";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		heap@0 {
+			reg = <0>;
+			label = "system";
+			type = <0>;
+		};
+
+		heap@3 {
+			reg = <3>;
+			label = "carveout_fb";
+			type = <2>;
+			memory-region = <&fb_reserved>;
+		};
+
+		heap@4 {
+			reg = <4>;
+			label = "carveout_camera";
+			type = <2>;
+			memory-region = <&camera_reserved>;
+		};
+	};
+
+	sprd-iq {
+		compatible = "sprd,iq";
+		sprd,region = <&iq_reserved>;
+		sprd,mapping-offs = <0x0>;
+	};
+
+	sprd-wlan {
+		compatible = "sprd,sp9863a";
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		input-name = "sprd-gpio-keys";
+		status = "okay";
+
+		key-volumedown {
+			label = "Volume Down Key";
+			linux,code = <114>;
+			gpios = <&ap_gpio 124 1>;
+			debounce-interval = <2>;
+			gpio-key,wakeup;
+			gpio-key,level-trigger;
+		};
+
+		key-volumeup {
+			label = "Volume Up Key";
+			linux,code = <115>;
+			gpios = <&pmic_eic 10 0>;
+			debounce-interval = <2>;
+			gpio-key,wakeup;
+			gpio-key,level-trigger;
+		};
+
+		key-power {
+			label = "Power Key";
+			linux,code = <116>;
+			gpios = <&pmic_eic 1 1>;
+			gpio-key,wakeup;
+			gpio-key,level-trigger;
+		};
+	};
+
+	fingerprint@0 {
+		compatible = "microarray,afs121";
+		fpint-gpios = <&ap_gpio 130 0>;
+	};
+};
+
+&dispc0 {
+	status = "okay";
+};
+
+&dsi0 {
+	status = "okay";
+};
+
+&dphy0 {
+	status = "okay";
+};
+
+&pwms {
+	status = "okay";
+};
+
+&pmic_bltc_rgb {
+	status = "okay";
+};
+
+&dcam {
+	status = "okay";
+};
+
+&iommu_dcam {
+	status = "okay";
+};
+
+&isp {
+	status = "okay";
+};
+
+&iommu_isp {
+	status = "okay";
+};
+
+&vsp {
+	status = "okay";
+};
+
+&iommu_vsp {
+	status = "okay";
+};
+
+&jpg {
+	status = "okay";
+};
+
+&iommu_jpg {
+	status = "okay";
+};
+
+&cpp {
+	status = "okay";
+};
+
+&iommu_cpp {
+	status = "okay";
+};
+
+&iommu_dispc {
+	status = "okay";
+};
+
+&csi0 {
+	status = "okay";
+};
+
+&csi1 {
+	status = "okay";
+};
+
+&csi2 {
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	sensor_main: sensor-main@20 {
+		compatible = "sprd,sensor-main";
+		reg = <0x20>;
+		clock-names = "clk_src","sensor_eb",
+			"clk_96m","clk_76m8",
+			"clk_48m","clk_26m";
+		clocks = <&clk_sensor0>, <&clk_mckg_gates 5>,
+			<&clk_twpll_96m>,<&clk_twpll_76m8>,
+			<&clk_twpll_48m>,<&ext_26m>;
+		vddio-supply = <&vddcamio>;
+		vddcamd-supply = <&vddcamd>;
+		vddcammot-supply = <&vddcammot>;
+		avdd-gpios=<&ap_gpio 87 0>;
+		reset-gpios = <&ap_gpio 44 0>;
+		power-down-gpios = <&ap_gpio 46 0>;
+		host = "dcam0";
+		port {
+			sensor_main_0: endpoint {
+				remote-endpoint = <&phy1_out>;
+			};
+		};
+	};
+};
+
+&i2c1 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	sensor_sub: sensor-sub@20 {
+		compatible = "sprd,sensor-sub";
+		reg = <0x20>;
+		clock-names = "clk_src","sensor_eb",
+			"clk_96m","clk_76m8",
+			"clk_48m","clk_26m";
+		clocks = <&clk_sensor1>, <&clk_mckg_gates 6>,
+			<&clk_twpll_96m>,<&clk_twpll_76m8>,
+			<&clk_twpll_48m>,<&ext_26m>;
+		vddio-supply = <&vddcamio>;
+		vddcammot-supply = <&vddcammot>;
+		avdd-gpios=<&ap_gpio 32 0>;
+		dvdd-gpios=<&ap_gpio 33 0>;
+		reset-gpios = <&ap_gpio 41 0>;
+		power-down-gpios = <&ap_gpio 40 0>;
+		host = "dcam0";
+		port {
+			sensor_sub_0: endpoint {
+				remote-endpoint = <&phy0_out>;
+			};
+		};
+	};
+
+	sensor_main2: sensor-main2@6C {
+		compatible = "sprd,sensor-main2";
+		reg = <0x6C>;
+		clock-names = "clk_src","sensor_eb",
+			"clk_96m","clk_76m8",
+			"clk_48m","clk_26m";
+		clocks = <&clk_sensor1>, <&clk_mckg_gates 6>,
+			<&clk_twpll_96m>,<&clk_twpll_76m8>,
+			<&clk_twpll_48m>,<&ext_26m>;
+		vddio-supply = <&vddcamio>;
+		vddcama-supply = <&vddcama>;
+		vddcamd-supply = <&vddcamd>;
+		vddcammot-supply = <&vddcammot>;
+		reset-gpios = <&ap_gpio 45 0>;
+		power-down-gpios = <&ap_gpio 47 0>;
+		host = "dcam1";
+		port {
+			sensor_main_2: endpoint {
+				remote-endpoint = <&phy2_out>;
+			};
+		};
+	};
+};
+
+&i2c3 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	synaptics_dsx@22 {
+		compatible = "synaptics,dsx-i2c";
+		reg = <0x22>;
+		synaptics,irq-gpio = <&ap_gpio 144 0x2008>;
+		synaptics,reset-gpio = <&ap_gpio 145 0>;
+		synaptics,irq-on-state = <0>;
+		synaptics,reset-on-state = <0>;
+		synaptics,power-delay-ms = <200>;
+		synaptics,reset-delay-ms = <200>;
+		synaptics,reset-active-ms = <20>;
+	};
+	/*for check*/
+	synaptics_dsx1@32 {
+		compatible = "sprd,flash_gpio";
+	};
+	synaptics_dsx2@33 {
+		compatible = "sprd,flash-ocp8137";
+	};
+	synaptics_dsx3@34 {
+		compatible = "sprd,flash_front_gpio";
+	};
+	synaptics_dsx5@35 {
+		compatible = "sprd,sc2705-flash";
+	};
+	synaptics_dsx6@36 {
+		compatible = "sprd,flash-front-rgb";
+	};
+	synaptics_dsx7@37 {
+		compatible = "sprd,flash-sc2731s-com";
+	};
+	synaptics_dsx8@38 {
+		compatible = "sprd,flash-sc2731sub";
+	};
+};
+
+&i2c4 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	bq2560x_chg: charger@6b {
+		compatible = "ti,bq2560x_chg";
+		reg = <0x6b>;
+		vbus-det-gpios = <&pmic_eic 0 0>;
+	};
+
+	flash_ic: flash-ic@63 {
+		compatible = "sprd,flash-aw3648";
+		reg = <0x63>;
+		sprd,flash-ic = <3648>;
+		sprd,torch = <1>;
+		sprd,preflash = <1>;
+		sprd,highlight = <1>;
+		sprd,torch-level = <10>;
+		sprd,preflash-level = <15>;
+		sprd,highlight-level = <15>;
+		sprd,lvfm-enable = <1>;
+		flash-chip-en-gpios = <&ap_gpio 89 0>;
+	};
+};
+
+&i2c7 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	ext_pmic: ncp6335d-regulator@1c {
+		compatible = "onnn,ncp6335d-regulator";
+		reg = <0x1c>;
+		onnn,vsel = <0>;
+		onnn,slew-rate-ns = <2666>;
+		onnn,discharge-enable;
+		onnn,step-size = <6250>;
+		onnn,min-slew-ns = <333>;
+		onnn,max-slew-ns = <2666>;
+		regulator-min-microvolt = <850000>;
+		regulator-max-microvolt = <1350000>;
+		regulator-always-on;
+		onnn,min-setpoint = <600000>;
+	};
+
+	/*virtual i2c device for cpu hw dvfs*/
+	cpufreqhw@61 {
+		compatible = "sprd,cpufreqhw-regulator-sharkl3";
+		reg = <0x61>;
+	};
+};
+
+&spi0 {
+	/*used for fingerprint sensor*/
+	status = "okay";
+};
+
+&mipi_csi_phy1 {
+	status = "okay";
+	sprd,phyid = <1>;
+	sprd,csi = <&csi0>;
+	status = "okay";
+	port {
+		phy1_out: endpoint {
+			remote-enpoint = <&sensor_main_0>;
+		};
+	};
+};
+
+&mipi_csi_phy2 {
+	status = "okay";
+	sprd,phyid = <2>;
+	sprd,csi = <&csi1>;
+	status = "okay";
+	port {
+		phy2_out: endpoint {
+			remote-enpoint = <&sensor_main_2>;
+		};
+	};
+};
+
+&mipi_csi_phy0 {
+	status = "okay";
+	sprd,phyid = <0>;
+	sprd,csi = <&csi0>;
+	status = "okay";
+	port {
+		phy0_out: endpoint {
+			remote-enpoint = <&sensor_sub_0>;
+		};
+	};
+};
+
+&hsphy {
+	vdd-supply = <&vddusb33>;
+};
+
+&usb {
+	sprd,cable-detection-method = "gpios";
+	sprd,vbus-gpios = <&pmic_eic 0 0>;
+	sprd,usb-id-gpios = <&ap_eic 4 0>;
+};
+
+&pmic_typec {
+	status = "okay";
+};
+
+&battery {
+	battery-adapt-support = <0>;
+	battery-adapt-fun = <0>;
+	adp-cdp-cur = <2000>;
+	adp-dcp-cur = <2000>;
+	adp-sdp-cur = <550>;
+	adp-unknown-cur = <550>;
+	adp-dcp-cur-limit = <1500>;
+	chg-end-vol = <4400>;
+	chg-end-vol-check = <4380>;
+	chg-bat-safety-vol = <4480>;
+	rechg-vol = <4330>;
+	rsense-real = <200>;
+	rint = <254>;
+	cnom = <3062>;
+	chg-polling-time = <15>;
+	ocv-tab-vol = <4362 4303 4246 4191 4137 4085 4038
+			3992 3945 3890 3857 3832 3812 3795
+			3779 3759 3739 3714 3686 3672 3400>;
+	ocv-tab-cap = <100  95   90   85   80   75   70
+			65   60   55   50   45   40   35
+			30   25   20   15   10   5    0>;
+	temp-support = <0>;
+	/*30mohm,if temp-table-mode = <1>, use it*/
+	temp-comp-res = <6>;
+	temp-tab-val = <1052 953 858 762 671 584
+			504 434 372 318 271 234
+			198 165 140 119 104 88>;
+	/* temperature + 1000,750 = 1000 + (-250)*/
+	temp-tab-temp = <750 800 850 900 950 1000
+			 1050 1100 1150 1200 1250 1300
+			 1350 1400 1450 1500 1550 1600>;
+	jeita-temp-tab = <1000 1050 1100 1450 1500>;
+	jeita-temp-recovery-tab = <930 1030 1130 1420 1470>;
+	jeita-cur-tab = <0 300 900 0x7FFF 1000 0>;
+	jeita-cccv-tab = <4400 4400 4400 4400 4100 4100>;
+};
+
+&pmic_fgu {
+	ocv-type = <1>;
+};
+
+&sdio0 {
+	 cd-gpios = <&ap_eic_async 9 0>;
+};
+
+&dmc_mpu {
+	status = "okay";
+	sprd,panic;
+};
+
+&sprd_cpufreqhw {
+	sprd,vtune-step-fast-core00 = <0x0>;
+	sprd,vtune-step-val-core00 = <0x8>;
+	sprd,vtune-step-fast-core01 = <0x0>;
+	sprd,vtune-step-val-core01 = <0x3ff>;
+	sprd,vtune-vld-bit-core01 = <0x3f>;
+	sprd,vtune-vld-bit-core00 = <0x3ff>;
+	/*chnl0-[3:0],chnl0-[7:4],chnl2-[11:8]*/
+	sprd,chnl-in-i2c = <0x000>;
+	/*chnl_0-core1-i2c,chnl_1_2-core0-adi*/
+	sprd,chnl-core-map = <0x01>;
+	/*vddarm0 chnl0 at DCDC_5355_VOL0*/
+	sprd,chnl0-dcdc-index = <0x02>;
+	/*vddarm1 chnl1 at DCDC_2731_VOL0*/
+	sprd,chnl1-dcdc-index = <0x00>;
+	/*vddarm1 chnl2 at DCDC_2731_VOL0*/
+	sprd,chnl2-dcdc-index = <0x00>;
+	sprd,hold-val-core00 = <50>;
+	sprd,pause-val-core00 = <5>;
+	sprd,to-val-core00 = <800>;
+	sprd,stable-val-core00 = <5>;
+	sprd,hold-val-core01 = <25>;
+	sprd,pause-val-core01 = <20>;
+	sprd,to-val-core01 = <800>;
+	sprd,stable-val-core01 = <25>;
+};
+
+&sound_vbc_r1p0v3_sprd_codec {
+	status = "okay";
+	sprd-audio-card,routing =
+		"HPMIC", "HP Mic Jack",
+		"MIC", "Mic Jack",
+		"AUXMIC", "Aux Mic Jack",
+		"inter HP PA", "HP PA",
+		"inter Spk PA", "Spk PA",
+		"Ext Spk", "Spk PA",
+		"inter Ear PA", "EAR",
+		"DMIC", "DMic Jack",
+		"DMIC1", "DMic1 Jack",
+
+		/* For vbc loopback */
+		"Aud input", "AD Clk",
+		"Aud input1", "AD Clk",
+		"Aud input", "Digital ADCL Switch",
+		"Aud input", "Digital ADCR Switch",
+		"Aud input1", "Digital ADC1L Switch",
+		"Aud input1", "Digital ADC1R Switch";
+	/* ext_control_type, hook selection, mode, gpio share */
+	sprd,spk-ext-pa-info = <0 0 0 0>;
+	sprd,spk-ext-pa-gpio = <&ap_gpio 63 0>;
+	sprd,spk-ext-pa-names = "ext_spk_r";
+};
+&CPU0 {
+	cpu-supply = <&ext_pmic>;
+};
+
+&CPU1 {
+	cpu-supply = <&ext_pmic>;
+};
+
+&CPU2 {
+	cpu-supply = <&ext_pmic>;
+};
+
+&CPU3 {
+	cpu-supply = <&ext_pmic>;
+};
+&cpufreq_clus0 {
+	voltage-tolerance = <3125>;
+};

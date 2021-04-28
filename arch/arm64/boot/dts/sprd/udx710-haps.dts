@@ -1,0 +1,49 @@
+/*
+ * Spreadtrum UDX710 Haps board DTS file
+ *
+ * Copyright (C) 2017,2018 Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+/dts-v1/;
+
+#include "udx710-haps.dtsi"
+#include "udx710-haps-mach.dtsi"
+
+/ {
+	model = "Spreadtrum UDX710 HAPSBoard";
+
+	compatible = "sprd,udx710-haps", "sprd,udx710";
+
+	sprd,sc-id = <710 1 0x20000>;
+
+	aliases {
+		serial0 = &uart0;
+	};
+
+	memory: memory@80000000 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x20000000>;
+	};
+
+	chosen {
+		stdout-path = &uart0;
+		bootargs = "earlycon console=ttyS0,115200n8 loglevel=8 init=/init root=/dev/ram0 rw androidboot.hardware=udx710_haps androidboot.selinux=permissive swiotlb=64k printk.devkmsg=on";
+	};
+
+	ion {
+		compatible = "sprd,ion";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		heap@0 {
+			reg = <0>;
+			label = "system";
+			type = <0>;
+		};
+	};
+};
+
+&uart0 {
+	status = "ok";
+};

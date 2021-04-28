@@ -1,0 +1,44 @@
+Spreadtrum Generic MUSB driver
+================================================================
+
+Required properties:
+ - compatible: should be one of the followings:
+   "sprd,sharkl3-musb",
+   "sprd,sharkl5-musb",
+   "sprd,roc1-musb"
+   "sprd,pike2-musb"
+   "sprd,sharkle-musb"
+ - reg: physical base address of the musb and length of memory mapped region
+ - interrupts: interrupt number for the musb controller
+ - interrupt-names: corresponding interrupt names for the interrupts
+                    listed in the 'interrupts'
+ - clocks: define which clk to core_clk
+ - clock-names: Should contain "core_clk"
+ - usb-phy: phandle for the PHY device
+ - dr-mode: Should be "peripheral"
+ - extcon: Should be "pmic_typec"
+ - vbus-supply: Should be "vddvbus" which is provided by charger
+
+Optional properties:
+ - wakeup-source: indicate USB irq is wakeup source of AP.
+ - syscons: define AON_PUB_SYS_DEEP_SLEEP_POLL in pmu apb
+ - syscon-names: should contain "usb_pub_slp_poll"
+
+Example:
+-------
+
+Board specific DT entry:
+
+	usb: usb@20200000 {
+		compatible  = "sprd,sharkl3-musb";
+		reg = <0x20200000 0x2000>;
+		interrupts = <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "mc";
+		clocks = <&clk_ap_ahb_gates CLK_OTG_EB>;
+		clock-names = "core_clk";
+		usb-phy = <&hsphy>;
+		phy-names = "usb";
+		dr-mode = "peripheral";
+		extcon = <&pmic_typec>;
+		vbus-supply = <&vddvbus>;
+	};

@@ -1,0 +1,26 @@
+Spreadtrum Communications UCP1301 smart pa bindings
+
+UCP1301 is a high performance, low noise analog audio smart
+amplifier with current and voltage sensing ADC inside, which
+specialized in music and audio applications with speaker temperature
+and membrane excursion protection to avoid speaker damage.
+
+======
+
+Required properties:
+- compatible : Should be one of following "sprd,ucp1301-spk", "sprd,ucp1301-spk2", "sprd,ucp1301-rcv"
+- reg: I2C slave address, 0x58.
+- reset-gpios: a GPIO spec for the reset pin.
+- #sound-dai-cells : it used to specify how many cells used when using dai phandle.
+	if equal 0 means using default dai 0, if equal 1,
+	the dai number is determined by the second parameter of sound-dai property.
+======
+
+Example:
+
+	ucp1301_smartpa: ucp1301@58 {
+		compatible = "sprd,ucp1301-spk";
+		reg = <0x58>;
+		reset-gpios = <&ap_gpio 134 GPIO_ACTIVE_HIGH>;
+		#sound-dai-cells = <1>;
+	};

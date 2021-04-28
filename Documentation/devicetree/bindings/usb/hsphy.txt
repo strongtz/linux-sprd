@@ -1,0 +1,35 @@
+Spreadtrum Generic USB PHY
+===========================================================
+
+Required properties:
+  - compatible: should be one of following:
+    "sprd,sharkl3-phy",
+    "sprd,sharkl5-phy",
+    "sprd,roc1-phy"
+    "sprd,pike2-phy"
+    "sprd,sharkle-phy"
+  - reg: must be the PHY controller base address
+  - reg-names: "phy_glb_regs" for the usb phy global register
+  - sprd,syscon-enables: specify the handle for aon apb syscon
+  - sprd,syscon-apahb: specify the handle for ap ahb syscon
+  - sprd,syscon-anag4: specify the handle for anlg_phy_g4 syscon
+  - sprd,tune-value: should be set for eye diagram calibration
+  - sprd,vdd-voltage: the voltage should be set 3.3V
+  - #phy-cells: should be set respectively to <0>
+
+Example
+-------
+
+Board specific DT entry:
+
+	hsphy: hsphy@e00000 {
+		compatible = "sprd,sharkl3-phy";
+		reg = <0xe00000 0x3030>;
+		reg-names = "phy_glb_regs";
+		sprd,syscon-enable = <&aon_apb_regs>;
+		sprd,syscon-apahb = <&ap_ahb_regs>;
+		sprd,syscon-anag4 = <&anlg_phy_g4_regs>;
+		sprd,tune-value = <0x0005af33>;
+		sprd,vdd-voltage = <3300000>;
+		#phy-cells = <0>;
+	};

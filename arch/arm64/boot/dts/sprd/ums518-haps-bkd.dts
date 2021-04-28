@@ -1,0 +1,51 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Unisoc Sharkl5Pro platform DTS file
+ *
+ * Copyright (C) 2018, Unisoc Communications Inc.
+ */
+
+/dts-v1/;
+
+#include "ums518-haps.dts"
+#include "ums518-haps-bkd-mach.dtsi"
+
+/ {
+	chosen {
+		bootargs = "earlycon=sprd_serial,0x70100000,115200n8 console=ttyS1,115200n8 loglevel=11 maxcpus=1 init=/init root=/dev/memdisk0p1 rootfstype=ext4 rw rootwait androidboot.hardware=ums518_haps androidboot.selinux=permissive printk.devkmsg=on";
+	};
+
+	reserved-memory {
+		system_memdisk_reserved: system_memdisk_reserved@c0000000{
+			reg = <0x0 0xc0000000 0x0 0x5AA00000>;  /* system 1536M */
+		};
+
+		userdata_memdisk_reserved: userdata_memdisk_reserved@120000000{
+			reg = <0x1 0x20000000 0x0 0x6400000>; /* userdata 512M */
+		};
+
+		vendor_memdisk_reserved: vendor_memdisk_reserved@130000000{
+			reg = <0x1 0x30000000 0x0 0x12c00000>; /* vendor 300M */
+		};
+	};
+
+	sprd-memdisk {
+		compatible = "sprd,memdisk";
+
+		system {
+			memory-region = <&system_memdisk_reserved>;
+			label = "memdisk0p1";
+		};
+
+		userdata {
+			memory-region = <&userdata_memdisk_reserved>;
+			label = "memdisk0p2";
+		};
+
+		vendor {
+			memory-region = <&vendor_memdisk_reserved>;
+			label = "memdisk0p3";
+		};
+	};
+};
+

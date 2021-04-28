@@ -1,0 +1,397 @@
+/*
+ * Spreadtrum Sharkl5 board common DTS file
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+#include "lcd/lcd_dummy_mipi.dtsi"
+#include <dt-bindings/thermal/thermal.h>
+
+/ {
+	aliases {
+		cooling-device0 = &cluster0_cooling;
+		cooling-device1 = &cluster1_cooling;
+		gpu-cooling0 = &gpu_cooling0;
+	};
+
+	firmware {
+		android {
+			compatible = "android,firmware";
+
+			vbmeta {
+				compatible = "android,vbmeta";
+				parts = "vbmeta,boot,recovery,system,vendor,product";
+			};
+
+			fstab {
+				compatible = "android,fstab";
+				vendor {
+					compatible = "android,vendor";
+					dev = "/dev/block/platform/soc/soc:ap-apb/71400000.sdio/by-name/vendor";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1";
+					fsmgr_flags = "wait";
+				};
+				product {
+					compatible = "android,product";
+					dev = "/dev/block/platform/soc/soc:ap-apb/71400000.sdio/by-name/product";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1";
+					fsmgr_flags = "wait";
+				};
+			};
+		};
+	};
+
+	display-subsystem {
+		compatible = "sprd,display-subsystem";
+		ports = <&dpu_port>;
+		gsp = <&gsp>;
+	};
+
+	ddr_dfs: scene-frequency {
+		compatible = "sprd,dfs";
+		freq-num = <7>;
+		backdoor = <1200>;
+	};
+
+	sprd-sensorhub {
+		compatible = "sprd,sharkl5-sensorhub";
+	};
+
+	thm_zone: thermal-zones {
+
+		soc_thmzone: soc-thmzone {
+			polling-delay-passive = <100>;
+			polling-delay = <1000>;
+			sustainable-power = <2000>;
+			thermal-sensors = <&soc_sensor  17>;
+			trips {
+				soc_threshold: trip-point@0 {
+					temperature = <70000>;
+					hysteresis = <1000>;
+					type = "passive";
+				};
+				soc_target: trip-point@1 {
+					temperature = <85000>;
+					hysteresis = <1000>;
+					type = "passive";
+				};
+				soc_crit: soc_crit {
+					temperature = <110000>;
+					hysteresis = <2000>;
+					type = "critical";
+				};
+			};
+			cooling-maps {
+				map0 {
+					trip = <&soc_target>;
+					contribution = <1024>;
+					cooling-device =
+					<&cluster0_cooling THERMAL_NO_LIMIT \
+					THERMAL_NO_LIMIT>;
+				};
+				map1 {
+					trip = <&soc_target>;
+					contribution = <674>;
+					cooling-device =
+					<&cluster1_cooling THERMAL_NO_LIMIT \
+					THERMAL_NO_LIMIT>;
+				};
+			};
+		};
+
+		prometheus_thmzone: prometheus-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm0 0>;
+		};
+
+		ank1_thmzone: ank1-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm0 1>;
+		};
+
+		ank2_thmzone: ank2-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm0 2>;
+		};
+
+		prometheus0_thmzone: prometheus0-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm0 3>;
+		};
+
+		ank_thmzone: ank-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm1 0>;
+		};
+
+		ank0_thmzone: ank0-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm1 1>;
+		};
+
+		gpu_thmzone: gpu-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm2 0>;
+		};
+
+		cluster0_thmzone: cluster0-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			sustainable-power = <2000>;
+			thermal-sensors = <&cluster0_sensor  15>;
+		};
+
+		cluster1_thmzone: cluster1-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			sustainable-power = <2000>;
+			thermal-sensors = <&cluster1_sensor  16>;
+		};
+
+		osctsen_thmzone: osctsen-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&pmic_tsensor 0>;
+		};
+
+		outtsen_thmzone: outtsen-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&pmic_tsensor 1>;
+		};
+	};
+
+	cooling-devices {
+		cluster0_cooling: cluster0-cooling {
+			compatible = "sprd,cluster-cooling";
+			#cooling-cells = <2>; /* min followed by max */
+			sprd,efuse-block7 = <7>;
+			sprd,efuse-block15 = <15>;
+			/* core_leak =                             */
+			/*(LIT_LEAK[4:0]+1) x 2mA x 0.85V x 18.69% */
+			sprd,leak-core = <2 85 1869>;
+			/* cluster_leak =                           */
+			/* (LIT_LEAK[4:0]+1) x 2mA x 0.85V x 25.24% */
+			sprd,leak-cluster = <2 85 2524>;
+			/*core Tscale = aT^3 + bT^2 + cT +di   */
+			sprd,core-temp-scale =
+			/* a*10^7   b*10^7      c*10^7     d*10^7 */
+			<  29      (-2100)      100000    (-580000)>;
+			/*core Vscale = eV^3 + fV^2 + gV + h */
+			sprd,core-voltage-scale =
+			/* e*10^2   f*10^2     g*10^2  h*10^2*/
+			<  201     (-169)      83      (-16)>;
+			/*cluster Tscale = aT^3 + bT^2 + cT +di   */
+			sprd,cluster-temp-scale =
+			/* a*10^7   b*10^7      c*10^7     d*10^7 */
+			<  29      (-2100)      100000    (-580000)>;
+			/*cluster Vscale = eV^3 + fV^2 + gV + h */
+			sprd,cluster-voltage-scale =
+			/* e*10^2   f*10^2     g*10^2  h*10^2*/
+			<  201     (-169)      83      (-16)>;
+			sprd,efuse-switch = <0>;
+			sprd,hotplug-period = <0>;
+			sprd,min-cpufreq = <768000>;
+			sprd,min-cpunum = <4>;
+			sprd,core-base = <2400>;
+			sprd,cluster-base = <3970>;
+			sprd,dynamic-core =
+			/*Pdynperghz*10    Freq     Vbase  */
+			< 1007           1000     1000>;
+			sprd,dynamic-cluster =
+			/*Pdynperghz*10    Freq     Vbase  */
+			< 747           1000     1000>;
+		};
+
+		cluster1_cooling: cluster1-cooling {
+			compatible = "sprd,cluster-cooling";
+			#cooling-cells = <2>; /* min followed by max */
+			sprd,efuse-block7 = <7>;
+			sprd,efuse-block15 = <15>;
+			/* core_leak =                             */
+			/*(LIT_LEAK[4:0]+1) x 2mA x 0.85V x 18.69% */
+			sprd,leak-core = <8 85 1984>;
+			/* cluster_leak =                           */
+			/* (LIT_LEAK[4:0]+1) x 2mA x 0.85V x 25.24% */
+			sprd,leak-cluster = <8 85 2064>;
+			/*core Tscale = aT^3 + bT^2 + cT +d  */
+			sprd,core-temp-scale =
+			/* a*10^7   b*10^7	c*10^7	   d*10^7*/
+			<  29      (-2100)      100000    (-580000)>;
+			/* core  Vscale = eV^3 + fV^2 + gV + h */
+			sprd,core-voltage-scale =
+			/* e*10^2  f*10^2     g*10^2  h*10^2*/
+			<  201     (-169)      83      (-16)>;
+			/*cluster Tscale = aT^3 + bT^2 + cT +di   */
+			sprd,cluster-temp-scale =
+			/* a*10^7   b*10^7      c*10^7     d*10^7 */
+			<  29      (-2100)      100000    (-580000)>;
+			/*cluster Vscale = eV^3 + fV^2 + gV + h */
+			sprd,cluster-voltage-scale =
+			/* e*10^2   f*10^2     g*10^2  h*10^2*/
+			<  201     (-169)      83      (-16)>;
+			sprd,efuse-switch = <0>;
+			sprd,hotplug-period = <0>;
+			sprd,min-cpufreq = <768000>;
+			sprd,min-cpunum = <0>;
+			sprd,core-base = <4190>;
+			sprd,cluster-base = <3970>;
+			sprd,dynamic-core =
+			/* Pdynperghz*10    Freq     Vbase */
+			<  1536          1000     1000>;
+			sprd,dynamic-cluster =
+			/* Pdynperghz*10    Freq     Vbase */
+			<  747            1000     1000>;
+		};
+	};
+
+	gpu-cooling-devices {
+		gpu_cooling0: gpu-cooling0 {
+			compatible = "sprd,mali-power-model";
+			#cooling-cells = <2>;
+			sprd,efuse-block7 = <7>;
+			sprd,efuse-block15 = <15>;
+			/* core_leak =                             */
+			/*(LIT_LEAK[4:0]+1) x 2mA x 0.85V x 18.69% */
+			sprd,leak-core = <2 85 1869>;
+			/* cluster_leak =                           */
+			/* (LIT_LEAK[4:0]+1) x 2mA x 0.85V x 25.24% */
+			sprd,leak-cluster = <2 85 2524>;
+			/*Tscale = aT^3 + bT^2 + cT +di   */
+			sprd,temp-scale =
+			/* a*10^7   b*10^7      c*10^7     d*10^7 */
+			<  300     (-29000)     1491000    (-13962000)>;
+			/*Vscale = eV^3 + fV^2 + gV + h */
+			sprd,voltage-scale =
+			/* e*10^2   f*10^2     g*10^2      h*10^2*/
+			<  (-1629)  6627       (-6871)     2222>;
+			sprd,hotplug-period = <0>;
+			sprd,core-base = <966>;
+			sprd,cluster-base = <966>;
+			sprd,dynamic-core =
+			/*Pdynperghz    Freq     Vbase  */
+			< 6046           768     900>;
+			sprd,dynamic-cluster =
+			/*Pdynperghz    Freq     Vbase  */
+			< 6064           768     900>;
+		};
+	};
+
+	reserved_memory: reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		ddrbist_reserved: ddrbist-mem@80000000{
+			reg = <0x80000000 0x00001000>;
+		};
+
+		audio_reserved: audio-mem@87400000{
+			reg = <0x87400000 0x00400000>;
+		};
+
+		smem_reserved: sipc-mem@87800000{
+			reg = <0x87800000 0x00800000>;
+		};
+
+		audiodsp_reserved: audiodsp-mem@89000000 {
+			reg = <0x89000000 0x00600000>;
+		};
+
+		cp_reserved: cp-modem@89600000 {
+			reg = <0x89600000 0x04b00000>;
+		};
+
+		/* must be 64M aligned */
+		sml_reserved: sml-mem@94000000{
+			reg = <0x94000000 0x00020000>;
+		};
+
+		tos_reserved: tos-mem@94020000{
+			reg = <0x94020000 0x040e0000>;
+		};
+
+		/* Only used for iq, will be removed in normal mode by uboot */
+		iq_reserved: iq-mem@98100000{
+			compatible = "sprd,iq-mem";
+			reg = <0x98100000 0x4000000>;
+		};
+
+		pstore: pstore@9f000000{
+			reg = <0x9F000000 0x4000>;
+		};
+
+		fb_reserved: framebuffer-mem@befc0000{
+			reg = <0xbefc0000 0x00c70000>;
+		};
+
+		wb_reserved: writeback@bfc30000{
+			reg = <0xbfc30000 0x00390000>;
+		};
+	};
+
+};
+
+&sdio0 {
+	sprd,sdr104-dly = <0x86 0x6e 0x70 0x70>;
+	sprd,sdr50-dly = <0x7f 0x7f 0xf6 0xf6>;
+	sprd,sdhs-dly = <0x0 0x24 0x24 0x24>;
+	sprd,legacy-dly = <0x0 0x24 0x24 0x24>;
+	vmmc-supply = <&vddsdcore>;
+	vqmmc-supply = <&vddsdio>;
+	voltage-ranges = <3000 3000>;
+	bus-width = <4>;
+	sd-uhs-sdr104;
+	sd-uhs-sdr50;
+	sprd,name = "sdio_sd";
+	sprd,sdio-adma;
+	no-sdio;
+	no-mmc;
+	status = "okay";
+};
+
+&sdio1 {
+	sprd,sdr104-dly = <0x7f 0x8f 0x93 0x93>;
+	sprd,sdr50-dly = <0xff 0x0c 0x0e 0x0e>;
+	sd-uhs-sdr104;
+	sd-uhs-sdr50;
+	bus-width = <4>;
+	sprd,name = "sdio_wifi";
+	sprd,sdio-adma;
+	no-sd;
+	no-mmc;
+	status = "okay";
+};
+
+&sdio3 {
+	sprd,hs400es-dly = <0x4f 0x7f 0x32 0x32>;
+	sprd,hs400-dly = <0x4b 0x72 0x38 0x38>;
+	sprd,hs200-dly = <0x7f 0xde 0xca 0xca>;
+	sprd,ddr52-dly = <0x30 0x27 0x19 0x19>;
+	sprd,mmchs-dly = <0x7f 0x94 0x7f 0x7f>;
+	vmmc-supply = <&vddemmccore>;
+	voltage-ranges = <3000 3000>;
+	bus-width = <8>;
+	non-removable;
+	cap-mmc-hw-reset;
+	mmc-hs400-enhanced-strobe;
+	mmc-hs400-1_8v;
+	mmc-hs200-1_8v;
+	mmc-ddr-1_8v;
+	sprd,name = "sdio_emmc";
+	sprd,sdio-adma;
+	no-sdio;
+	no-sd;
+	status = "okay";
+};

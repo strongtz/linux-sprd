@@ -1,0 +1,295 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Unisoc Sharkl5Pro platform DTS file
+ *
+ * Copyright (C) 2018, Unisoc Communications Inc.
+ */
+
+#include <dt-bindings/soc/sprd,sharkl5pro-regs.h>
+#include <dt-bindings/soc/sprd,sharkl5pro-mask.h>
+#include <dt-bindings/clock/sprd,sharkl5pro-clk.h>
+
+/ {
+	interrupt-parent = <&gic>;
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	soc: soc {
+		compatible = "simple-bus";
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		ap_ahb_regs: syscon@20100000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x20100000 0 0x10000>;
+		};
+
+		pub_apb_regs: syscon@31050000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x31050000 0 0x10000>;
+		};
+
+		ap_intc0_regs: syscon@32310000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32310000 0 0x10000>;
+		};
+
+		ap_intc1_regs: syscon@32320000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32320000 0 0x10000>;
+		};
+
+		ap_intc2_regs: syscon@32330000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32330000 0 0x10000>;
+		};
+
+		ap_intc3_regs: syscon@32340000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32340000 0 0x10000>;
+		};
+
+		ap_intc4_regs: syscon@32350000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32350000 0 0x10000>;
+		};
+
+		ap_intc5_regs: syscon@32360000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32360000 0 0x10000>;
+		};
+
+		anlg_phy_g0_regs: syscon@32390000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32390000 0 0x10000>;
+		};
+
+		anlg_phy_g1_regs: syscon@323a0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323a0000 0 0x10000>;
+		};
+
+		anlg_phy_g2_regs: syscon@323b0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323b0000 0 0x10000>;
+		};
+
+		anlg_phy_g3_regs: syscon@323c0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323c0000 0 0x10000>;
+		};
+
+		anlg_phy_g4_regs: syscon@323d0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323d0000 0 0x10000>;
+		};
+
+		anlg_phy_gc_regs: syscon@323e0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323e0000 0 0x10000>;
+		};
+
+		anlg_phy_g10_regs: syscon@323f0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323f0000 0 0x10000>;
+		};
+
+		aon_apb_regs: syscon@327d0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x327d0000 0 0x10000>;
+		};
+
+		pmu_apb_regs: syscon@327e0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x327e0000 0 0x10000>;
+		};
+
+		audcp_apb_regs: syscon@3350d000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x3350d000 0 0x1000>;
+		};
+
+		audcp_ahb_regs: syscon@335e0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x335e0000 0 0x1000>;
+		};
+
+		gpu_apb_regs: syscon@60100000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x60100000 0 0x10000>;
+		};
+
+		mm_ahb_regs: syscon@62200000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x62200000 0 0x100000>;
+		};
+
+		ap_apb_regs: syscon@71000000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x71000000 0 0x10000>;
+		};
+
+		ap-apb {
+			compatible = "simple-bus";
+			#address-cells = <2>;
+			#size-cells = <2>;
+			ranges;
+
+			uart0: serial@70000000 {
+				compatible = "sprd,ums518-uart",
+					     "sprd,sc9836-uart";
+				reg = <0 0x70000000 0 0x100>;
+				interrupts = <GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH>;
+				clock-names = "enable", "uart", "source";
+				clocks = <&apapb_gate CLK_UART0_EB>;
+				status = "disabled";
+			};
+
+			uart1: serial@70100000 {
+				compatible = "sprd,ums518-uart",
+					     "sprd,sc9836-uart";
+				reg = <0 0x70100000 0 0x100>;
+				interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>;
+				clock-names = "enable", "uart", "source";
+				clocks = <&apapb_gate CLK_UART1_EB>;
+				status = "disabled";
+			};
+
+			sdio3: sdio@71400000 {
+				compatible = "sprd,sdhc-r11p1";
+				reg = <0x71400000  0x1000>;
+				interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
+				status = "disabled";
+			};
+
+			sdio0: sdio@71100000 {
+				compatible = "sprd,sdhc-r11p1";
+				reg = <0x71100000 0x1000>;
+				interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+				status = "disabled";
+			};
+
+			sdio1: sdio@71200000 {
+				compatible = "sprd,sdhc-r11p1";
+				reg = <0x71200000 0x1000>;
+				interrupts = <GIC_SPI 20 IRQ_TYPE_LEVEL_HIGH>;
+				status = "disabled";
+			};
+
+			sdio2: sdio@71300000 {
+				compatible = "sprd,sdhc-r11p1";
+				reg = <0x71300000 0x1000>;
+				interrupts = <GIC_SPI 21 IRQ_TYPE_LEVEL_HIGH>;
+				status = "disabled";
+			};
+		};
+
+		ap-ahb {
+			compatible = "simple-bus";
+			#address-cells = <2>;
+			#size-cells = <2>;
+			ranges;
+
+			dpu: dpu@20300000 {
+				compatible = "sprd,display-processor";
+				reg = <0x0 0x20300000 0x0 0x1000>;
+				/*syscons = <&ap_ahb_regs REG_AP_AHB_AHB_RST
+					MASK_AP_AHB_DISPC_SOFT_RST>;*/
+				syscon-names = "reset";
+				interrupts = <GIC_SPI 27 IRQ_TYPE_LEVEL_HIGH>;
+				status = "disabled";
+				iommus = <&iommu_dispc>;
+
+				dma-coherent;
+
+				sprd,ip = "dpu-r4p0";
+				sprd,soc = "sharkl5Pro";
+
+				dpu_port: port {
+					dpu_out: endpoint {
+						remote-endpoint = <&dummy_connector_in>;
+					};
+				};
+			};
+
+			gsp_core0: gsp@20300000 {
+				compatible = "sprd,gsp-core";
+				reg = <0 0x20300000 0 0x2000>;
+				core-id = <0>;
+				kcfg-num = <16>;
+				interrupts = <GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>;
+				iommus = <&iommu_dispc>;
+			};
+
+			iommu_dispc: iommu@20300000 {
+				compatible = "sprd,iommuvaul5p-dispc";
+				reg = <0x0 0x20300000 0x0 0x800>,
+				      <0x0 0x20300800 0x0 0x80>;
+				iova-base = <0x30000000>;
+				iova-size = <0x10000000>;
+				reg_name = "mmu_interrupt_reg","mmu_reg";
+				status = "okay";
+				#iommu-cells = <0>;
+			};
+		};
+
+		apahb_gate: apahb-gate {
+			compatible = "sprd,sharkl5pro-apahb-gate";
+			sprd,syscon = <&ap_ahb_regs>; /* 0x20100000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+
+		aonapb_gate: aonapb-gate {
+			compatible = "sprd,sharkl5pro-aon-gate";
+			sprd,syscon = <&aon_apb_regs>; /* 0x327d0000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+
+		apapb_gate: apapb-gate {
+			compatible = "sprd,sharkl5pro-apapb-gate";
+			sprd,syscon = <&ap_apb_regs>; /* 0x71000000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+	};
+
+	ext_26m: ext-26m {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <26000000>;
+		clock-output-names = "ext-26m";
+	};
+
+	gsp: sprd-gsp {
+		compatible = "sprd,gsp-r8p0-sharkl5pro";
+		name = "sprd-gsp";
+		core-cnt = <1>;
+		io-cnt = <7>;
+		cores = <&gsp_core0>;
+	};
+};

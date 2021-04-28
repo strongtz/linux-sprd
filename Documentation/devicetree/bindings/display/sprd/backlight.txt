@@ -1,0 +1,32 @@
+Spreadtrum backlight bindings
+
+Required properties:
+ - compatible: "sprd,sharkl5pro-backlight"
+ - pwms: OF device-tree PWM specification (see PWM binding[0])
+ - pwm-names: a list of names for the PWM devices specified in the
+     "pwms" property (see PWM binding[0])
+ - sprd,max-brightness-level: The max brightness level.
+     Between min brightness level and max brightness level
+     represents the actual brightness levels array
+     (min brightness level defined by the "sprd,min-brightness-level" property)
+ - default-brightness-level: the default brightness level.
+     Must take a value between min brightness level and max brightness level
+     see pwm-backlight binding[1]
+ - sprd,brightness-scale: This value represents a 100% duty cycle (brightest)
+
+Optional properties:
+  - sprd,min-brightness-level: The min brightness level, default is 0.
+
+[0]: Documentation/devicetree/bindings/pwm/pwm.txt
+[1]: Documentation/devicetree/bindings/leds/backlight/pwm-backlight.txt
+
+Example:
+
+	backlight {
+		compatible = "sprd,sharkl5pro-backlight";
+		pwms = <&pwm 2 40000>;
+		pwm-names = "backlight";
+		sprd,max-brightness-level = <240>;
+		default-brightness-level = <33>;
+		sprd,brightness-scale = <255>;
+	};

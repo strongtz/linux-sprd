@@ -1,0 +1,33 @@
+Spreadtrum ipa level2 interrupt controller
+
+This interrupt controller is only used on roc1 chip. It has the
+following properties:
+
+- outputs a single interrupt signal to its interrupts controller parent(GIC).
+
+Required properties:
+
+- compatible: should be "sprd,ud710-ipa-intc"
+- reg: specifies the register base physical address and length
+- interrupt-controller: identifies the node as an interrupt controller
+- #interrupt-cells: specifies the number of cells needed to encode an interrupt
+		    source, should be 1.
+		    It specifies the interrupt number in this controller.
+- interrupts: specifies the interrupt line in the interrupt-parent controller
+	      (GIC) node
+- syscons: The global registers of ipa interrupt controller.
+	   Each group syscon has 3 cells.
+- syscon-name: each mask of global register needs a corresponding name.
+
+Example:
+
+ipa_intc: ipa@20e03000 {
+	compatible = "sprd,ud710-ipa-intc";
+	reg = <0 0x20e03000 0 0x1000>;
+	interrupt-controller;
+	interrupts = <GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>;
+	#interrupt-cells = <1>;
+	syscon-names =  "ipa_intc_eb";
+	syscons = <&ipa_ahb_regs REG_IPA_AHB_IPA_EB MASK_IPA_AHB_INTC_EB>;
+};
+

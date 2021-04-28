@@ -1,0 +1,64 @@
+Spreadtrum BUSMONITOR
+
+Required properties:
+- compatible: Should be one of follow:
+		"sprd,sharkl3-busmonitor",
+		"sprd,sharkl5-busmonitor",
+		"sprd,sharkl5pro-busmonitor".
+- interrupts: Should contain the BUSMONITOR interrupt number.
+- reg: Should contain the number of the sys on the djtag bus.
+- sprd,bm-num: Should contain the number of BUSMONITOR this sys have.
+- sprd,bm-name: Should contain the name of each BUSMONITOR in this sys.
+- sprd,bm-type: Should contain all BUSMONITOR type.
+- sprd,bm-dap: Should contain the number of the dap contain the BUSMONITOR.
+- sprd,bm-config: Should contain busmonitor enable, monitor type
+		(monitor writing or reading) and monitor mode.
+- sprd,bm-id: Should contain BUSMONITOR the id match function enable,
+	      monitored ID and ID type.
+- sprd,bm-ranges: Should contain BUSMONITOR monitored range address.
+
+Optional properties:
+- sprd,panic: Used to indicate whether panic when occurred the address violate event.
+
+Configuration related macro definitions:
+#define ENABLE		1
+#define DISABLE		0
+#define MON_WRITE	1
+#define MON_READ	2
+#define MON_WRITEREAD	(MON_WRITE | MON_READ)
+#define MON_OUTSIDE	0
+#define MON_INSIDE	1
+
+#define USERID		1
+#define AXI		1
+#define AHB		0
+#define AXIID		0
+
+Example:
+&djtag {
+	aon-busmonitor@3{
+		compatible  = "sprd,sharkl3-busmonitor";
+		interrupts = <GIC_SPI 34
+			IRQ_TYPE_LEVEL_HIGH>;
+		reg = <0x3>;
+		sprd,bm-num = <4>;
+		sprd,bm-name =
+			"AP", "WTLCP", "PUBCP","WCN";
+		sprd,bm-type =
+			<AXI>, <AXI>, <AXI>, <AXI>;
+		sprd,bm-dap = <1>, <2>, <3>, <4>;
+		sprd,bm-config =
+			<DISABLE MON_READ MON_INSIDE>,
+			<DISABLE MON_WRITE MON_INSIDE>,
+			<DISABLE MON_WRITE MON_INSIDE>,
+			<DISABLE MON_WRITE MON_INSIDE>;
+		sprd,bm-id =
+			<DISABLE 0 AXIID>,
+			<DISABLE 0 AXIID>,
+			<DISABLE 0 AXIID>,
+			<DISABLE 0 AXIID>;
+		sprd,bm-ranges =
+			<0x33000800 0x3300088c>,
+			<0 0>, <0 0>, <0 0>;
+	};
+}

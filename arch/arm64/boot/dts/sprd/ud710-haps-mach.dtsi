@@ -1,0 +1,154 @@
+/*
+ * Spreadtrum UD710 board common DTS file
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+/ {
+	firmware {
+		android {
+			compatible = "android,firmware";
+
+			vbmeta {
+				compatible = "android,vbmeta";
+				parts = "vbmeta,boot,recovery,system,vendor,product";
+			};
+
+			fstab {
+				compatible = "android,fstab";
+				vendor {
+					compatible = "android,vendor";
+					dev = "/dev/block/platform/soc/soc:ap-apb/71400000.sdio/by-name/vendor";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1";
+					fsmgr_flags = "wait";
+				};
+				product {
+					compatible = "android,product";
+					dev = "/dev/block/platform/soc/soc:ap-apb/71400000.sdio/by-name/product";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1";
+					fsmgr_flags = "wait";
+				};
+			};
+		};
+	};
+
+	display-subsystem {
+		compatible = "sprd,display-subsystem";
+		ports = <&dpu_port>;
+		gsp = <&gsp>;
+	};
+
+	sprd-sensorhub {
+		compatible = "sprd,roc1-sensorhub";
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		ddrbist_reserved: ddrbist-mem@80000000 {
+			reg = <0x0 0x80000000 0x0 0x00000080>;
+		};
+
+		audio_reserved: audio-mem@87400000 {
+			reg = <0x0 0x87400000 0x0 0x00400000>;
+		};
+
+		smem_reserved: sipc-mem@87800000 {
+			reg = <0x0 0x87800000 0x0 0x00800000>;
+		};
+
+		audiodsp_reserved: audiodsp-mem@89000000 {
+			reg = <0x0 0x89000000 0x0 0x00600000>;
+		};
+
+		cp_reserved: cp-modem@89600000 {
+			reg = <0x0 0x89600000 0x0 0x04500000>;
+		};
+
+		vdsp_reserved: vdsp-mem@93e00000 {
+			reg = <0x0 0x93e00000 0x0 0x00200000>;
+		};
+
+		/* Only used for iq, will be removed in normal mode by uboot */
+		iq_reserved: iq-mem@98100000 {
+			compatible = "sprd,iq-mem";
+			reg = <0x0 0x98100000 0x0 0x4000000>;
+		};
+
+		sml_reserved: sml-mem@94000000 {
+			reg = <0x0 0x94000000 0x0 0x00020000>;
+		};
+
+		tos_reserved: tos-mem@94020000 {
+			reg = <0x0 0x94020000 0x0 0x03fe0000>;
+		};
+
+		pstore_reserved: pstore-mem@9f000000 {
+			reg = <0x0 0x9f000000 0x0 0x00040000>;
+		};
+
+		ipa_reserved: ipa-mem@f8dc0000 {
+			reg = <0x0 0xf8dc0000 0x0 0x03000000>;
+		};
+
+		fd_reserved: fd-mem@fbdc0000 {
+			reg = <0x0 0xfbdc0000 0x0 0x01e00000>;
+		};
+
+		fb_reserved: framebuffer-mem@fdbc0000 {
+			reg = <0x0 0xfdbc0000 0x0 0x01b00000>;
+		};
+
+		wb_reserved: writeback-mem@ff6c0000 {
+			reg = <0x0 0xff6c0000 0x0 0x00900000>;
+		};
+	};
+
+	sprd-iq {
+			compatible = "sprd,iq";
+			sprd,region = <&iq_reserved>;
+			sprd,mapping-offs = <0x0>;
+		};
+
+	ion {
+		compatible = "sprd,ion";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		heap@1 {
+			reg = <1>;
+			label = "carveout_mm";
+			type = <2>;
+		};
+
+		heap@2 {
+			reg = <2>;
+			label = "carveout_overlay";
+			type = <2>;
+		};
+
+		heap@3 {
+			reg = <3>;
+			label = "carveout_fb";
+			type = <2>;
+			memory-region = <&fb_reserved>;
+		};
+	};
+};
+
+&iommu_ai {
+	status = "okay";
+};
+
+&uart0 {
+	status = "okay";
+};
+&uart1 {
+	status = "okay";
+};

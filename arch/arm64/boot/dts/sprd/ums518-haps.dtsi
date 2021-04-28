@@ -1,0 +1,267 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Unisoc Sharkl5Pro platform DTS file
+ *
+ * Copyright (C) 2018, Unisoc Communications Inc.
+ */
+
+#include "sharkl5Pro-haps.dtsi"
+
+/ {
+	cpus {
+		#address-cells = <2>;
+		#size-cells = <0>;
+
+		cpu-map {
+			cluster0 {
+				core0 {
+					cpu = <&CPU0>;
+				};
+			};
+			cluster1 {
+				core0 {
+					cpu = <&CPU1>;
+				};
+			};
+
+		};
+
+		CPU0: cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a55","arm,armv8";
+			reg = <0x0 0x0>;
+			enable-method = "psci";
+			cpufreq-data-v1 = <&cpufreq_clus0>;
+		};
+		CPU1: cpu@100 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a75","arm,armv8";
+			reg = <0x0 0x100>;
+			enable-method = "psci";
+		};
+
+	};
+
+	energy-costs {
+		CPU_COST_0: core-cost0 {
+			busy-cost-data = <
+				165	59		//614MHz
+				206	76		//768MHz
+				329	120		//1229MHz
+				397	156		//1482MHz
+				418	182		//1560MHz
+				460	218		//1716MHz
+				488	254		//1820MHz
+			>;
+			idle-cost-data = <
+				31		/* ACTIVE-IDLE */
+				31		/* WFI */
+				0		/* CORE_PD */
+			>;
+		};
+		CPU_COST_1: core-cost1 {
+			busy-cost-data = <
+				621	472		//1229MHz
+				748	623		//1482MHz
+				776	720		//1536MHz
+				880	897		//1742MHz
+				945	1063		//1872MHz
+				1024	1265		//2028MHz
+			>;
+			idle-cost-data = <
+				108		/* ACTIVE-IDLE */
+				108		/* WFI */
+				0		/* CORE_PD */
+			>;
+		};
+		CLUSTER_COST_0: cluster-cost0 {
+			busy-cost-data = <
+				164	1		//614MHz
+				206	2		//768MHz
+				329	3		//1229MHz
+				397	4		//1482MHz
+				412	5		//1560MHz
+				460	6		//1716MHz
+				488	7		//1820MHz
+			>;
+			idle-cost-data = <
+				0		/* ACTIVE-IDLE */
+				0		/* WFI */
+				0		/* CORE_PD */
+			>;
+		};
+		CLUSTER_COST_1: cluster-cost1 {
+			busy-cost-data = <
+				621	36		//1229MHz
+				748	40		//1482MHz
+				776	43		//1536MHz
+				880	47		//1742MHz
+				945	52		//1872MHz
+				1024	58		//2028MHz
+			>;
+			idle-cost-data = <
+				45		/* ACTIVE-IDLE */
+				45		/* WFI */
+				45		/* CORE_PD */
+			>;
+		};
+	};
+
+	cpufreq_clus0: cpufreq-clus0 {
+		cpufreq-cluster-id = <0>;
+		cpufreq-sub-clusters =  <&cpufreq_scu>,
+				<&cpufreq_periph>,
+				<&cpufreq_gic>;
+		clock-latency = <50000>;
+		voltage-tolerance = <6413>;
+		operating-points = <
+			/* kHZ   uV */
+			1820000 1000000
+			1716000 1000000
+			1536000 1000000
+			1482000 1000000
+			1228800 800000
+			1144000 800000
+			962000  800000
+			768000  800000
+			614400  700000
+		>;
+	};
+
+	cpufreq_scu: cpufreq-scu {
+		cpufreq-cluster-id = <2>;
+		clock-latency = <50000>;
+		voltage-tolerance = <0>;
+		operating-points = <
+			/* kHz   uV */
+			1404000 1000000
+			1326000 1000000
+			1222000 1000000
+			1118000 1000000
+			1014000 800000
+			962000  800000
+			768000  800000
+			650000  800000
+			546000  700000
+		>;
+	};
+
+	cpufreq_periph: cpufreq-periph {
+		cpufreq-cluster-id = <3>;
+		clock-latency = <50000>;
+		voltage-tolerance = <0>;
+		operating-points = <
+			/* kHZ  uV */
+			768000 1000000
+			512000 800000
+			384000 800000
+			256000 800000
+			153600 700000
+		>;
+	};
+
+	cpufreq_gic: cpufreq-gic {
+		cpufreq-cluster-id = <4>;
+		clock-latency = <50000>;
+		voltage-tolerance = <0>;
+		operating-points = <
+			/* kHZ  uV */
+			512000 800000
+			384000 800000
+			256000 800000
+			192000 800000
+			153600 700000
+		>;
+	};
+
+	cpufreq_atb: cpufreq-atb {
+		cpufreq-cluster-id = <5>;
+		operating-points = <
+			/* kHZ  uV */
+			768000 1000000
+			512000 800000
+			384000 800000
+			256000 700000
+			153600 700000
+		>;
+	};
+
+	gic: interrupt-controller@12000000 {
+		compatible = "arm,gic-v3";
+		#interrupt-cells = <3>;
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+		redistributor-stride = <0x0 0x20000>;	/* 128KB stride */
+		#redistributor-regions = <1>;
+		interrupt-controller;
+		reg = <0x0 0x12000000 0 0x20000>,	/* GICD */
+			<0x0 0x12040000 0 0x100000>;	/* GICR */
+		interrupts = <1 9 4>;
+		v2m_0: v2m@0 {
+			compatible = "arm,gic-v2m-frame";
+			msi-controller;
+			reg = <0 0 0 0x1000>;
+		};
+	};
+
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <GIC_PPI 13 IRQ_TYPE_LEVEL_HIGH>, /* Physical Secure PPI */
+			<GIC_PPI 14 IRQ_TYPE_LEVEL_HIGH>, /* Physical Non-Secure PPI */
+			<GIC_PPI 11 IRQ_TYPE_LEVEL_HIGH>, /* Virtual PPI */
+			<GIC_PPI 10 IRQ_TYPE_LEVEL_HIGH>; /* Hipervisor PPI */
+		arm,no-tick-in-suspend;
+	};
+
+	 gsp: sprd-gsp {
+		compatible = "sprd,gsp-r8p0-sharkl5pro";
+		name = "sprd-gsp";
+		core-cnt = <1>;
+		io-cnt = <7>;
+		cores = <&gsp_core0>;
+	};
+
+	soc {
+		apahb_gate: apahb-gate {
+			compatible = "sprd,sharkl5pro-apahb-gate";
+			sprd,syscon = <&ap_ahb_regs>; /* 0x20100000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+
+		aonapb_gate: aonapb-gate {
+			compatible = "sprd,sharkl5pro-aon-gate";
+			sprd,syscon = <&aon_apb_regs>; /* 0x327d0000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+
+		apapb_gate: apapb-gate {
+			compatible = "sprd,sharkl5pro-apapb-gate";
+			sprd,syscon = <&ap_apb_regs>; /* 0x71000000 */
+			clocks = <&ext_26m>;
+			#clock-cells = <1>;
+		};
+	};
+};
+
+&sdio0 {
+	clock-names = "sdio_clk_source", "sdio_ahb_enable";
+	clocks = <&ext_26m>, <&apapb_gate 22>;
+};
+
+&sdio1 {
+	clock-names = "sdio_clk_source", "sdio_ahb_enable";
+	clocks = <&ext_26m>, <&apapb_gate 23>;
+};
+
+&sdio2 {
+	clock-names = "sdio_clk_source", "sdio_ahb_enable";
+	clocks = <&ext_26m>, <&apapb_gate 24>;
+};
+
+&sdio3 {
+	clock-names = "sdio_clk_source", "sdio_ahb_enable";
+	clocks = <&ext_26m>, <&apapb_gate 25>;
+};

@@ -1,0 +1,15 @@
+* Spreadtrum sound audio communication driver
+
+This node models spreadtrum sound audio conmmunication driver
+
+Required properties:
+
+- compatible = "sprd,audio_sipc";
+- sprd,mailbox-core : id of audio cp
+
+Example:
+
+audio-sipc{
+	compatible = "sprd,audio_sipc";
+	sprd,mailbox-core = <5>;
+};

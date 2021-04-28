@@ -1,0 +1,27 @@
+Spreadtrum 27XX TYPEC device tree bindings
+================================================================
+
+Required properties:
+ - compatible: should be one of the following
+		"sprd,sc2730-typec"
+ - reg: physical base address of the musb and length of memory mapped region
+ - interrupt-parent: phandle for the Interrupt Controller
+ - interrupts: typec interrupt of the Interrupt Controller
+ - mode: Should specify initial typec mode
+	 (0 for DRP mode, 1 for UDP mode, 2 for DRP mode)
+ - nvmem-cells: A phandle to the calibration data provided by a nvmem device.
+ - nvmem-cell-names: Should be "cc_calib".
+
+Example:
+-------
+Board specific DT entry:
+
+	pmic_typec: typec@380 {
+		compatible = "sprd,sc27xx-typec", "sprd,sc2730-typec";
+		interrupt-parent = <&sc2730_pmic>;
+		interrupts = <8 IRQ_TYPE_LEVEL_HIGH>;
+		reg = <0x380>;
+		mode = <2>;
+		nvmem-cells = <&cc_cal>;
+		nvmem-cell-names = "cc_calib";
+	};

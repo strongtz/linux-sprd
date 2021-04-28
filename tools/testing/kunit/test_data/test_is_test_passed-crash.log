@@ -1,0 +1,33 @@
+random: get_random_bytes called from init_oops_id+0x35/0x40 with crng_init=0
+Stack:
+ 6016eed2 608cc880 60454080 71831e50
+ 601699f1 1991c23c4 a67808503c5b6530 71831de0
+ 71831dd0 71831e50 604543e0 60454500
+Call Trace:
+ [<6016eed2>] ? test_test_catches_segfault+0x12/0x80
+ [<601699f1>] ? test_run_case_catch_errors+0x1b1/0x1c0
+ [<601698a7>] ? test_run_case_catch_errors+0x67/0x1c0
+ [<60169620>] ? test_printk+0x0/0xb0
+ [<60169840>] ? test_run_case_catch_errors+0x0/0x1c0
+ [<60169a9c>] ? test_run_tests+0x9c/0x140
+ [<60169340>] ? test_vprintk+0x0/0x30
+ [<60169220>] ? test_fail+0x0/0x30
+ [<601696d0>] ? test_abort+0x0/0x170
+ [<6016eea0>] ? module_test_inittest_test_module+0x0/0x20
+ [<60001c24>] ? do_one_initcall+0x0/0x197
+ [<60001cb0>] ? do_one_initcall+0x8c/0x197
+ [<6005b570>] ? irq_to_desc+0x0/0x30
+ [<60001f6e>] ? kernel_init_freeable+0x1b3/0x27e
+ [<6005aeac>] ? printk+0x0/0x9b
+ [<601c5656>] ? kernel_init+0x26/0x160
+ [<60015152>] ? new_thread_handler+0x82/0xc0
+kunit example: example_simple_test crashed
+kunit example: example_simple_test failed
+kunit example: exiting
+kunit example: initializing
+kunit example: example_mock_test passed
+kunit example: exiting
+kunit example: all tests passed
+dummy 0-0053: hwmon0: sensor 'lm75'
+kunit lm75: lm75_test_read passed
+kunit lm75: all tests passed

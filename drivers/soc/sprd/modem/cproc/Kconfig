@@ -1,0 +1,6 @@
+
+config SPRD_CPROC
+	tristate "SPRD Communication Processor Driver"
+	default n
+	help
+	  spreadtrum modem communication processor driver.

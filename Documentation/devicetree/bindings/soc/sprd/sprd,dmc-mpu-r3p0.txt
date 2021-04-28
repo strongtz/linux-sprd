@@ -1,0 +1,73 @@
+Spreadtrum DMC MPU
+
+Required properties:
+- compatible: "sprd,dmc-mpu-r3p0".
+	There will be different IP versions for different Spreadtrum
+	SoC families. So we use specified IP to compatible different SoC.
+	e.g. sprd,dmc-mpu-r3p0 for pike2.
+- reg: Address range of dmc mpu registers.
+- sprd,ddr-interleaved: Used to indicate whether the DDR is interleaved.
+- interrupts: Should contain the bus-monitor interrupt number.
+- sprd,channel-num: Should contain DDR hardware channel number.
+- sprd,channel-names: Should contain the name of each DDR hardware channel.
+- sprd,ranges: Should contain DMC MPU monitored range address each channel.
+- sprd,chn-config: Should contain enable channel, monitor range and monitor mode.
+- sprd,id-config: Should contain DMC MPU monitored ID type, master ID and mask bits.
+- sprd,panic: Used to indicate whether panic when occurred the address violate event
+- sprd,shared-chn: Should contain the channel name which used for shared.
+- sprd,ddr-offset: The value is the offset of the AXI accessing address to
+		the DDR hardware address
+- status: Used to indicate whether open the MPU device.
+
+Configuration related macro definitions:
+/*MPU property*/
+#define ENABLE		1
+#define DISABLE		0
+#define MON_WRITE	1
+#define MON_READ	2
+#define MON_WRITEREAD	(MON_WRITE | MON_READ)
+#define MON_OUTSIDE	0
+#define MON_INSIDE	1
+
+/*ID property*/
+#define USERID	1
+#define MPUID	0
+
+Example:
+
+	dmc-mpu@300e0000 {
+		compatible = "sprd,dmc-mpu-r3p0";
+		reg = <0 0x300e0000 0 0x10000>;
+		interrupts = <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>;
+		sprd,channel-num = <8>;
+		sprd,channel-names = "MM", "GPU", "DISP",
+				"A53", "AP/VSP/GSP", "WTLCP/PUBCP",
+				"WCN/AON", "SHARED";
+		sprd,ranges = <0 0>,
+			<0 0>,
+			<0 0>,
+			<0X90000000 0X90001000>,
+			<0 0>,
+			<0x89600000 0x8EE00000>,
+			<0 0>,
+			<0X90001000 0X90002000>;
+		sprd,chn-config =
+				<DISABLE MON_INSIDE MON_WRITE>,
+				<DISABLE MON_INSIDE MON_WRITE>,
+				<DISABLE MON_INSIDE MON_WRITE>,
+				<ENABLE MON_INSIDE MON_WRITE>,
+				<ENABLE MON_INSIDE MON_WRITE>,
+				<DISABLE MON_INSIDE MON_WRITE>,
+				<DISABLE MON_INSIDE MON_WRITE>,
+				<ENABLE MON_INSIDE MON_WRITE>;
+		sprd,id-config =
+				<MPUID 0 0>, <MPUID 0 0>,
+				<MPUID 0 0>, <MPUID 0 0>,
+				<MPUID 0 0>, <MPUID 0 0>,
+				<MPUID 0 0>, <USERID 0 0>;
+		sprd,panic;
+		sprd,ddr-interleaved;
+		sprd,shared-chn = "A53";
+		sprd,ddr-offset = <0x80000000>;
+		status = "disable";
+	};

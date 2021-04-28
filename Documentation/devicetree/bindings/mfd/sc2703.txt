@@ -1,0 +1,50 @@
+Spreadtrum Communications SC2703 Charger block MFD bindings
+
+SC2703 is a high voltage, high current charger with built-in ADC GPIO and
+Flash-led functionality.
+
+======
+
+Required properties:
+- compatible : Should be "sprd,sc2703"
+- reg: I2C slave address, 0x4C.
+- interrupt-parent : Specifies the phandle of the interrupt controller to which
+  the IRQs from SC2703 are delivered to.
+- interrupts : IRQ line info for sc2703.
+- interrupt-controller: sc2703 has internal IRQs (own IRQ domain).
+  (See ../interrupt-controller/interrupts.txt for further info)
+
+======
+
+Child nodes:
+
+- sc2703-adc: See ../iio/adc/sc2703-adc.txt
+- sc2703-charger: See ../power_supply/sc2703-charger.txt
+- gpio-sc2703: See ../gpio/gpio-sc2703.txt
+
+======
+
+Example:
+
+	sc2703_pmic: pmic@4C {
+		compatible = "sprd,sc2703";
+		reg = <0x4c>;
+		interrupt-parent = <&gpio6>;
+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-controller;
+
+		adc: sc2703-adc {
+			compatible = "sprd,sc2703-adc";
+			#io-channel-cells = <1>;
+		};
+
+		gpio: sc2703-gpio {
+			compatible = "sprd,sc2703-gpio";
+			#gpio-cells = <2>;
+			gpio-controller;
+		};
+
+		sc2703-charger {
+			compatible = "sprd,sc2703-charger";
+		};
+	};

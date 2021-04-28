@@ -1,0 +1,191 @@
+/*
+ * Spreadtrum Roc1 Haps board DTS file
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+/dts-v1/;
+
+#include "ud710-haps.dtsi"
+#include "ud710-haps-mach.dtsi"
+#include "lcd/lcd_nt35597_boe_mipi_hd.dtsi"
+
+/ {
+	model = "Spreadtrum UD710 Haps Board";
+
+	compatible = "sprd,ud710-haps", "sprd,ud710";
+
+	sprd,sc-id = <710 1 0x20000>;
+
+	aliases {
+		serial0 = &uart0;
+		serial1 = &uart1;
+	};
+
+	memory: memory@80000000 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x80000000>;
+	};
+
+	chosen {
+		stdout-path = &uart1;
+		bootargs = "earlycon=sprd_serial,0x70100000,115200n8 console=ttyS1,115200n8 loglevel=8 maxcpus=1 init=/init root=/dev/mmcblk0p30 rootfstype=ext4 rw rootwait androidboot.hardware=ud710_haps androidboot.selinux=permissive printk.devkmsg=on";
+	};
+
+	ipi: interrupt-controller {
+		compatible = "android,CustomIPI";
+		#interrupt-cells = <1>;
+		interrupt-controller;
+	};
+
+	trusty {
+		compatible = "android,trusty-smc-v1";
+
+		irq {
+			compatible = "android,trusty-irq-v1";
+			interrupt-templates = <&ipi 0>,
+						<&gic 1 GIC_PPI 0>,
+						<&gic 1 GIC_SPI 0>;
+			interrupt-ranges = < 0  15 0>,
+						<16  31 1>,
+						<32 223 2>;
+		};
+
+	sprd-sysdump {
+		memory-region = <&memory>;
+		memory-region-re = <&ddrbist_reserved>, <&cp_reserved>, <&smem_reserved>;
+	};
+		virtio {
+			compatible = "android,trusty-virtio-v1";
+		};
+
+		log {
+			compatible = "android,trusty-log-v1";
+		};
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+	};
+
+	sprd-mtty {
+		compatible = "sprd,mtty";
+		sprd,name = "ttyBT";
+	};
+
+	sprd-fm {
+		compatible = "sprd,marlin3-fm";
+		sprd,name = "sprd-fm";
+	};
+
+	dvfs_dcdc_cpu0_supply: dvfs-dcdc-cpu0-supply {
+		supply-type-sel = <0x29C 0 1>;
+		top-dvfs-i2c-state = <0x88 4 0xF>;
+		voltage-grade-num = <7>;
+		voltage-grade = <0 0x28 0x260 0 0xFFFF>,
+				<1 0x2D 0x260 16 0xFFFF>,
+				<2 0x32 0x264 0 0xFFFF>,
+				<3 0x37 0x264 16 0xFFFF>,
+				<4 0x3C 0x268 0 0xFFFF>,
+				<5 0x41 0x268 16 0xFFFF>,
+				<6 0x46 0x26C 0 0xFFFF>;
+		tuning-latency-us = <200>;
+		chnl-in-i2c = <1>;
+	};
+
+	dvfs_dcdc_cpu1_supply: dvfs-dcdc-cpu1-supply {
+		supply-type-sel = <0x2A0 0 1>;
+		top-dvfs-i2c-state = <0x8C 4 0xF>;
+		voltage-grade-num = <6>;
+		voltage-grade = <0 0x4B 0x280 0 0xFFFF>,
+				<1 0x50 0x280 16 0xFFFF>,
+				<2 0x55 0x284 0 0xFFFF>,
+				<3 0x5A 0x284 16 0xFFFF>,
+				<4 0x5F 0x288 0 0xFFFF>,
+				<5 0x64 0x288 16 0xFFFF>;
+		tuning-latency-us = <200>;
+		chnl-in-i2c = <1>;
+	};
+
+};
+
+&sdio0 {
+	bus-width = <4>;
+	sprd,name = "sdio_sd";
+	sprd,sdio-adma;
+	no-sdio;
+	no-mmc;
+	status = "disabled";
+};
+
+&sdio1 {
+	bus-width = <4>;
+	sprd,name = "sdio_wifi";
+	sprd,sdio-adma;
+	no-sd;
+	no-mmc;
+	status = "disabled";
+};
+
+&sdio2 {
+	bus-width = <4>;
+	sprd,name = "sdio_wifi";
+	sprd,sdio-adma;
+	no-sd;
+	no-mmc;
+	status = "disabled";
+};
+
+&sdio3 {
+	bus-width = <8>;
+	non-removable;
+	cap-mmc-hw-reset;
+	sprd,name = "sdio_emmc";
+	no-sdio;
+	no-sd;
+	status = "okay";
+};
+
+&dpu {
+	status = "okay";
+};
+
+&iommu_dispc {
+	status = "okay";
+};
+
+&dsi {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	panel {
+		compatible = "sprd,generic-mipi-panel";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0>;
+
+		sprd,force-attached = "lcd_nt35597_boe_mipi_hd";
+		port {
+			reg = <1>;
+			panel_in: endpoint {
+				remote-endpoint = <&dphy_out>;
+			};
+		};
+	};
+};
+
+&lcd_nt35597_hd_timing0 {
+	clock-frequency = <6500000>;
+};
+
+&dphy {
+	status = "okay";
+};
+
+&vdsp {
+	status = "okay";
+};

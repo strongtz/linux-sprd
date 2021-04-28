@@ -1,0 +1,5 @@
+config SPRD_APDU
+    tristate "Spreadtrum APDU driver"
+    default n
+    help
+      Spreadtrum application protocol data unit driver Support.

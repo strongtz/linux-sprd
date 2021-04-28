@@ -1,0 +1,6 @@
+config SND_SOC_SPRD_VBC_V4
+	tristate "VBC V4"
+	depends on SPRD_AUDIO_MCDT && SPRD_AUDIO_SIPC
+	help
+	  If the chip is the series of sharkl5,
+	  set Y or M, else N.

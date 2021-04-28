@@ -1,0 +1,169 @@
+Spreadtrum PCIe controller DT description
+
+Spreadtrum PCIe host controller is based on Designware PCI core.
+It shares common functions with PCIe Designware core driver and inherits
+common properties defined in
+Documentation/devicetree/bindings/pci/designware-pci.txt.
+
+Additional properties are described here:
+
+Required properties:
+ - compatible: Should be "sprd,pcie" for RC
+	       Should be "sprd,pcie-ep" for EP
+ - num-lanes as specified in ../designware-pcie.txt
+
+HOST MODE
+=========
+ - reg: Should contain dbi, config registers location and length.
+ - reg-names: Must include the following entries:
+	      "dbi": controller configuration registers;
+	      "config": PCIe configuration space registers.
+ - #address-cells,
+   #size-cells,
+   #interrupt-cells,
+   device_type,
+   ranges,
+   interrupt-map-mask,
+   interrupt-map: as specified in ../designware-pcie.txt
+
+ - sprd,pcie-startup-syscons:
+	The global registers of pcie are used when pcie startup.
+	Each group syscon has 6 cells as follows:
+	- phandle of pcie syscon for used for pcie host controller
+	- the type of syscon:
+          0： set/clear, use regmap_update_bits() to operate these registers
+          1: not set/clear, use regmap_read() and regmap_write() to operate
+             these registers
+	- the delay value: the delay time (unit: ms) after the syscon is set
+	- register: the register to be operated by the syscon
+	- mask: the mask of the syscon register
+	- value: the value to be set to the syscon register mask
+
+ - sprd,pcie-shutdown-syscons:
+	The global registers of pcie are used when pcie shutdown.
+	This property is the same as sprd,pcie-startup-syscons.
+ - sprd,pcie-resume-syscons:
+	The global registers of pcie are used when pcie resume.
+	This property is the same as sprd,pcie-startup-syscons.
+
+ - sprd,pcie-suspend-syscons:
+	The global registers of pcie are used when pcie suspend.
+	This property is the same as sprd,pcie-startup-syscons.
+
+ - sprd,pcie-aspml1p2-syscons:
+	The global registers of pcie are used when pcie enter ASPM L1.2.
+	This property is the same as sprd,pcie-startup-syscons.
+
+ - dummy@0 and dummy@1: dummy nodes.
+	   some pcie controllers have two or more interrupt lines. one connect
+	   to ipa level2 interrupt controller (e.g. pcie legacy irq), which
+	   may belong to dummy@0. and the others connect to GIC(e.g. MSI
+	   controller), which may belong to dummy@1
+
+ - no-pcie: no pcie device.
+ - label: describe the interrupt connect to which interrupt controller
+ - interrupt-parent: specifies the phandle to the parent interrupt controller
+		     this one is cascaded from.
+ - #interrupt-cells: specifies the number of cells needed to encode an interrupt
+		     source. it may be 3 or 1.
+	-1. if the vlue of this property is 3:
+		a) the 1st cell is the interrupt type: SPI interrupt
+		b) the 2nd cell is the interrupt number for the interrupt type
+		c) the 3rd cell is the flags, it must be active high
+		   level-sensitive
+	-2 if the value of this property is 1:
+		The only value is the interrupt number
+- interrupts: as specified about #interrupt-cells
+
+DEVICE MODE
+===========
+ - reg : Three register ranges as listed in the reg-names property
+ - reg-names: "dbi" for the standard configuration registers as
+		they are locally accessed within the DIF CS space
+	       "dbi2" for the standard configuration registers as
+		they are locally accessed within the DIF CS2 space
+	       "addr_space" used to map remote RC address space
+ - num-ib-windows: number of inbound address translation windows
+ - num-ob-windows: number of outbound address translation windows
+
+Example:
+	pcie0@2b100000 {
+		compatible = "sprd,pcie", "snps,dw-pcie";
+		reg = <0x0 0x2b100000 0x0 0x2000>,
+		      <0x2 0x00000000 0x0 0x2000>;
+		reg-names = "dbi", "config";
+		#address-cells = <3>;
+		#size-cells = <2>;
+		device_type = "pci";
+		ranges = <0x01000000 0x0 0x00000000 0x2 0x00002000 0x0 0x00010000
+			  0x03000000 0x0 0x10000000 0x2 0x10000000 0x1 0xefffffff>;
+		bus-range = <0  15>;
+		num-lanes = <1>;
+		num-vectors = <256>;
+		num-viewport = <8>;
+		sprd,pcie-startup-syscons =
+			<&ipa_ahb_regs 0 0
+				REG_IPA_AHB_IPA_EB
+				MASK_IPA_AHB_PCIE2_EB
+				(0x1 << 8)>,
+			<&pmu_apb_regs 0 20
+				REG_PMU_APB_PCIE_PERST_CTRL_CFG
+				MASK_PMU_APB_REG_PCIE2_PERST_N_ASSERT
+				0>,
+			<&pmu_apb_regs 0 0
+				REG_PMU_APB_PCIE_PERST_CTRL_CFG
+				MASK_PMU_APB_PCIE2_PERST_N_AUTO_CTRL_EN
+				0x1>;
+		sprd,pcie-resume-syscons =
+			<&pmu_apb_regs 0 0
+				REG_PMU_APB_XTLBUF_PCIEH_REL_CFG
+				MASK_PMU_APB_XTLBUF_PCIEH_FRC_ON
+				(0x1 << 7)>,
+			<&pmu_apb_regs 0 0
+				REG_PMU_APB_XTLBUF_PCIEV_REL_CFG
+				MASK_PMU_APB_XTLBUF_PCIEV_FRC_ON
+				(0x1 << 7)>;
+		sprd,pcie-suspend-syscons =
+			<&pmu_apb_regs 0 0
+				REG_PMU_APB_PCIE_PERST_CTRL_CFG
+				MASK_PMU_APB_PCIE2_PERST_N_AUTO_CTRL_EN
+				0>,
+			<&pmu_apb_regs 0 20
+				REG_PMU_APB_PCIE_PERST_CTRL_CFG
+				MASK_PMU_APB_REG_PCIE2_PERST_N_ASSERT
+				(0x1 << 1)>,
+			<&ipa_ahb_regs 0 0
+				REG_IPA_AHB_IPA_EB
+				MASK_IPA_AHB_PCIE2_EB
+				0>;
+		sprd,pcie-aspml1p2-syscons =
+			<&anlg_pcie20_phy_regs 1 0
+				REG_ANALOG_USB30_CFGA_ANA_CFG13
+				MASK_PIPE_CFGA_ANA_CFG13_CFG_FORCE_REFCLK_EN
+				(0x1 << 23)>;
+		dummy@0 {
+			label = "parent_gic_intc";
+			interrupt-parent = <&gic>;
+			#interrupt-cells = <3>;
+			interrupts = <GIC_SPI 153 IRQ_TYPE_LEVEL_HIGH>;
+		};
+		dummy@1 {
+			label = "parent_ipa_intc";
+			interrupt-parent = <&ipa_intc>;
+			#interrupt-cells = <1>;
+			interrupts = <20>;
+		};
+		no-pcie;
+	};
+
+	pcie1@2b100000 {
+		compatible = "sprd,pcie-ep", "snps,dw-pcie";
+		reg = <0x0 0x2b100000 0x0 0x2000>,
+		      <0x0 0x2b108000 0x0 0x2000>,
+		      <0x2 0x00000000 0x2 0x00000000>;
+		reg-names = "dbi", "dbi2","addr_space";
+		interrupts = <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>;
+		num-lanes = <1>;
+		num-ib-windows = <6>;
+		num-ob-windows = <8>;
+	};

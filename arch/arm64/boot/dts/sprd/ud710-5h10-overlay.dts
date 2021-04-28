@@ -1,0 +1,62 @@
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	fragment {
+		target-path = "/";
+		__overlay__ {
+
+			gpio-keys {
+				compatible = "gpio-keys";
+
+				key-volumedown {
+					label = "Volume Down Key";
+					linux,code = <KEY_VOLUMEDOWN>;
+					gpios = <&ap_gpio 124 GPIO_ACTIVE_LOW>;
+					debounce-interval = <2>;
+					wakeup-source;
+				};
+
+				key-volumeup {
+					label = "Volume Up Key";
+					linux,code = <KEY_VOLUMEUP>;
+					gpios = <&pmic_eic 4 GPIO_ACTIVE_HIGH>;
+					debounce-interval = <2>;
+					wakeup-source;
+				};
+
+				key-power {
+					label = "Power Key";
+					linux,code = <KEY_POWER>;
+					gpios = <&pmic_eic 1 GPIO_ACTIVE_LOW>;
+					debounce-interval = <2>;
+					wakeup-source;
+				};
+			};
+
+			fingerprint@0 {
+				compatible = "microarray,afs121";
+				fpint-gpios = <&eic_async 29 0>;
+			};
+		};
+	};
+};
+
+&i2c2 {
+	status = "okay";
+	clock-frequency = <100000>;
+	lt9611-i2c@3b {
+		compatible = "lt9611,i2c";
+		test-node = "0937";
+		reg = <0x3b>;
+	};
+};
+
+&ddr_dfs {
+	sprd-scene = "boost", "lcdon", "lcdoff", "camlow",
+		"camhigh", "camveryhigh";
+	sprd-freq = <1333 667 256 384 667 1333>;
+};

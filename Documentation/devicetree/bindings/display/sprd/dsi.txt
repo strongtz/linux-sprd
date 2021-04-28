@@ -1,0 +1,98 @@
+Spreadtrum MIPI DSI Master
+=============================================================================
+
+Required properties:
+  - compatible: value should be "sprd,dsi-host";
+  - reg: physical base address and length of the registers set for the device
+  - interrupts: should contain DSI interrupt
+  - clocks: list of clock specifiers, must contain an entry for each required
+	    entry in clock-names
+  - clock-names: list of clock names sorted in the same order as the clocks
+                 property.
+  - #address-cells, #size-cells: should be set respectively to <1> and <0>
+    according to DSI host bindings (see MIPI DSI bindings [1])
+  - sprd,ip: the IP version of the DSI controller.
+  - sprd,soc: the SoC family that contains this DSI hardware.
+
+Optional properties:
+  - power-domains: a phandle to DSIM power domain node
+
+Child nodes:
+  Should contain DSI peripheral nodes (see MIPI DSI bindings [1]).
+
+Video interfaces:
+  Device node can contain video interface port nodes according to [2].
+  The following are properties specific to those nodes:
+
+  port node inbound:
+    - reg: (required) must be 0.
+  port node outbound:
+    - reg: (required) must be 1.
+
+  endpoint node connected from DPU node (reg = 0):
+    - remote-endpoint: specifies the endpoint in DPU node.
+  endpoint node connected to D-PHY node (reg = 1):
+    - remote-endpoint: specifies the endpoint in D-PHY node.
+
+[1]: Documentation/devicetree/bindings/display/mipi-dsi-bus.txt
+[2]: Documentation/devicetree/bindings/media/video-interfaces.txt
+
+Example:
+
+SoC specific DT entry:
+
+	dsi: dsi@63100000 {
+		compatible = "sprd,dsi-host";
+		reg = <0 0x63100000 0 0x1000>;
+		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>;
+		clock-names = "clk_aon_apb_disp_eb";
+		clocks = <&clk_aon_top_gates 2>;
+		status = "disabled";
+
+		sprd,ip = "sprd,dsi-ctrl", "r3p0";
+		sprd,soc = "sharkl3";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				dsi_in: endpoint {
+					remote-endpoint = <&dpu_out>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				dsi_out: endpoint@1 {
+					remote-endpoint = <&dphy_in>;
+				};
+			};
+		};
+	};
+
+
+Board specific DT entry:
+
+	&dsi {
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		panel {
+			compatible = "sprd,generic-mipi-panel";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+
+			port {
+				reg = <1>;
+				panel_in: endpoint {
+					remote-endpoint = <&dphy_out>;
+				};
+			};
+		};
+	};
+

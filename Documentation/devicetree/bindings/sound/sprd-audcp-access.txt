@@ -1,0 +1,44 @@
+* Spreadtrum sound audio co-processor access driver
+
+This node models spreadtrum sound audio co-processor access driver
+
+Required properties:
+
+- compatible	: "sprd,agdsp-access"
+- sprd,syscon-agcp-ahb : node of audio co-processor ahb
+- sprd,syscon-pmu-apb : node of pmu apb
+- syscons : control function for access audio co-processor.
+- syscon-names : names of used syscons function
+- sprd,dst : comunicate target id of audio co-processor.
+- sprd,channel : communicate channel,
+	which is used only for ap access audio co-processor.
+	And channel number 130 is negotiated by application processor
+	and audio co-processor.
+- sprd,sipc-name : name of audio communicate module
+- sprd,mailbox-core : mailbox core for audio co-processor.
+- sprd,ddr-addr-offset : ddr address mapping offset between ap and
+	audio co-processor.
+- hwlocks : hardware lock for muti co-processor.
+- sprd,auto_agcp_access : switch of agcp auto access
+
+Example:
+agdsp-access {
+	compatible = "sprd,agdsp-access";
+	sprd,syscon-agcp-ahb = <&aon_apb_regs>;
+	sprd,syscon-pmu-apb = <&pmu_apb_regs>;
+	syscons = <&pmu_apb_regs REG_PMU_APB_SLEEP_CTRL   MASK_PMU_APB_AUDCP_DEEP_SLEEP>,
+			<&pmu_apb_regs REG_PMU_APB_SLEEP_STATUS   MASK_PMU_APB_AUDCP_SLP_STATUS>,
+			<&pmu_apb_regs REG_PMU_APB_PWR_STATUS4_DBG   MASK_PMU_APB_PD_AUDCP_SYS_STATE>,
+			<&pmu_apb_regs REG_PMU_APB_PWR_STATUS3_DBG   MASK_PMU_APB_PD_AUDCP_AUDDSP_STATE>,
+			<&aon_apb_regs REG_AON_APB_AUDCP_CTRL  MASK_AON_APB_AP_2_AUD_ACCESS_EN>;
+	syscon-names = "audcp_pmu_sleep_ctrl", "audcp_pmu_slp_status",
+		       "audcp_pmu_pwr_status4", "audcp_pmu_pwr_status3",
+		       "ap_access_ena";
+	sprd,dst = <5>;
+	sprd,channel = <130>;
+	sprd,sipc-name = "sipc0";
+	sprd,mailbox-core = <5>; /* AGDSP id */
+	sprd,ddr-addr-offset = <0x0>;
+	hwlocks = <&hwlock 11>;
+	sprd,auto_agcp_access = <0>;
+};

@@ -1,0 +1,67 @@
+#
+# SPRD Soc drivers
+#
+config SPRD_PIKE2_SLEEP
+        bool "Spreadtrum light sleep driver for pike2 processors"
+	depends on ARM_SPRD_CPUIDLE
+	help
+	  Select this to enable light sleep function for pike2 soc.
+
+config SPRD_HWFEATURE
+	bool "Spreadtrum hwfeature driver"
+	depends on ARCH_SPRD
+	help
+	  Select this to enable hwfeature property function for all platform board
+
+config SPRD_MEMDISK
+	tristate "SPRD memdisk driver"
+	depends on ARCH_SPRD
+	help
+	  This option can support sprd memdisk driver, which can use a block of
+	  DDR memory as a disk. we can load the android image to this disk when
+	  mmc driver is not ready, for example in vdk and FPGA platform.
+
+config SPRD_7SRESET
+        tristate "Spreadtrum PMIC 7s reset driver"
+	depends on ARCH_SPRD || COMPILE_TEST
+        help
+          This driver support for 7Sreset of PMIC(2731,2730,2721)
+
+config SPRD_PMIC_SYSCON
+	tristate "Spreadtrum PMIC global driver"
+	depends on MFD_SC27XX_PMIC || COMPILE_TEST
+        help
+          Enable this configuration option to enable pmic global driver.
+
+config SPRD_SYSTIMER
+	bool "Spreadtrum system timer driver (systimer/sysfrt)"
+	depends on ARCH_SPRD
+	help
+	  Support sprd system timer driver.
+
+source drivers/soc/sprd/iommu/Kconfig
+source "drivers/soc/sprd/modem/Kconfig"
+source "drivers/soc/sprd/domain/Kconfig"
+source "drivers/soc/sprd/autotest/Kconfig"
+
+config SPRD_DEBUG
+	tristate "Spreadtrum debug module"
+	depends on ARCH_SPRD
+	help
+	  Say y here to enable Debug support.
+
+config SPRD_POWER_DEBUG
+	bool "Spreadtrum power debug log"
+	depends on PM_SLEEP
+	default n
+	---help---
+	Select this to enable power debug log driver for sprd soc. This driver
+	is only used to output the power state, wakeup interrupt and some
+	specific register values log before the system enter deep sleep mode.
+	and output the power state and wakeup source information in
+	sprd_pm_thread every 30s. These logs will help to analysis system power
+	issue.
+
+source "drivers/soc/sprd/debug/Kconfig"
+source "drivers/soc/sprd/performance/Kconfig"
+source "drivers/soc/sprd/pub/Kconfig"

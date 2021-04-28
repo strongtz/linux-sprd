@@ -1,0 +1,91 @@
+Spreadtrum SC23XX platform devices.
+Spreadtrum SC2342_INTEG platform devices.
+
+This node provides properties for controlling the SPREADTRUM wireless device.
+
+Required properties:
+
+- compatible : used to match devices.
+- sprd,name : defined as being similar to the node name.
+- sprd,syscon-ap-apb: controller of wcn's apb bus.
+- sprd,ctrl-probe-num: support btwf and gnss.
+- sprd,ctrl-reg: offset of some regisers for power on.
+- sprd,ctrl-rw-offset: support some RW types of registers.
+- sprd,ctrl-type: types of registers.
+- sprd,ctrl-shutdown-reg: offset of some regisers for shutdown.
+- reg: mapping of the size of the address space.
+- memory_region: wcn reserved.
+- vddwcn-supply: power supply.
+
+Example:
+
+	wcn_btwf: cpwcn_btwf {
+		compatible = "sprd,integrate_marlin";
+		sprd,name = "wcn_btwf";
+		sprd,syscon-ap-apb = <&aon_apb_controller>;
+		sprd,ctrl-probe-num = <2>;
+		sprd,ctrl-reg = <0x1578 0x30a0 0x2100 0x20cc 0x20b0 0x157c>;
+		sprd,ctrl-rw-offset = <0x1000 0x0 0x2000 0x2000 0x2000 0x1000>;
+		sprd,ctrl-type = <0x0 0x2 0x1 0x1 0x1 0x0>;
+		sprd,ctrl-shutdown-reg = <0x257c 0x10b0>;
+		reg = <0x0 0x88000000 0x0 0x180000>;
+		memory_region = < &wcn_reserved >;
+		vddwcn-supply = <&vddcon>;
+	};
+
+	wcn_gnss: cpwcn_gnss {
+		compatible = "sprd,integrate_gnss";
+		sprd,name = "wcn_gnss";
+	};
+
+	wcn_spipe {
+		compatible = "sprd,spipe";
+
+		spipe_cpwcn {
+			sprd,name = "spipe_wcn";
+		};
+
+		 spipe_gnss {
+			 sprd,name = "sttygnss0";
+		 };
+	};
+
+	wcn_btwf: cpwcn_btwf {
+		compatible = "sprd,integrate_marlin";
+		sprd,name = "wcn_btwf";
+	};
+
+	 wcn_gnss: cpwcn_gnss {
+		compatible = "sprd,integrate_gnss";
+		sprd,name = "wcn_gnss";
+	};
+
+	wcn_wifi_cmd {
+		compatible = "sprd,swcnblk";
+		sprd,name = "wcn_wifi_cmd";
+	};
+
+	wcn_wifi_data0 {
+		compatible = "sprd,swcnblk";
+		sprd,name = "wcn_wifi_data0";
+	};
+
+	wcn_wifi_data1 {
+		compatible = "sprd,swcnblk";
+		sprd,name = "wcn_wifi_data1";
+	};
+
+	wcn_bt {
+		compatible = "sprd,wcn_internal_chip";
+		sprd,name = "ttyBT";
+	};
+
+	wcn_fm {
+		compatible = "sprd,wcn_internal_chip";
+		sprd,name = "fm";
+	};
+
+	gnss_common_ctl {
+		compatible = "sprd,gnss_common_ctl";
+		sprd,name = "gnss_common_ctl";
+	};

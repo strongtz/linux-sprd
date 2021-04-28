@@ -1,0 +1,38 @@
+Unisoc sipa-eth bindings
+
+This is only for virtual network interface controller that dealing with ipa data transferring.
+
+Required properties:
+- compatible: Must be "sprd,sipa_eth".
+- sprd,netid: index for SIPA NIC interface
+- sprd,term-type: names for the various IPA srouce / destination ID
+- sprd,mac-header: a bool to indicate a skb has to pull its mac header or not
+
+Example:
+
+aliases {
+	eth0 = &sipa_eth0;
+	...
+	eth8 = &sipa_eth8;
+};
+
+sipa_eth8:  sipa-wifi {
+	compatible = "sprd,sipa_eth";
+	sprd,netid = <0>;
+	sprd,term-type = <0x2>;
+};
+
+On Roc1+Orca platform:
+sipa_eth0: sipa-eth0 {
+	compatible = "sprd,sipa_eth";
+	sprd,netid = <1>;
+	sprd,term-type = <0x6>;
+};
+
+On Orca CPE platform:
+sipa_eth0: sipa-eth0 {
+	compatible = "sprd,sipa_eth";
+	sprd,netid = <1>;
+	sprd,term-type = <0x6>;
+	sprd,mac-header;
+};

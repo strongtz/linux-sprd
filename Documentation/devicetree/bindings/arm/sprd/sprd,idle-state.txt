@@ -1,0 +1,32 @@
+SPRD Idle States for cpuidle driver
+
+The devicetree representation of the idle state should be -
+
+Required properties:
+
+- compatible: Must be -
+	 "sprd,pike2-idle-state".
+
+Other required and optional properties are specified in
+Documentation/devicetree/bindings/arm/idle-states.txt
+
+Example:
+
+	idle-states {
+		LIGHT_SLEEP: light_sleep {
+			compatible = "sprd,pike2-idle-state";
+			entry-latency-us = <1000>;
+			exit-latency-us = <700>;
+			min-residency-us = <2500>;
+			local-timer-stop;
+			arm,psci-suspend-param = <0x00010002>;
+		};
+		HEAVY_SLEEP: heavy_sleep {
+			compatible = "sprd,pike2-idle-state";
+			entry-latency-us = <1000>;
+			exit-latency-us = <1000>;
+			min-residency-us = <3000>;
+			local-timer-stop;
+			arm,psci-suspend-param = <0x01010003>;
+		};
+	};

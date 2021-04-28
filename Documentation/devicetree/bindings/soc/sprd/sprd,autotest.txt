@@ -1,0 +1,11 @@
+Spreadtrum autotest bindings
+
+Required properties:
+- compatible: "sprd,autotest".
+- sprd,pinctrl: Specify the phandle of pin controller.
+
+Example:
+autotest: autotest {
+	compatible = "sprd,autotest";
+	sprd,pinctrl = <&pin_controller>;
+};

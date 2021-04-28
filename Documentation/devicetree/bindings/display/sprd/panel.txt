@@ -1,0 +1,38 @@
+Spreadtrum Generic MIPI Panel
+================================================================
+
+Required properties:
+  - compatible: must be "sprd,generic-mipi-panel"
+  - reg: panel ID
+  - #address-cells, #size-cells: should be set respectively to <1> and <0>
+  - port: video port for DPI input
+
+Optional properties:
+  - timing: containing video timings
+            (Documentation/devicetree/bindings/display/panel/display-timing.txt)
+
+Example
+-------
+
+Board specific DT entry:
+
+	&dsi {
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		panel {
+			compatible = "sprd,generic-mipi-panel";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+
+			port {
+				reg = <1>;
+				panel_in: endpoint {
+					remote-endpoint = <&dphy_out>;
+				};
+			};
+		};
+	};
+

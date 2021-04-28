@@ -1,0 +1,15 @@
+#
+# Adaptive touchscreen module
+#
+
+config TOUCHSCREEN_ADAPTIVE
+    tristate "adaptive touchscreen driver"
+    depends on I2C || SPI_MASTER
+    help
+      Say Y here to use adaptive touchscreen driver.
+
+if TOUCHSCREEN_ADAPTIVE
+
+source drivers/input/touchscreen/adaptive-ts/vendors/Kconfig
+
+endif

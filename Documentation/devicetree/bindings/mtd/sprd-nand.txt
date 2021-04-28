@@ -1,0 +1,35 @@
+* Spreadtrum Nand Host Controller
+
+The Spreadtrum Nand Host Controller provides an interface for Nand.
+This file documents differences between the coreproperties described by Nand.txt
+and the properties used by the Spreadtrum Nand driver.
+
+Required properties:
+- compatible:
+ should be "sprd,orca-nandc"
+ in order to compatible with Nand controller version
+- reg: Registers location and length
+- interrupts: exactly one interrupt specifier
+- sprd,random-mode: if set, nandc will enable randomizer on IO data trans;
+- clocks: Freq of source clk of nand controller ECC and ahb enable or disable
+Example:
+
+nandc: nand-controller@21300000 {
+	compatible = "sprd,orca-nandc";
+	reg = reg = <0 0x21300000 0 0x1000>;
+	interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
+	sprd,random-mode;
+	clock-names = "nandc_clk","nandc_ecc_clk","nandc_parent_sdr",
+		"nandc_parent_ddr","nandc_ahb_enable","nandc_ecc_enable",
+		"nandc_26m_enable","nandc_1x_enable","nandc_2x_enable";
+	clocks = <&aon_clk CLK_NANDC_2X>,
+		 <&ap_clk CLK_NANDC_ECC>,
+		 <&g3_pll CLK_TWPLL_219M4>,
+		 <&g3_pll CLK_TWPLL_307M2>,
+		 <&apahb_gate CLK_NANDC_EB>,
+		 <&apahb_gate CLK_NANDC_ECC_EB>,
+		 <&apahb_gate CLK_NANDC_26M_EB>,
+		 <&aonapb_gate CLK_NANDC_1X_EN>,
+		 <&aonapb_gate CLK_NANDC_2X_EN>;
+	status = "disabled";
+};

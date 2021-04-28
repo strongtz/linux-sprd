@@ -1,0 +1,36 @@
+Spreadtrum SC2703 battery charger binding
+
+Required properties:
+ - compatible: Should be "sprd,sc2703-charger".
+ - reg: Address offset of charger register.
+ - phys: Contains a phandle to the USB phy.
+ - vddvbus: Provide a handle to the usb module to operate vbus otg.
+Optional Properties:
+- monitored-battery: phandle of battery characteristics devicetree node.
+  The charger uses the following battery properties:
+- charge-term-current-microamp: current for charge termination phase.
+- constant-charge-voltage-max-microvolt: maximum constant input voltage.
+  See Documentation/devicetree/bindings/power/supply/battery.txt
+- sprd,long-key-detection: the long key power on configuration option, if
+  configured, press 15s the internal battery will disconnect.
+
+Example:
+
+	bat: battery {
+		compatible = "simple-battery";
+		charge-term-current-microamp = <120000>;
+		constant-charge-voltage-max-microvolt = <4350000>;
+		......
+	};
+
+	sc2703-charger {
+		compatible = "sprd,sc2703-charger";
+		reg = <0x4c>;
+		phys = <&ssphy>;
+		monitored-battery = <&bat>;
+		sprd,long-key-detection;
+		vddvbus:otg-vbus {
+			regulator-name = "vddvbus";
+			regulator-ramp-delay = <25000>;
+		};
+	};

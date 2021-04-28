@@ -1,0 +1,44 @@
+* Spreadtrum cpu dai driver
+
+This node models spreadtrum cpu dai driver of vbc
+
+Required properties:
+
+- compatible : "sprd,sharkl5-vbc", "sprd,roc1-vbc", "sprd,sharkl5pro-vbc"
+- pinctrl-N : One property must exist for each entry in
+	pinctrl-names.  See ../pinctrl/sprd,sc9860-pinctrl.txt
+	for details of the property values.
+- pinctrl-names : vbc iis select port
+- reg : registor address and size of vbc
+- sprd,syscon-agcp-ahb : audio cp ahb node
+- sprd,vbc-phy-offset : vbc address mapping offset of ap and agdsp
+	used for transform agcp addr from ap addrss of vbc.
+- #sound-dai-cells : it used to select vbc cpu dai number,
+    if equal 0 means use default dai 0, if equal 1,
+    the cpu dai number is determined by the second parameter
+    of sound-dai property.
+Example:
+vbc@33480000 {
+	compatible = "sprd,sharkl5-vbc";
+	#sound-dai-cells = <1>;
+	reg = <0 0x33480000 0 0x1000>;
+	sprd,syscon-agcp-ahb = <&audcp_ahb_regs>;
+	sprd,vbc-phy-offset = <0x32000000>;
+	/* iis pin map */
+	pinctrl-names =
+	/* iis interface 0 */
+	"vbc_iis3_0", "vbc_iism0_0",
+	"vbc_iis_to_pad", "vbc_iis_to_aon_usb";
+	pinctrl-0 = <&vbc_iis3_0>;
+	pinctrl-1 = <&vbc_iism0_0>;
+	pinctrl-2 = <&vbc_iis_to_pad>;
+	pinctrl-3 = <&vbc_iis_to_aon_usb>;
+};
+
+sprd-audio-card,dai-link@1 {
+	...
+	cpu {
+		sound-dai = <&vbc 1>;
+	};
+	...
+};

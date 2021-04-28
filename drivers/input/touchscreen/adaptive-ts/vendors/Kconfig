@@ -1,0 +1,19 @@
+#
+# Controller definitions for adaptive touchscreen
+#
+
+config TOUCHSCREEN_ADAPTIVE_VENDOR_FOCALTECH
+    tristate "Focaltech controller definition for adaptive touchscreen"
+    depends on I2C || TOUCHSCREEN_ADAPTIVE
+    help
+      Say Y here if you have a focaltech based touchscreen controller.
+
+      If unsure, say N.
+
+config TOUCHSCREEN_ADAPTIVE_VENDOR_MSTAR
+    tristate "MStar controller definition for adaptive touchscreen"
+    depends on I2C || TOUCHSCREEN_ADAPTIVE
+    help
+      Say Y here if you have a mstar based touchscreen controller.
+
+      If unsure, say N.

@@ -1,0 +1,5 @@
+config SPRD_PTM
+	bool "Spreadtrum Performance Trace Monitor Support"
+	depends on SPRD_DEBUG
+	help
+	  Say Y here to support ptm support.

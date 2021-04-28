@@ -1,0 +1,21 @@
+= Spreadtrum thermal device tree bindings =
+
+Required properties:
+- compatible : Should be "sprd,sharkl3-thermal"
+- reg : Address range of the thermal registers
+- clock-names: "enable" for thermal module enable clock.
+- clocks: Should contain a clock specifier for each entry in clock-names.
+- nvmem-cells: A phandle to the calibration data provided by a nvmem device.
+- nvmem-cell-names: Should be "cthm_sign_cal" and "cthm_ratio_cal", "thm_delta_cal".
+
+Example:
+
+cpu_thm: cpu-thm@40390000 {
+	compatible = "sprd,sharkl3-thermal";
+	reg = <0x40390000 0x10000>;
+	clock-names = "enable";
+	clocks = <&aonapb_gate CLK_THM_EB>;
+	#thermal-sensor-cells = <1>;
+	nvmem-cells = <&cthm_sign>, <&cthm_ratio>, <&cthm_delta>;
+	nvmem-cell-names = "thm_sign_cal", "thm_ratio_cal", "thm_delta_cal";
+};

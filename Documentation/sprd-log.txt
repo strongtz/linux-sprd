@@ -1,0 +1,270 @@
+SPRDLINUX LOG 编写规则
+(C) 2019 Unisoc Inc.
+
+1. 需求和目标
+
+    - 基本概念澄清：Log输出有2个层次。
+
+      -- 第1个层次是打印输出到LogBuffer。
+         LogBuffer的Log数据需要系统服务程序读出方可呈现给用户或开发者。这些服务
+         程序包括,ylog, dmesg, syslogd,journald，等
+
+      -- 第2个层次是console输出，一般就是串口输出。console的输出来源于LogBuffer，
+         但受到Console Loglevel的阀门控制。
+         Console loglevel可通过Kernel命令行参数设定，或动态设定(通过/proc/sys/
+         kernel/printk)。Console Loglevel的设定只能控制console输出，并不能影响
+         LogBuffer中的内容。也就是不会影响ylog,dmesg等服务所能获取的内容。
+
+    - 以下谈到”输出“，无特别说明，默认指LogBuffer输出，即第一层次。
+
+1.1 输出格式清理
+
+    现状：Log格式混乱、内容纷杂，不同的Module，不同的Owner都有不同的格式，亟需统
+          一。尤其是Module的名字，区段和位置需要固定，以便进行Log后处理和配额分配
+          管理。
+    目标：所有Module（对应每个owner team），统一module name输出区段位置和名称。
+          有device的driver，名字和devicetree节点一致。
+          无device或无devicetree node的，名字协商确定后备案，一经确定，原则上以后
+          便不再做修改。
+
+1.2 输出字节数量设定上限
+
+    现状：以每秒统计，最高输出字节数可高达100K以上，对系统造成了很大的负担。这么多
+          的信息输出是否真的有用？是否有效？无法一一鉴别讨论。别无他法，那么只能模
+          仿社会上的方法，限号限行限流量。
+    目标：确定合理的最高输出字节数量，各个module按比例申领字节数配额。
+          对log输出进行动态检测，超过最高流量限制的模块，给予警告。
+          需要Owner减少其打印输出数量。
+
+1.3  合理console Loglevel设定
+
+     现状：用户无法将console loglevel(后简称”loglevel")设定为3以上的任何值。串口调试
+           功能形同虚设，用户反响强烈
+     目标：user版默认loglevel为4, debug版默认loglevel为8.
+
+1.4  合理Log添加方式
+
+     现状： 任意位置任意时间任意添加
+     目标： 非常规情况的添加规则(如中断上下文,循环打印等)
+
+2. 环境准备和前置条件
+
+2.1 打印输出函数（API）基本用法详情请参考文献，见[1]. “Debugging by printing”
+
+2.1.2 dev_xxxx族函数
+    void dev_emerg(const struct device *dev, const char *fmt, ...)
+    void dev_crit(const struct device *dev, const char *fmt, ...)
+    void dev_alert(const struct device *dev, const char *fmt, ...)
+    void dev_err(const struct device *dev, const char *fmt, ...)
+    void dev_warn(const struct device *dev, const char *fmt, ...)
+    void dev_notice(const struct device *dev, const char *fmt, ...)
+    void dev_info(const struct device *dev, const char *fmt, ...)
+    宏： dev_dbg(dev, format, ...)
+
+2.1.2 pr_xxxx族宏定义
+
+    pr_fmt(....)
+    pr_emerg(....)
+    pr_alert(....)
+    pr_crit(....)
+    pr_err(....)
+    pr_warn(....)
+    pr_notice(....)
+    pr_info(....)
+    pr_cont(....)
+    pr_debug(....)
+    以及限速版：
+    pr_xxxx_once(....)
+    pr_xxxx_ratelimited(....)
+    print_hex_dump_bytes(prefix_str, prefix_type, buf, len)
+
+    设备驱动，须使用"dev_xxx族"函数。频繁输出，须使用"dev_xxx_ratelimited"后缀
+    函数。
+    非设备驱动，须使用“pr_xxx族”函数，频繁输出，须使用"pr_xxx_ratelimited"后缀
+    函数。
+    xxxx代表不同的Loglevel。
+    设备驱动调试级Log输出统一使用dev_dbg()。
+
+2.2 串口驱动需要开启DMA支持，波特率最低115200bps, 最高可支持921600bps。
+
+2.3 DYNAMIC_DEBUG宏开启，即所有sprdlinux均将此功能设为强制打开。
+    Dynamic_debug用法请参考kernel文档 [2]. "Dynamic Debug How-to"。
+    此宏开启后，dev_dbg、pr_debug、pr_debug_once、pr_debug_ratelimited 以及
+    print_hex_dump_bytes()均受dynamic_debug功能管辖。
+
+2.4 Log buffer设定
+    Sprdlinux默认Log buffer大小为2MiB,即CONFIG_LOG_BUF_SHIFT=21。
+    Kernel log buffer 大小和内存使用有关，可根据项目需求，通过diff-config调整优
+    化。但最小不能使得最早运行的Log服务无法获取到从0秒开始的Kernel Log，即用户
+    层读取log不能因logbuffer过小而有缺失。
+
+3. Kernel Log打印编写规则
+
+3.1 输出格式
+
+3.1.1 强制使用dev_xxxx函数：
+      所有Device Drivers驱动代码，在能够获取device指针的情况下，一律使用dev_xxx
+      族函数。只有在判断device指针为NULL或暂时无法获取device指针时，使用pr_族函
+      数打印输出。
+
+3.1.2 强制使用pr_xxxx函数：
+      除device driver的场合外，一律使用pr_xxx族函数。
+
+3.1.3 Log输出前缀：
+      <time-stamp> <cpu-id>[ dyndbg-format] <driver-name>[ device-name]: [log 正文]
+      (1) time-stamp: 时间戳。系统自动输出。
+      (2) cpu-id: 系统自动输出。内核升级时需要cherry-pick Qiao.Wei's patch.
+      (3) dyndbg-format: Dynamic Debug自动添加的格式，取决于dyndbg的参数设定。
+      (4) driver-name: 由module owner确定，一经确定不可擅自更改。
+          名称仅由小写英文字母、数字（但不可用于表示顺序）、连字符(不可用下划线)
+          组成。不可包含“空格”，和其他标点符号。
+          device driver 通过以下结构中的成员变量.name赋值：
+
+          static struct platform_driver sprd_platform_driver = {
+                  .driver = {
+                          .name   = "sprd-serial",
+                          ^^^^^^
+                  },
+          };
+
+          使用pr_xxx输出时，需要使用pr_fmt自行定义模板，手工包含所属driver-name。
+          注意：driver-name后应跟一个“:”。
+      (5) device-name: 根据Device Tree Node Name由系统自动合成输出（仅适用dev_xxx
+          族函数）。使用pr_xxx输出时，device name可以忽略。
+
+3.1.4 Log正文
+      (1) 只可使用英文。
+      (2) 每行输出不可超过120字节。
+      (3) 折行可使用pr_cont (注意：非SMP安全，多核不保)。
+      (4) 批量二进制数据输出，请使用print_hex_dump_bytes。
+      (5) 不应包含函数名、文件名、行号等信息。因为Dynamic Debug可以输出该信息。见
+          附件[4]补充说明。
+      (6) 内容描述必须与实际问题匹配，不能出现无效Log，或含义不明的Log。(比如有的
+          Log显示xxx error或xxx warning，但经查实际没有任何异常)
+
+3.2 Log Level的选择
+
+3.2.1 Loglevel分划原则
+      请参见[1]中的表1，细则规定如下：
+          emerg: 系统将要出现crash、或不可预期的行为、或进入不稳定状态。
+                 比如： xx资源无法释放。
+          alert: 系统将出现问题，且必须立即采取行动。
+                 比如：高温超过100摄氏度。
+          crit:  发生了较为关键的系统问题（一般位于公共内核框架中），由软件或硬件
+                 的问题引起。
+                 比如：无法分配内存。
+          err:   发生了硬件相关的错误（一般设备驱动中）。
+                 比如：写寄存器失败。
+          warn:  发生一些超出预期的状况，不是很严重，代码仍能继续向下运行，但可能
+                 会有一些潜在的问题，可能需要关注。
+                 比如：读取某用户配置参数不存在。
+          notice: 安全问题提醒，系统仍可正常运行。
+                  比如：无权限访问xx资源。
+          info:  一般性提示。
+                 比如：xx驱动初始化完成。
+          debug: 调试类信息，用于定位错误，观察代码运行状态等。（受dynamic_debug
+                 控制）
+
+3.2.2 串口Log输出设定目标
+      user / release版： loglevel = 4  即允许emerg,alert,crit,err 四个级别输出。
+      userdebug / debug版： loglevel = 8 即允许从emerg到debug所有级别log输出。
+
+4 Log配额管理
+
+4.1 配额总上限
+    Loglevel 从emerg到info (0-6) 共7个级别总log输出量不超过10000字节/秒，即每秒
+    Log输出不可超过1万个英文字母（含空格、标点符号、时间戳等）。
+
+4.2 Upstream代码log输出限额
+    不作限制，以原生代码为准。
+
+4.3 Sprdlinux主线自有代码log输出限额
+    按模块划分：见附件《sprdlinux驱动模块名称(Driver Name)总表》。
+        各模块限额用百分比p表示，计算公式：
+         M = (10000 - U) * p%
+
+         M: 模块每秒最多输出log字节数。
+         U: Upstream代码每秒产生的log字节数。
+         p: 模块限额。
+
+         模块限额根据KRG会议投票表决得出。
+
+4.4 模块log输出字节数计算方法
+    以行为单位，如此行匹配到驱动模块名称(Driver Name)，则整行字节数计入该模块名
+    下。（包含所有标点符号、时间戳、前缀、空格、回车等）
+
+5 特殊情况下的Log打印规则
+
+5.1 循环打印
+    - 位于循环体中的打印，需要考虑使用xxx_ratelimited 和 xxx_once等限速、限次打
+      印函数或宏。
+    - 如本意就是要循环打印，不可超出该模块规定配额。
+
+5.2 中断上下文打印
+    - 严格限制在中断上半部打印，打印会引起稳定性问题。见Bug#1187212。
+    - 如确有必要，同一中断上半部打印总字节数不可超过eirqoff检测上限。
+
+5.3 User层Log反写打印
+    User层反写的Kernel Log必须设定Loglevel且其值不可低于8。
+
+5.4 Log转发打印
+    转发打印Log计入代理模块配额，总配额保持不变。或通过其他渠道输出。
+
+5.5 其他渠道Log输出
+    不通过Logbuffer的Log输出打印，不受本文所述之总配额约束。
+
+5.6 宏封装转义问题
+    不提倡自行二次封装Kernel原生的打印函数或宏。对于某些模块确有需求，如同份代码
+    需兼容非Linux系统，可以进行宏封装。但封装之后的打印输出，仍需遵循本第3章描述
+    的规则条款。
+
+6. Log清理计划和管理流程
+
+6.1 存量代码Log清理计划
+      (1) Owner自查自纠。
+          仅在sprdlinux4.14上进行。
+          Haidong Yao负责提Bug追踪。截至2019年12月31日。
+      (2) Kernel统一清理。
+          在sprdlinux4.14, sprdlinux5.4分支进行。
+          自2020年1月1日起，至2020年3月内核驱动大会召开前。
+
+6.2  日常管理流程
+     自即日起，所有提交至Kernel sprdlinux4.14, sprdlinux5.4分支的Log打印代码，均需
+     按本文规则由KRG执行review +2。不符合规则代码一律不得合入。
+
+[1] https://elinux.org/Debugging_by_printing
+[2] https://www.kernel.org/doc/html/v4.14/admin-guide/dynamic-debug-howto.html
+[3] 附件： Sprdlinux驱动模块(Driver Name)名称总表
+
+模块             DRIVER-NAME         DT-NODE-NAME
+UART             sprd-serial         serial@
+I2C              sprd-i2c            i2c@
+SPI              sprd-spi            spi@
+ADI              sprd-adi            spi@
+DMA              sprd-dma            dma-controller@
+GPIO             sprd-gpio           gpio-controller@
+GPIO             sprd-pmic-eic       gpio-controller@
+GPIO             sprd-eic            gpio-controller@
+HWSpinlock       sprd-hwspinlock     hwspinlock@
+LED              sprd-bltc           led-controller@
+MMC(Upstream)    sdhci-sprd-r11      sdio@
+MMC(SPRD)        sprd-sdhcr11        sdio@
+PINCTRL          sprd-pinctrl        pinctrl@
+RTC              sprd-rtc            rtc@
+Watchdog         sprd-wdt            watchdog@
+
+[4] 附件： Dynamic Debug用法补充说明
+     - 以下为在kernel boot parameters中添加'dyndbg="+pmflt"'后产生输出节选：
+        [   36.890552] [1] mmc_core:mmc_set_initial_signal_voltage:1173:
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         Dynamic Debug自动添加的输出内容
+        sdhci-sprd-r11 20600000.sdio: Initial signal voltage of 3.3v
+
+        释义：
+            -- [1]: 线程ID=1，Init进程。
+            -- mmc_core: 模块名称。
+            -- mmc_set_initial_signal_voltage:函数名。
+            -- 1173: 行号。
+
+     - 当在调试初期希望Debug Level Log默认输出,可在kernel boot parameters中
+       设定"dyndbg="+p"'即可无条件全开。

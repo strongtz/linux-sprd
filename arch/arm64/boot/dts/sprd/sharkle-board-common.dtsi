@@ -1,0 +1,37 @@
+/*
+ * Spreadtrum SP98x0 board common DTS file
+ *
+ * Copyright (C) 2017, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+/ {
+	firmware {
+		android {
+			compatible = "android,firmware";
+
+			vbmeta {
+				compatible = "android,vbmeta";
+				parts = "vbmeta,boot,recovery,system,vendor,product";
+			};
+			fstab {
+				compatible = "android,fstab";
+				vendor {
+					compatible = "android,vendor";
+					dev = "/dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/vendor";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1";
+					fsmgr_flags = "wait,avb";
+				};
+				product {
+					compatible = "android,product";
+					dev = "/dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/product";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1";
+					fsmgr_flags = "wait,avb";
+				};
+			};
+		};
+	};
+};

@@ -1,0 +1,16 @@
+* Spreadtrum sound audio codec digital driver
+
+This node models spreadtrum sound audio codec digital driver
+
+Required properties:
+
+- compatible = "sprd,audio-codec-dig-agcp", "sprd,sharkl3-audio-codec";
+- reg : register address of codec digital
+- sprd,syscon-agcp-ahb : node of audio cp ahb
+Example:
+
+sprd_audio_codec_dig: audio-codec@33750000 {
+	compatible = "sprd,audio-codec-dig-agcp";
+	reg = <0 0x33750000 0 0x1000>;
+	sprd,syscon-agcp-ahb = <&audcp_ahb_regs>;
+};

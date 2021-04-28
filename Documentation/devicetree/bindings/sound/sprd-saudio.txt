@@ -1,0 +1,25 @@
+* Spreadtrum sound audio cp dump driver
+
+This node models spreadtrum sound audio cp dump driver
+
+Required properties:
+- compatible : "sprd,saudio"
+- sprd,saudio-dst-id : communicate target, should be 5 for pub cp
+- sprd,ctrl_channel : communicate channel id, negotiate with pub cp for ctrl command communication
+- sprd,playback_channel : communicate channel id, for sblock for playback data transfer pcm data to pubcp
+- sprd,capture_channel :  communicate channel id, for sblcok for capture to get pcm data from pubcp
+- sprd,monitor_channel :  communicate channel id, negotiate with pub cp when pub cp restart
+- sprd,device : pcm device count for playback
+- sprd,saudio-names : card names for soundcard
+
+Example:
+saudio_lte{
+	compatible = "sprd,saudio";
+	sprd,saudio-dst-id = <5>;		/* SIPC_ID_LTE */
+	sprd,ctrl_channel = <10>;		/* SMSG_CH_VBC */
+	sprd,playback_channel = <11 131>; /* SMSG_CH_PLAYBACK */
+	sprd,capture_channel = <12>;	/* SMSG_CH_CAPTURE */
+	sprd,monitor_channel = <13>;	/*SMSG_CH_MONITOR_AUDIO */
+	sprd,device = <2>;
+	sprd,saudio-names = "saudiolte";
+};

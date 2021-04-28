@@ -1,0 +1,8 @@
+config SPRD_AUDIO_MCDT
+	bool "Spreadtrum MCDT support"
+	default n
+	help
+	  MCDT(Multi-Channel Data Transfer) is a Hardware module
+	  that can be used to transfer data between AP and DSP,
+	  normally we use it transfer audio data.
+	  Say Y if your platform supports hardware MCDT.

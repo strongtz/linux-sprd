@@ -1,0 +1,77 @@
+* Spreadtrum cpu dai driver
+
+This node models spreadtrum dai driver of i2s.
+
+Required properties:
+
+- compatible : "sprd,i2s"
+- sprd,config_type : should configured as "i2s" or "pcm",
+	driver prepares 2 default configs for i2s and pcm, and this node
+	decide to use witch one.
+- sprd,slave_timeout : for slave mode, configure timeout length
+- sprd,hw_port : i2s hardware port number
+- sprd,fs : sample rate
+- sprd,bus_type : interface type
+	0 i2s, 1 pcm, different form sprd,config_type, it descripts
+	i2s interface type of i2s protocal.
+- sprd,rtx_mode : transmit-receive mod
+	0 idle, 1 receive, 2 transmit, 3 receive and transmit
+- sprd,byte_per_chan :byte count for per i2s channel
+	0 8bit, 1 16 bit, 2 32 bit, 3 32 bit
+- sprd,slave_mode : master mode or slave mode
+	0 master, 1 slave
+- sprd,lsb : msb or lsb
+	0 msb is first bit to transmit, 1 lsb is first bit to transmit
+- sprd,lrck : sync_mode
+	0 output lrck, 1 sync
+- sprd,low_for_left : lrck_inv
+	0 low_for_left, 1 high_for_left
+- sprd,clk_inv : bit clk invert
+	0 not invert, 1 invert
+- sprd,pcm_short_frame : pcm_bus_mode
+	For short frame: falling edge indicates the start of pcm word,
+	PCM_SYNC always one clock cycle long.
+	For long frame: rising edge of PCM_SYNC indicates the start of
+	pcm word. for master 8bit in one frame PCM_SYNC is 7bit long,
+	for slave PCM_SYNC is 2~7.5 long.
+- sprd,pcm_slot : pcm slot
+	pcm_slot means channel count, support 3 slots.
+	pcm data format is difficult for master and slaver, please
+	lookup iis spec.
+- sprd,pcm_cycle : pcm cycles
+	slots use how many cycle, for exsample 8bit for each slot, 3 slot, 4 cycle.
+	There will 4 8bit output, 3 8bit is valid, 1 8bit is dymmy.
+- sprd,tx_watermark : iis tx watermark for dma request or interrupt,
+	not large than 32
+- sprd,rx_watermark : iis rx watermark for dma request or interrupt,
+	not large than 32
+- sprd,i2s_compatible : i2s compatible mode
+	i2s_compatible the same bit for pcm_short_frame.
+	And for i2s bus mode we call this bit as i2s_compatible.
+
+Example:
+i2s configured as 96k 32bit
+i2s0: i2s@70c00000  {
+	compatible = "sprd,i2s";
+	reg = <0x70c00000 0x100000>;
+	sprd,dai_name = "i2s_bt_sco0";
+	sprd,hw_port = <0>;
+	sprd,syscon-ap-apb = <&ap_apb_controller>;
+	sprd,config_type = "i2s";
+	sprd,slave_timeout = <0xF11>;
+	sprd,fs = <96000>;
+	sprd,bus_type = <0>;
+	sprd,rtx_mode = <3>;
+	sprd,byte_per_chan = <2>;
+	sprd,slave_mode = <0>;
+	sprd,lsb = <0>;
+	sprd,lrck = <1>;
+	sprd,low_for_left = <0>;
+	sprd,clk_inv = <1>;
+	sprd,pcm_short_frame = <0>;
+	sprd,pcm_slot = <0x1>;
+	sprd,pcm_cycle = <1>;
+	sprd,tx_watermark = <24>;
+	sprd,rx_watermark = <24>;
+	sprd,i2s_compatible = <0>;
+};

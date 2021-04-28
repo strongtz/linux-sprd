@@ -1,0 +1,43 @@
+* Spreadtrum audio cp boot
+
+This node models spreadtrum audio cp boot function from kernel.
+
+Required properties:
+
+- compatible : "sprd,sharkl5-audcp-boot", "sprd,roc1-audcp-boot",
+	"sprd,orca-audcp-boot","sprd,sharkl5pro-audcp-boot"
+- syscons : Pmu and aon registers used for audio cp boot.
+- syscon-names : The function name for dsp boot registers.
+
+Example:
+audiocp_boot {
+	compatible = "sprd, sharkl5-audcp-boot";
+	syscons =
+		<&pmu_apb_regs REG_PMU_APB_PD_AUDCP_SYS_CFG
+		MASK_PMU_APB_PD_AUDCP_SYS_FORCE_SHUTDOWN>,
+		<&pmu_apb_regs REG_PMU_APB_PD_AUDCP_AUDDSP_CFG
+		MASK_PMU_APB_PD_AUDCP_AUDDSP_AUTO_SHUTDOWN_EN>,
+		<&pmu_apb_regs REG_PMU_APB_SLEEP_CTRL
+		MASK_PMU_APB_AUDCP_FORCE_DEEP_SLEEP>,
+		<&pmu_apb_regs REG_PMU_APB_CP_SOFT_RST
+		MASK_PMU_APB_AUDCP_AUDDSP_SOFT_RST>,
+		<&pmu_apb_regs REG_PMU_APB_CP_SOFT_RST
+		MASK_PMU_APB_AUDCP_SYS_SOFT_RST>,
+		<&pmu_apb_regs REG_PMU_APB_SOFT_RST_SEL
+		MASK_PMU_APB_SOFT_RST_SEL>,
+		<&pmu_apb_regs REG_PMU_APB_PWR_STATUS4_DBG
+		MASK_PMU_APB_PD_AUDCP_SYS_STATE>,
+		<&pmu_apb_regs REG_PMU_APB_PWR_STATUS3_DBG
+		MASK_PMU_APB_PD_AUDCP_AUDDSP_STATE>,
+		<&pmu_apb_regs REG_PMU_APB_SLEEP_STATUS
+		MASK_PMU_APB_AUDCP_SLP_STATUS>,
+		<&aon_apb_regs REG_AON_APB_AUDCP_BOOT_PROT
+		MASK_AON_APB_REG_PROT_VAL>,
+		<&aon_apb_regs REG_AON_APB_AUDCP_DSP_CTRL0
+		MASK_AON_APB_AUDCP_DSP_BOOT_VECTOR>,
+		<&aon_apb_regs REG_AON_APB_AUDCP_DSP_CTRL1
+		MASK_AON_APB_AUDCP_DSP_BOOT>;
+	syscon-names = "sysshutdown", "coreshutdown", "deepsleep", "corereset",
+		"sysreset", "reset_sel", "sysstatus", "corestatus", "sleepstatus",
+		"bootprotect", "bootvector", "bootaddress_sel";
+};

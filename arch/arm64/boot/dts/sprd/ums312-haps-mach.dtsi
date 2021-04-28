@@ -1,0 +1,145 @@
+/*
+ * Spreadtrum Sharkl5 board common DTS file
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+#include "lcd/lcd_dummy_mipi.dtsi"
+
+/ {
+	firmware {
+		android {
+			compatible = "android,firmware";
+
+			vbmeta {
+				compatible = "android,vbmeta";
+				parts = "vbmeta,boot,recovery,system,vendor,product";
+			};
+
+			fstab {
+				compatible = "android,fstab";
+				vendor {
+					compatible = "android,vendor";
+					dev = "/dev/block/platform/soc/soc:ap-apb/71400000.sdio/by-name/vendor";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1";
+					fsmgr_flags = "wait";
+				};
+				product {
+					compatible = "android,product";
+					dev = "/dev/block/platform/soc/soc:ap-apb/71400000.sdio/by-name/product";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1";
+					fsmgr_flags = "wait";
+				};
+			};
+		};
+	};
+
+	display-subsystem {
+		compatible = "sprd,display-subsystem";
+		ports = <&dpu_port>;
+		gsp = <&gsp>;
+	};
+
+	sprd-sensorhub {
+		compatible = "sprd,sharkl5-sensorhub";
+	};
+
+	thermal-zones {
+
+		prometheus0_thmzone: prometheus0-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm0 0>;
+		};
+
+		ank1_thmzone: ank1-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm0 1>;
+		};
+
+		ank2_thmzone: ank2-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm0 2>;
+		};
+
+		prometheus1_thmzone: prometheus1-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm0 3>;
+		};
+
+		cputop_thmzone: cputop-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm1 0>;
+		};
+
+		ank0_thmzone: ank0-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm1 1>;
+		};
+
+		gpu_thmzone: gpu-thmzone {
+			polling-delay-passive = <0>;
+			polling-delay = <0>;
+			thermal-sensors = <&ap_thm2 0>;
+		};
+	};
+
+	reserved_memory: reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		ddrbist_reserved: ddrbist-mem@80000000{
+			reg = <0x0 0x80000000 0x0 0x00001000>;
+		};
+
+		aduio_reserved: audio-mem@87400000{
+			reg = <0x0 0x87400000 0x0 0x00400000>;
+		};
+
+		smem_reserved: sipc-mem@87800000{
+			reg = <0x0 0x87800000 0x0 0x00800000>;
+		};
+
+		audiodsp_reserved: audiodsp-mem@89000000 {
+			reg = <0x0 0x89000000 0x0 0x00600000>;
+		};
+
+		cp_reserved: cp-modem@89600000 {
+			reg = <0x0 0x89600000 0x0 0x04b00000>;
+		};
+
+		/* must be 64M aligned */
+		sml_reserved: sml-mem@94000000{
+			reg = <0x0 0x94000000 0x0 0x00020000>;
+		};
+
+		tos_reserved: tos-mem@94020000{
+			reg = <0x0 0x94020000 0x0 0x01fe0000>;
+		};
+
+		/* Only used for iq, will be removed in normal mode by uboot */
+		iq_reserved: iq-mem@98100000{
+			compatible = "sprd,iq-mem";
+			reg = <0x0 0x98100000 0x0 0x4000000>;
+		};
+
+		overlay_reserved: overlay-mem@bcdc0000{
+			reg = <0x0 0xbcdc0000 0x0 0x01800000>;
+		};
+
+		fb_reserved: framebuffer-mem@befc0000{
+			reg = <0x0 0xbefc0000 0x0 0x01000000>;
+		};
+	};
+
+};

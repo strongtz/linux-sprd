@@ -1,0 +1,98 @@
+
+/*
+ * R61350 Truly LCD config dtsi file for spreadtrum
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+ */
+
+/ { lcds {
+	lcd_icnl9911_txd_mipi_hdp: lcd_icnl9911_txd_mipi_hdp {
+
+		sprd,dsi-work-mode = <1>; /* video burst mode*/
+		sprd,dsi-lane-number = <4>;
+		sprd,dsi-color-format = "rgb888";
+
+		sprd,phy-bit-clock = <600000>;	/* kbps */
+		sprd,phy-escape-clock = <20000>;/* kHz */
+
+		sprd,width-mm = <68>;
+		sprd,height-mm = <121>;
+
+		sprd,esd-check-enable = <0>;
+		sprd,esd-check-mode = <0>;
+		sprd,esd-check-period = <1000>;
+		sprd,esd-check-register = <0x0A>;
+		sprd,esd-check-value = <0x9C>;
+
+		sprd,reset-on-sequence = <1 5>, <0 5>, <1 20>;
+		sprd,reset-off-sequence = <0 5>;
+
+		sprd,use-dcs-write;
+		sprd,initial-command = [
+			39 00 00 03 F0 5A 5A
+			39 00 00 03 F1 A5 A5
+			15 00 00 02 C2 00 //TE
+			//GSP
+			39 00 00 11 B0 76 54 11 11 33 33 33 33 00 01 01 76 01 01 00 00
+			//GCK
+			39 00 00 0E B1 53 D4 02 85 00 01 01 76 01 01 53 5F 5F
+			39 00 00 11 B2 37 20 05 80 65 02 08 20 30 91 22 33 44 00 18 01
+			39 00 00 11 B3 0F 00 87 10 80 26 26 C0 3F AA 33 C3 AA 30 C3 AA
+			//GOUTL (BOE: nc(1)  GCL VSD STV3 STV1 VGL CLK1 CLK3 CLK5 CLK7 GCH VDS)
+			39 00 00 0D B4 03 23 14 05 07 1B 0F 0D 13 11 24 15
+			//GOUTR (BOE: nc(1)  GCL VSD STV4 STV2 VGL CLK2 CLK4 CLK6 CLK8 GCH VDS)
+			39 00 00 0D B6 03 23 14 04 06 1B 0E 0C 12 10 24 15
+			// 39 00 00 03 B9 5a 5a //VCOM
+			39 00 00 11 BB 00 00 00 00 02 FF FD 0B 33 01 73 33 33 00 00 00
+			39 00 00 0B BC 61 03 FF DE 72 E0 2E 04 88 3E //enable GIP VGH in APO-0914
+			39 00 00 11 BD 8E 0E 78 78 15 15 46 5A 14 66 23 06 00 00 00 00 //VGMP 5.0V-0911 VGH=14V VGL=-14V
+			39 00 00 06 BE 60 60 50 60 77
+			39 00 00 0F C1 70 7C 3A 78 04 0C 10 04 2A 71 00 07 10 10
+			39 00 00 0A C3 00 00 FF 00 FF 00 00 0D 1F
+			39 00 00 09 C4 B4 A3 EE 41 04 2F 00 00
+			39 00 00 11 C5 07 1F 42 26 51 44 14 1A 04 00 0A 08 00 00 00 00
+			39 00 00 08 C6 85 01 67 01 33 00 03
+			//gamma
+			39 00 00 11 C7 7C 72 69 62 71 61 55 5C 46 5D 59 40 54 4D 5B 4B
+			39 00 00 06 C8 35 60 37 25 0C
+			39 00 00 11 C9 7C 72 69 62 71 61 55 5C 46 5D 59 40 55 4D 5B 4B
+			39 00 00 06 CA 35 60 37 25 0C
+			39 00 00 0C CB 00 00 00 01 6C 00 33 00 17 FF EF
+			39 00 00 03 F0 B4 4B
+			39 00 00 09 D0 80 0D FF 0F 63 2B 08 88
+			39 00 00 0B D2 43 0C 00 01 80 26 04 00 16 01
+			15 00 00 02 35 00
+			39 00 00 03 F0 A5 A5
+			39 00 00 03 F1 5A 5A
+			05 78 00 01 11
+			05 0A 00 01 29
+			15 00 00 02 26 01
+			];
+
+		sprd,sleep-in-command = [
+			15 0A 00 01 28
+			15 78 00 01 10
+			];
+
+		sprd,sleep-out-command = [
+			15 78 00 01 11
+			15 32 00 01 29
+			];
+
+		display-timings {
+			timing0 {
+				clock-frequency = <76800000>;
+				hactive = <720>;
+				vactive = <1520>;
+				hback-porch = <12>;
+				hfront-porch = <16>;
+				vback-porch = <58>;
+				vfront-porch = <120>;
+				hsync-len = <4>;
+				vsync-len = <4>;
+			};
+		};
+	};
+};};

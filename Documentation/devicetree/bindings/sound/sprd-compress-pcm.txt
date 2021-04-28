@@ -1,0 +1,29 @@
+* Spreadtrum sound compress offload platform driver
+
+This node models spreadtrum sound compress offload platform driver
+
+Required properties:
+
+this node allow sound use sound offload platform driver
+- compatible : "sprd,sharkl5-compress-platform", "sprd,roc1-compress-platform"
+	"sprd,sharkl5pro-compress-platform"
+- dmas : compress used dma channels
+- dma-names : dma names of dma channels
+- #sound-dai-cells : only support 0, it means use default
+    asoc platform.
+
+Example:
+sprd_compr: sprd-compr-audio {
+	#sound-dai-cells = <0>;
+	compatible = "sprd,sharkl5-compress-platform";
+	dmas = <&agcp_dma 17 &agcp_dma 18>;
+	dma-names = "compr_dma_stage0", "compr_dma_stage1";
+};
+
+sprd-audio-card,dai-link@1 {
+	...
+	plat {
+		sound-dai = <&sprd_compr>;
+    };
+	...
+};

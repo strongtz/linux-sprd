@@ -1,0 +1,24 @@
+* Spreadtrum sound routing driver
+
+This node models spreadtrum sound routing driver
+
+Required properties:
+
+this node allow sound use sound routing
+- compatible : "sprd,pcm-routing"
+- #sound-dai-cells : only support 0, it means use default
+    asoc platform.
+
+Example:
+sprd_route_pcm: sprd-routing-pcm {
+	compatible = "sprd,pcm-routing";
+	#sound-dai-cells = <0>;
+};
+
+sprd-audio-card,dai-link@10 {
+	...
+	plat {
+		sound-dai = <&sprd_route_pcm>;
+	};
+	...
+};

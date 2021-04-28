@@ -1,0 +1,28 @@
+/ { lcds {
+	lcd_lt9611_mipi_fhd: lcd_lt9611_mipi_fhd {
+
+		sprd,dsi-work-mode = <1>; /* video burst mode*/
+		sprd,dsi-lane-number = <4>;
+		sprd,dsi-color-format = "rgb888";
+
+		sprd,phy-bit-clock = <1000000>;/* kbps */
+		sprd,phy-escape-clock = <20000>;/* kHz */
+
+		sprd,width-mm = <68>;
+		sprd,height-mm = <121>;
+
+		display-timings {
+			timing0 {
+				clock-frequency = <153600000>;
+				hactive = <1920>;
+				vactive = <1080>;
+				hback-porch = <32>;
+				hfront-porch = <32>;
+				vback-porch = <16>;
+				vfront-porch = <176>;
+				hsync-len = <4>;
+				vsync-len = <10>;
+			};
+		};
+	};
+};};

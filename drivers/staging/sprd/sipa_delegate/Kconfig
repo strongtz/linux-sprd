@@ -1,0 +1,33 @@
+
+menu "SIPA delegate modules"
+config SPRD_SIPA_DELEGATE
+	bool "Enable delegate for modem side sipa"
+	default n
+	depends on SPRD_SIPA
+	help
+	  This option enables delegate for modem side sipa.
+
+config SPRD_SIPA_DELE_MINIAP_IN_AP
+	bool "Enable sipa delegate for mini ap in ap side"
+	default n
+	depends on SPRD_SIPA_DELEGATE
+	help
+	  This option enables a sipa delegate featrue in ap side.
+	  And this option enables ap to create a delegatro for mini ap.
+
+config SPRD_SIPA_DELE_AP_IN_MINIAP
+	bool "Enable sipa delegate for ap in mini ap side"
+	default n
+	depends on SPRD_SIPA_DELEGATE
+	help
+	  This option enables a sipa delegate featrue in mini ap side.
+	  And this option enables ap to create a delegatro for ap.
+
+config SPRD_SIPA_DELE_CP_IN_MINIAP
+	bool "Enable sipa delegate for cp in mini ap side"
+	default n
+	depends on SPRD_SIPA_DELEGATE
+	help
+	  This option enables a sipa delegate featrue in mini ap side.
+	  And this option enables ap to create a delegatro for cp.
+endmenu

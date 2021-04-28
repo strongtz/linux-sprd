@@ -1,0 +1,661 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Unisoc Sharkl5Pro platform DTS file
+ *
+ * Copyright (C) 2018, Unisoc Communications Inc.
+ */
+
+#include <dt-bindings/soc/sprd,sharkl5pro-regs.h>
+#include <dt-bindings/soc/sprd,sharkl5pro-mask.h>
+#include <dt-bindings/clock/sprd,sharkl5pro-clk.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+/ {
+	interrupt-parent = <&gic>;
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	soc: soc {
+		compatible = "simple-bus";
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		ap_ahb_regs: syscon@20100000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x20100000 0 0x10000>;
+		};
+
+		pub_apb_regs: syscon@31050000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x31050000 0 0x10000>;
+		};
+
+		ap_intc0_regs: syscon@32310000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32310000 0 0x10000>;
+		};
+
+		ap_intc1_regs: syscon@32320000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32320000 0 0x10000>;
+		};
+
+		ap_intc2_regs: syscon@32330000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32330000 0 0x10000>;
+		};
+
+		ap_intc3_regs: syscon@32340000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32340000 0 0x10000>;
+		};
+
+		ap_intc4_regs: syscon@32350000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32350000 0 0x10000>;
+		};
+
+		ap_intc5_regs: syscon@32360000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32360000 0 0x10000>;
+		};
+
+		anlg_phy_g0_regs: syscon@32390000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x32390000 0 0x10000>;
+		};
+
+		anlg_phy_g1_regs: syscon@323a0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323a0000 0 0x10000>;
+		};
+
+		anlg_phy_g2_regs: syscon@323b0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323b0000 0 0x10000>;
+		};
+
+		anlg_phy_g3_regs: syscon@323c0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323c0000 0 0x10000>;
+		};
+
+		anlg_phy_g4_regs: syscon@323d0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323d0000 0 0x10000>;
+		};
+
+		anlg_phy_gc_regs: syscon@323e0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323e0000 0 0x10000>;
+		};
+
+		anlg_phy_g10_regs: syscon@323f0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x323f0000 0 0x10000>;
+		};
+
+		aon_apb_regs: syscon@327d0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x327d0000 0 0x10000>;
+		};
+
+		pmu_apb_regs: syscon@327e0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x327e0000 0 0x10000>;
+		};
+
+		audcp_apb_regs: syscon@3350d000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x3350d000 0 0x1000>;
+		};
+
+		audcp_ahb_regs: syscon@335e0000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x335e0000 0 0x1000>;
+		};
+
+		gpu_apb_regs: syscon@60100000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x60100000 0 0x10000>;
+		};
+
+		mm_ahb_regs: syscon@62200000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x62200000 0 0x100000>;
+		};
+
+		ap_apb_regs: syscon@71000000 {
+			compatible = "syscon";
+			#syscon-cells = <2>;
+			reg = <0 0x71000000 0 0x10000>;
+		};
+
+		ap-apb {
+			compatible = "simple-bus";
+			#address-cells = <2>;
+			#size-cells = <2>;
+			ranges;
+
+			uart0: serial@70000000 {
+				compatible = "sprd,ums518-uart",
+					     "sprd,sc9836-uart";
+				reg = <0 0x70000000 0 0x100>;
+				interrupts = <GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH>;
+				clock-names = "enable", "uart", "source";
+				clocks = <&apapb_gate CLK_UART0_EB>;
+				status = "disabled";
+			};
+
+			uart1: serial@70100000 {
+				compatible = "sprd,ums518-uart",
+					     "sprd,sc9836-uart";
+				reg = <0 0x70100000 0 0x100>;
+				interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>;
+				clock-names = "enable", "uart", "source";
+				clocks = <&apapb_gate CLK_UART1_EB>;
+				status = "disabled";
+			};
+
+			sdio3: sdio@71400000 {
+				compatible = "sprd,sdhc-r11p1";
+				reg = <0 0x71400000 0 0x1000>;
+				interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
+				status = "disabled";
+			};
+
+			sdio0: sdio@71100000 {
+				compatible = "sprd,sdhc-r11p1";
+				reg = <0 0x71100000 0 0x1000>;
+				interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+				status = "disabled";
+			};
+
+			sdio1: sdio@71200000 {
+				compatible = "sprd,sdhc-r11p1";
+				reg = <0 0x71200000 0 0x1000>;
+				interrupts = <GIC_SPI 20 IRQ_TYPE_LEVEL_HIGH>;
+				status = "disabled";
+			};
+
+			sdio2: sdio@71300000 {
+				compatible = "sprd,sdhc-r11p1";
+				reg = <0 0x71300000 0 0x1000>;
+				interrupts = <GIC_SPI 21 IRQ_TYPE_LEVEL_HIGH>;
+				status = "disabled";
+			};
+		};
+
+		ap-ahb {
+			compatible = "simple-bus";
+			#address-cells = <2>;
+			#size-cells = <2>;
+			ranges;
+
+			dpu: dpu@20300000 {
+				compatible = "sprd,display-processor";
+				reg = <0x0 0x20300000 0x0 0x1000>;
+				/*syscons = <&ap_ahb_regs REG_AP_AHB_AHB_RST
+					MASK_AP_AHB_DISPC_SOFT_RST>;*/
+				syscon-names = "reset";
+				interrupts = <GIC_SPI 27 IRQ_TYPE_LEVEL_HIGH>;
+				status = "disabled";
+				iommus = <&iommu_dispc>;
+
+				dma-coherent;
+
+				sprd,ip = "dpu-r4p0";
+				sprd,soc = "sharkl5Pro";
+
+				dpu_port: port {
+					dpu_out: endpoint {
+						remote-endpoint = <&dsi_in>;
+					};
+				};
+			};
+
+			gsp_core0: gsp@20300000 {
+				compatible = "sprd,gsp-core";
+				reg = <0 0x20300000 0 0x2000>;
+				core-id = <0>;
+				kcfg-num = <16>;
+				interrupts = <GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>;
+				iommus = <&iommu_dispc>;
+			};
+
+			iommu_dispc: iommu@20300000 {
+				compatible = "sprd,iommuvaul5p-dispc";
+				reg = <0x0 0x20300000 0x0 0x800>,
+				      <0x0 0x20300800 0x0 0x80>;
+				iova-base = <0x30000000>;
+				iova-size = <0x10000000>;
+				reg_name = "mmu_interrupt_reg","mmu_reg";
+				status = "okay";
+				#iommu-cells = <0>;
+			};
+
+			dsi: dsi@20400000 {
+				compatible = "sprd,dsi-host";
+				reg = <0x0 0x20400000 0x0 0x1000>;
+				/*syscons = <&ap_ahb_regs REG_AP_AHB_AHB_RST
+					MASK_AP_AHB_DSI_SOFT_RST>;*/
+				syscon-names = "reset";
+				interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>,
+					<GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>;
+				status = "disabled";
+
+				sprd,ip = "sprd,dsi-ctrl", "r3p1";
+				sprd,soc = "sharkl5Pro";
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+
+					port@0 {
+						reg = <0>;
+						dsi_out: endpoint {
+							remote-endpoint = <&dphy_in>;
+						};
+					};
+
+					port@1 {
+						reg = <1>;
+						dsi_in: endpoint {
+							remote-endpoint = <&dpu_out>;
+						};
+					};
+				};
+			};
+
+			dphy: dphy {
+				compatible = "sprd,dsi-phy";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				reg = <0x0 0x20400000 0x0 0x1000>;
+				/*syscons = <&ap_ahb_regs
+					REG_AP_AHB_MISC_CKG_EN
+					(MASK_AP_AHB_DPHY_REF_CKG_EN |
+					MASK_AP_AHB_DPHY_CFG_CKG_EN)>,
+					<&pmu_apb_regs
+					REG_PMU_APB_ANALOG_PHY_PD_CFG
+					MASK_PMU_APB_DSI_PD_REG>;*/
+				syscon-names = "enable", "power";
+				status = "disabled";
+
+				sprd,ip = "sprd,megacores-sharkl5";
+				sprd,soc = "sharkl5Pro";
+
+				/* output port */
+				port@0 {
+					reg = <0>;
+					dphy_out: endpoint {
+						remote-endpoint = <&panel_in>;
+					};
+				};
+
+				/* input port*/
+				port@1 {
+					reg = <1>;
+					dphy_in: endpoint {
+						remote-endpoint = <&dsi_out>;
+					};
+				};
+			};
+		};
+
+		aon {
+			compatible = "simple-bus";
+			#address-cells = <2>;
+			#size-cells = <2>;
+			ranges;
+
+			ap_gpio: gpio@32070000 {
+				compatible = "sprd,sharkl5Pro-gpio", "sprd,sharkl5-gpio";
+				reg = <0 0x32070000 0 0x10000>;
+				gpio-controller;
+				#gpio-cells = <2>;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				interrupts = <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>;
+			};
+
+			aon_mailbox: mailbox@320a0000 {
+				compatible = "sprd,mailbox";
+				reg = <0 0x320a0000 0 0x8000>,
+				      <0 0x320a8000 0 0x8000>;
+				syscons = <&aon_apb_regs 0x4 0x4>;
+				syscon-names = "clk";
+				interrupts = <GIC_SPI 82 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 83 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 84 IRQ_TYPE_LEVEL_HIGH>;
+				sprd,sensor = <6>;
+				sprd,core-cnt = <7>;
+				sprd,version = <3>;
+			};
+
+			topdvfs_controller: topdvfsctrl@322a0000 {
+				compatible = "sprd,sharkl5pro-topdvfs", "syscon";
+				sprd,syscon-enable = <&aon_apb_regs>;
+				module-enable-cfg = <0x4 7>;
+				reg = <0 0x322a0000 0 0x8000>;
+				cpu-dcdc-cells = <&dcdc_cpu0>, <&dcdc_cpu1>;
+				device-dcdc-cells = <&dcdc_mm>, <&dcdc_modem>;
+				dcdc_cpu0: dcdc-cpu0{
+					dcdc-dvfs-enable = <0x68 20 1>;
+					dcdc-judge-vol-sw = <0x68 1 0x7 6>;
+					dcdc-subsys-tune-enable = <0x150 6 1>;
+					dcdc-supply-mode-cfg = <&dvfs_dcdc_cpu0_supply>;
+				};
+				dcdc_cpu1: dcdc-cpu1{
+					dcdc-dvfs-enable = <0x94 0 1>;
+					dcdc-judge-vol-sw = <0x138 15 0x7 5>;
+					dcdc-subsys-tune-enable = <0x150 7 1>;
+					dcdc-supply-mode-cfg = <&dvfs_dcdc_cpu1_supply>;
+				};
+				dcdc_mm: dcdc-mm {
+					dcdc-dvfs-enable = <0x18 20 1>;
+					dcdc-judge-vol-sw = <0x18 1 0x7 2>;
+					dcdc-subsys-cells = <&audcp_sys>,
+							<&gpu_sys>,
+							<&mm_sys>;
+					audcp_sys: audcp-sys {
+						dcdc-subsys-tune-enable = <0x150 5 0>;
+					};
+					gpu_sys: gpu-sys {
+						dcdc-subsys-tune-enable = <0x150 1 1>;
+					};
+
+					mm_sys: mm-sys {
+						dcdc-subsys-tune-enable = <0x150 2 0>;
+					};
+				};
+				dcdc_modem: dcdc-modem {
+					dcdc-dvfs-enable = <0x3c 20 0>;
+					dcdc-judge-vol-sw = <0x3c 1 0x7 2>;
+					dcdc-subsys-cells = <&pubcp_sys>,
+							<&wtlcp_sys>,
+							<&ap_sys>;
+					pubcp_sys: pubcp-sys {
+						dcdc-subsys-tune-enable = <0x150 4 0>;
+					};
+					wtlcp_sys: wtlcp-sys {
+						dcdc-subsys-tune-enable = <0x150 3 0>;
+					};
+					ap_sys: ap-sys {
+						dcdc-subsys-tune-enable = <0x150 0 0>;
+					};
+				};
+			};
+
+			cpudvfs_dev: cpudvfs-dev@322a8000 {
+				compatible = "sprd,sharkl5pro-cpudvfs";
+				sprd,syscon-enable = <&aon_apb_regs>;
+				module-enable-cfg = <0x4 7>;
+				topdvfs-controller = <&topdvfs_controller>;
+				reg = <0 0x322a8000 0 0x1000>;
+				mpll-cells = <&mpll_0>, <&mpll_1>, <&mpll_2>;
+				apcpu-dvfs-dcdc-cells = <&apcpu_cpu0>,
+						<&apcpu_cpu1>;
+				cpudvfs-clusters = <&lit_core_cluster>,
+						<&big_core_cluster>,
+						<&scu_cluster>,
+						<&periph_cluster>,
+						<&gic_cluster>;
+				lit_core_cluster: lit-core-cluster {
+					cluster-name = "lit-core-cluster";
+					row-num = <10>;
+					column-num = <7>;
+					work-index-cfg = <0x214 0xf>;
+					idle-index-cfg = <0x218 0xf>;
+					tuning-result-judge = <0>;
+					dcdc-name = "DCDC_CPU0";
+					map-tbl-regs = <0x60 0x64 0x68 0x6c 0x70 0x74 0x78 0x7c 0x80 0x84>;
+					column-entry-start-bit = <0 2 15 5 9 18 12>;
+					column-entry-mask = <0x3 0x7 0x7 0xf 0x7 0x7 0x7>;
+					cluster-devices = <&lit_core0_dev>,
+							<&lit_core1_dev>,
+							<&lit_core2_dev>,
+							<&lit_core3_dev>,
+							<&lit_core4_dev>,
+							<&lit_core5_dev>;
+					lit-core-dvfs-tbl = <
+							0 0 0 0 0 0 0
+							1 1 0 1 1 1 0
+							2 1 2 2 2 2 0
+							3 0 2 3 2 3 0
+							3 0 2 4 3 4 1
+							1 0 2 5 4 4 0
+							3 0 6 6 4 4 2
+							2 0 6 7 4 4 0
+							3 0 6 8 4 5 3
+							3 0 6 9 5 5 4
+							>;
+					lit_core0_dev:lit-core0-dev {
+						device-name = "cpu0";
+						sel-get = <0x38 0 3>;
+						div-get = <0x38 2 7>;
+						vol-get = <0x30 0 7>;
+
+					};
+					lit_core1_dev:lit-core1-dev {
+						device-name = "cpu1";
+						sel-get = <0x38 5 3>;
+						div-get = <0x38 7 7>;
+						vol-get = <0x30 3 7>;
+
+					};
+					lit_core2_dev:lit-core2-dev {
+						device-name = "cpu2";
+						sel-get = <0x38 10 3>;
+						div-get = <0x38 12 7>;
+						vol-get = <0x30 6 7>;
+					};
+					lit_core3_dev:lit-core3-dev {
+						device-name = "cpu3";
+						sel-get = <0x38 15 3>;
+						div-get = <0x38 17 7>;
+						vol-get = <0x30 9 7>;
+					};
+					lit_core4_dev:lit-core4-dev {
+						device-name = "cpu4";
+						sel-get = <0x40 0 3>;
+						div-get = <0x40 2 7>;
+						vol-get = <0x34 0 7>;
+					};
+					lit_core5_dev:lit-core5-dev {
+						device-name = "cpu5";
+						sel-get = <0x40 5 3>;
+						div-get = <0x40 7 7>;
+						vol-get = <0x34 3 7>;
+					};
+				};
+				big_core_cluster:big-core-cluster {
+					cluster-name = "big-core-cluster";
+					row-num = <7>;
+					column-num = <8>;
+					work-index-cfg = <0x224 0xf>;
+					idle-index-cfg = <0x228 0xf>;
+					tuning-result-judge = <0>;
+					dcdc-name = "DCDC_CPU1";
+					map-tbl-regs = <0xa0 0xa4 0xa8 0xac 0xb0 0xb4 0xb8>;
+					column-entry-start-bit = <0 2 15 5 9 18 12 21>;
+					column-entry-mask = <0x3 0x7 0x7 0xf 0x7 0x7 0x7 0x7>;
+					cluster-devices = <&big_core0_dev>,
+							<&big_core1_dev>;
+					big-core-dvfs-tbl = <
+							0 0 0 0 0 0 0 0
+							1 0 0 3 3 0 0 4
+							3 0 1 5 4 0 0 4
+							2 0 5 6 4 0 0 4
+							3 0 5 7 4 0 1 5
+							3 0 5 8 4 0 2 5
+							3 0 5 9 5 0 3 5
+							>;
+					big_core0_dev: big-core0-dev {
+						device-name = "cpu6";
+						sel-get = <0x40 10 3>;
+						div-get = <0x40 12 7>;
+						vol-get = <0x34 6 7>;
+					};
+					big_core1_dev: big-core1-dev {
+						device-name = "cpu7";
+						sel-get = <0x40 15 3>;
+						div-get = <0x40 17 7>;
+						vol-get = <0x34 9 7>;
+					};
+				};
+				scu_cluster: scu-cluster {
+					cluster-name = "scu-cluster";
+					row-num = <10>;
+					column-num = <5>;
+					work-index-cfg = <0x22C 0xf>;
+					idle-index-cfg = <0x230 0xf>;
+					dcdc-name = "DCDC_CPU0";
+					tuning-func-cfg = <0x18 1>;
+					map-tbl-regs = <0x180 0x184 0x188 0x18c 0x190 0x194 0x198 0x19c 0x1a0 0x1a4>;
+					column-entry-start-bit = <0 2 11 5 8>;
+					column-entry-mask = <0x3 0x7 0x7 0x7 0x7>;
+					cluster-devices = <&scu_dev>, <&ace_dev>;
+					scu-dvfs-tbl = <
+							0 0 0 0 0
+							3 0 0 1 0
+							3 0 2 1 1
+							1 0 2 1 0
+							3 0 2 1 2
+							3 0 2 1 3
+							3 0 6 1 4
+							3 0 6 1 5
+							3 0 6 1 6
+							3 0 6 1 7
+							>;
+					scu_dev: scu-dev {
+						device-name = "scu";
+						sel-get = <0x38 20 3>;
+						div-get = <0x38 22 7>;
+						vol-get = <0x30 12 7>;
+					};
+					ace_dev: ace-dev {
+						device-name = "ace";
+						sel-get = <0x38 20 3>;
+						div-get = <0x38 25 7>;
+						vol-get = <0x30 12 7>;
+					};
+				};
+				periph_cluster:periph-cluster {
+					cluster-name = "periph-cluster";
+					row-num = <6>;
+					column-num = <3>;
+					work-index-cfg = <0x23C 0x7>;
+					idle-index-cfg = <0x240 0x7>;
+					dcdc-name = "DCDC_CPU0";
+					tuning-func-cfg = <0x18 0>;
+					map-tbl-regs = <0x1f4 0x1f8 0x1fc 0x200 0x204 0x208>;
+					column-entry-start-bit = <0 2 5>;
+					column-entry-mask = <0x3 0x7 0x7>;
+					cluster-devices = <&periph_dev>;
+					periph-dvfs-tbl = <
+							0 0 0
+							1 0 0
+							2 1 2
+							3 1 2
+							2 0 2
+							3 0 6
+							>;
+					periph_dev: periph-dev {
+						device-name = "periph";
+						sel-get = <0x3C 0 3>;
+						div-get = <0x3C 2 7>;
+						vol-get = <0x30 18 7>;
+					};
+				};
+
+				gic_cluster: gic-cluster {
+					cluster-name = "gic-cluster";
+					row-num = <6>;
+					column-num = <3>;
+					work-index-cfg = <0x2e0 0x7>;
+					idle-index-cfg = <0x2e4 0x7>;
+					dcdc-name = "DCDC_CPU0";
+					tuning-func-cfg = <0x18 2>;
+					map-tbl-regs = <0x280 0x284 0x288 0x28c 0x290 0x294>;
+					column-entry-start-bit = <0 2 5>;
+					column-entry-mask = <0x3 0x7 0x7>;
+					cluster-devices = <&gic_dev>;
+					gic-dvfs-tbl = <
+							0 0 0
+							1 0 0
+							2 1 2
+							3 1 2
+							2 0 2
+							3 0 2
+							>;
+					gic_dev: gic-dev {
+						device-name = "gic";
+						sel-get = <0x3c 12 3>;
+						div-get = <0x3c 14 7>;
+						vol-get = <0x30 21 7>;
+					};
+				};
+
+				mpll_0: mpll-ananke{
+					sprd,syscon-ang = <&anlg_phy_g3_regs>;
+					mpll-rst = <0x98 4 6 7>;
+					relock-cfg = <0x244 1>;
+					pd-cfg = <0x244 0>;
+				};
+
+				mpll_1: mpll-prometheus{
+					sprd,syscon-ang = <&anlg_phy_g2_regs>;
+					mpll-rst = <0x44 4 6 7>;
+					relock-cfg = <0x258 1>;
+					pd-cfg = <0x258 0>;
+				};
+
+				mpll_2: mpll-scu{
+					sprd,syscon-ang = <&anlg_phy_g3_regs>;
+					mpll-rst = <0xdc 3 5 6>;
+					relock-cfg = <0x26c 1>;
+					pd-cfg = <0x26c 0>;
+				};
+
+				apcpu_cpu0: apcpu-cpu0 {
+					subsys-dcdc-vol-sw = <0x20 4 0x7 6>;
+					subsys-dvfs-state = <0x44 0 7>;
+				};
+				apcpu_cpu1: apcpu-cpu1 {
+					subsys-dcdc-vol-sw = <0x24 4 0x7 5>;
+					subsys-dvfs-state = <0x4c 0 7>;
+				};
+			};
+		};
+	};
+
+	ext_26m: ext-26m {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <26000000>;
+		clock-output-names = "ext-26m";
+	};
+};

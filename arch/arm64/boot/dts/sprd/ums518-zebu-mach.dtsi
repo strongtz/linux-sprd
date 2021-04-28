@@ -1,0 +1,58 @@
+/*
+ * Spreadtrum Sharkl5Pro board common DTS file
+ *
+ * Copyright (C) 2018, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+#include "lcd/lcd_dummy_mipi.dtsi"
+
+/ {
+	firmware {
+		android {
+			compatible = "android,firmware";
+
+			fstab {
+				compatible = "android,fstab";
+				vendor {
+					compatible = "android,vendor";
+					dev = "/dev/block/memdisk0p3";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1";
+					fsmgr_flags = "wait";
+				};
+			};
+		};
+	};
+
+	display-subsystem {
+		compatible = "sprd,display-subsystem";
+		ports = <&dpu_port>;
+		gsp = <&gsp>;
+	};
+
+	dummy-connector {
+		compatible = "sprd,dummy-connector";
+
+		display-timings {
+			timing0 {
+				clock-frequency = <192000000>;
+				hactive = <1080>;
+				vactive = <2400>;
+				hback-porch = <50>;
+				hfront-porch = <50>;
+				vback-porch = <50>;
+				vfront-porch = <50>;
+				hsync-len = <47>;
+				vsync-len = <47>;
+			};
+		};
+
+		port {
+			dummy_connector_in: endpoint {
+				remote-endpoint = <&dpu_out>;
+			};
+		};
+	};
+};

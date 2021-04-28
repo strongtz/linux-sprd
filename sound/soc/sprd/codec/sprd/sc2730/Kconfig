@@ -1,0 +1,6 @@
+config SND_SOC_SPRD_CODEC_SC2730
+	tristate #"Sprd codec sc2730"
+	#depends on PMIC_SC2730
+	select POWER_SUPPLY
+	help
+	  If the codec is the series of sc2730, set this to Y or M, else N.

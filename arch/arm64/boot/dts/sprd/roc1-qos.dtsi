@@ -1,0 +1,153 @@
+/*
+ * Spreadtrum Roc1 board common DTS file
+ *
+ * Copyright (C) 2017, Spreadtrum Communications Inc.
+ *
+ * This file is licensed under a dual GPLv2 or X11 license.
+ */
+
+
+/ { qos {
+	#address-cells=<1>;
+	#size-cells=<0>;
+	ranges;
+	gpu_qos: qos@0 {
+		reg = <0>;
+		arqos-gpu0 = [06];
+		awqos-gpu0 = [06];
+		arqos-threshold-gpu0 = [0f];
+		awqos-threshold-gpu0 = [0f];
+		arqos-gpu1 = [06];
+		awqos-gpu1 = [06];
+		arqos-threshold-gpu1 = [0f];
+		awqos-threshold-gpu1 = [0f];
+	};
+	dpu_qos: qos@1 {
+		reg = <1>;
+		awqos-high	= [0a];
+		awqos-low	= [0a];
+		arqos-high	= [0d];
+		arqos-low	= [0b];
+		arqos-threshold = [0c];
+		awqos-threshold = [0f];
+	};
+	vsp_qos: qos@2 {
+		reg = <2>;
+		awqos		= [01];
+		arqos-high	= [07];
+		arqos-low	= [01];
+	};
+	ai_qos: qos@3 {
+		reg = <3>;
+		arqos-threshold-ai = [0f];
+		awqos-threshold-ai = [0f];
+		arqos-powervr	   = [06];
+		awqos-powervr      = [06];
+		arqos-cambricon    = [06];
+		awqos-cambricon    = [06];
+	};
+	ese_qos: qos@4{
+		reg = <4>;
+		awqos-axi = [05];
+		arqos-axi = [05];
+	};
+	mm {
+		dcam_qos: qos@0 {
+			reg = <0>;
+			arqos		= [0b];
+			awqos-high	= [0d];
+			awqos-low	= [0b];
+		};
+		isp_qos: qos@1 {
+			reg = <1>;
+			awqos-high	= [0a];
+			awqos-low	= [08];
+			arqos-high	= [0a];
+			arqos-low	= [08];
+		};
+		cpp_qos: qos@2 {
+			reg = <2>;
+			awrqos		= [01];
+		};
+		fd_qos: qos@3 {
+			reg = <3>;
+			arqos		= [01];
+			awqos		= [01];
+		};
+		jpg_qos: qos@4 {
+			reg = <4>;
+			arqos-high	= [07];
+			arqos-low	= [01];
+			awqos		= [01];
+		};
+		mm_qos_threshold: qos@5 {
+			reg = <5>;
+			arqos-threshold	= [0d];
+			awqos-threshold	= [0d];
+		};
+	};
+	ap {
+		ap_qos0: qos@0 {
+			reg = <0>;
+			arqos-vdsp= [05];
+			awqos-vdsp= [05];
+			arqos-ce  = [05];
+			awqos-ce  = [05];
+			arqos-dma = [05];
+			awqos-dma = [05];
+			arqos-ufs = [06];
+			awqos-ufs = [06];
+		};
+		ap_qos1: qos@1{
+			reg = <1>;
+			arqos-sdio0 = [05];
+			awqos-sdio0 = [05];
+			arqos-sdio1 = [05];
+			awqos-sdio1 = [05];
+			arqos-sdio2 = [05];
+			awqos-sdio2 = [05];
+			arqos-emmc  = [05];
+			awqos-emmc  = [05];
+		};
+		ap_qos_threshold: qos@2 {
+			reg = <2>;
+			arqos-threshold-main  = [05];
+			awqos-threshold-main  = [05];
+			arqos-threshold-merge = [06];
+			awqos-threshold-merge = [06];
+			arqos-threshold-vdsp  = [0a];
+			awqos-threshold-vdsp  = [0a];
+		};
+	};
+	ipa {
+		mtx_qos_0: qos@0{
+			reg = <0>;
+			arqos-m0 = [09];
+			awqos-m0 = [09];
+			arqos-m1 = [09];
+			awqos-m1 = [09];
+			arqos-m2 = [09];
+			awqos-m2 = [09];
+			arqos-m3 = [09];
+			awqos-m3 = [09];
+		};
+		mtx_qos_1: qos@1{
+			reg = <1>;
+			arqos-m4 = [09];
+			awqos-m4 = [09];
+			arqos-m5 = [09];
+			awqos-m5 = [09];
+			arqos-m6 = [09];
+			awqos-m6 = [09];
+			arqos-m7 = [09];
+			awqos-m7 = [09];
+		};
+		misc_cfg: qos@2{
+			reg = <2>;
+			arqos-threshold-ipa1 = [0c];
+			awqos-threshold-ipa1 = [0c];
+			arqos-threshold-ipa2 = [0c];
+			awqos-threshold-ipa2 = [0c];
+		};
+	};
+}; };

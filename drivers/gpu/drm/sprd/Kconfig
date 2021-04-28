@@ -1,0 +1,23 @@
+config DRM_SPRD
+	tristate "DRM Support for Spreadtrum SoCs Platform"
+	depends on DRM && OF
+	select DRM_KMS_HELPER
+	select DRM_GEM_CMA_HELPER
+	select DRM_KMS_CMA_HELPER
+	select DRM_MIPI_DSI
+	select DRM_PANEL
+	select VIDEOMODE_HELPERS
+	select BACKLIGHT_CLASS_DEVICE
+	help
+	  Choose this option if you have a Spreadtrum chipsets.
+	  If M is selected the module will be called sprd-drm.
+
+#
+#SPRD DRM GSP driver
+#
+source "drivers/gpu/drm/sprd/gsp/Kconfig"
+
+config DRM_SPRD_HDMI
+	bool "SPRD DRM HDMI DRIVER"
+	help
+	  Choose this option when you need mipi switch hdmi.

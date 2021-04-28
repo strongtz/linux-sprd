@@ -1,0 +1,18 @@
+pike2 configs file architecture
+
+||basefile
+||{
+||        kernel/arch/arm/config/sprd_pike2_defconfig
+||}
+=======>||if (TARGET_BUILD_VARIANT == user)
+        ||{
+        ||        kernel/sprd-diffconfig/pike2/user_diff_config
+        ||}
+        =======>||if (PRODUCT_GO_DEVICE == go_diff_config) //pike2 is always Android go
+                ||{
+                ||        kernel/sprd-diffconfig/pike2/go_diff_config
+                ||}
+                =======>||if (BOARD_TEE_CONFIG == trusty)
+                        ||{
+                        ||        kernel/sprd-diffconfig/pike2/trusty_diff_config
+                        ||}

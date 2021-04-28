@@ -1,0 +1,46 @@
+dbg-log for Spreadtrum platforms
+
+Required properties:
+- compatible: should be one of following:
+	"sprd,dbg-log-sharkl3",
+	"sprd,dbg-log-sharkl5",
+	"sprd,dbg-log-roc1",
+	"sprd,dbg-log-orca".
+- reg: Specify the physical base address of the controller and length
+  	of memory mapped region.
+- sprd,syscon-mm-ahb:
+	use to get phy mm ahb address.
+- sprd,syscon-aon-apb:
+	use to get aon apb address.
+- sprd,syscon-dsi-apb:
+	use to get phy dsi apb address.
+- sprd,syscon-pll-apb:
+	use to get pll address.
+- sprd,ch-name:
+	channel name list of serdes function supported by hardware.
+- sprd,ch-index:
+	channel index list of serdes function supported by hardware.
+- sprd,dcfix:
+	value of dc_blnc_fix(fix DC balance issue of 8b/10b encoder). set to enable.
+- sprd,mm:
+	call sprd_cam_pw_on function to power mm on. set to enable.
+- vddio-supply:
+	To let sensor power on for MIPI SWITCH working. this property is optional.
+- mipi-switch-en-gpio:
+	enable the MIPI SWITCH
+- mipi-switch-mode-gpio:
+	select the rear camera for MIPI SWITCH
+
+Examples:
+	modem_dbg_log: modem-dbg-log@324f0000 {
+		compatible = "sprd,dbg-log-sharkl5";
+		reg = <0 0x324f0000 0 0x4000>;
+		sprd,syscon-mm-ahb = <&mm_ahb_regs>;
+		sprd,syscon-dsi-apb = <&anlg_phy_g10_regs>;
+		sprd,ch-name = "TRAINING", "WTL", "MDAR", "TPIU", "DBUS", "WCN";
+		sprd,ch-index = <15 1 0 2 3 4>;
+		sprd,dcfix;
+		sprd,mm;
+		status = "disabled";
+	};
+

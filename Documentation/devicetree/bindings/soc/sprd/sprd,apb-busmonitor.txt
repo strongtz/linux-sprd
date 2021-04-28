@@ -1,0 +1,50 @@
+Spreadtrum APB BUSMONITOR
+
+Required properties:
+- compatible: Should be one of follow:
+	"sprd,sharkl5-apb-busmonitor".
+- interrupts: Should contain the APB BUSMONITOR interrupt number.
+- reg: Address and length of APB BUSMONITOR controller register space.
+- sprd,target-addr: Should contain the target address and mask bits for the
+	matching function.
+- sprd,target-data: Should contain the target data and mask bits for the
+	matching function.
+
+Optional properties:
+- sprd,match-addr: Enable the controller to detect the match address.
+- sprd,match-data: Enable the controller to detect the match data.
+- sprd,match-addr-trigger: When the controller detect the match address, it
+	will occur interrupt.
+- sprd,match-data-trigger: When the controller detect the match data, it will
+	occur interrupt.
+- sprd,record-last-match: When the controller occur the match event, it will
+	record the last event.
+- sprd,write-detection: The controller will detect the writing address or data.
+- sprd,read-detection: The controller will detect the reading address or data.
+- sprd,record-last-hang: When the controller detect the hang event, it will
+	record the last event.
+- sprd,hang-timeout: Set a timeout threshold in terms of bus cycle to occur
+	bus hang events.
+- sprd,latest-detection: Detect the lastest bus status.
+- sprd,panic: Used to indicate whether panic when occurred bus hang or
+	match address.
+
+Example:
+apb_bm: apb-busmonitor@32370000 {
+	compatible = "sprd,sharkl5-apb-busmonitor";
+	reg = <0 0x32370000 0 0x1000>;
+	interrupts = <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>;
+	sprd,match-addr;
+	sprd,match-data;
+	sprd,match-addr-trigger;
+	sprd,match-data-trigger;
+	sprd,record-last-match;
+	sprd,write-detection;
+	sprd,read-detection;
+	sprd,target-addr = <0 0>;
+	sprd,target-data = <0 0>;
+	sprd,record-last-hang;
+	sprd,hang-timeout = <0>;
+	sprd,latest-detection;
+	sprd,panic;
+};

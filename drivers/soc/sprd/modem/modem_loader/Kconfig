@@ -1,0 +1,14 @@
+
+config SPRD_MODEM_LOADER
+	tristate "SPRD Modem Loader"
+	default n
+	help
+	  SPRD modem loader driver. It be user for modem poweron,
+	  modem image load, modem memory dump, modem boot and modem reset.
+
+config SPRD_EXT_MODEM
+	tristate "SPRD External Modem support"
+	default n
+	depends on SPRD_MODEM_LOADER
+	help
+	  This feature used to decide the modem type is external modem.

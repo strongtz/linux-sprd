@@ -1,0 +1,6 @@
+config SPRD_DMC_DRV
+	bool "Spreadtrum DMC DRV Support"
+	depends on ARCH_SPRD
+	default n
+	help
+	  Say Y here to support dmc drv.
